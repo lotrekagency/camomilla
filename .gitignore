@@ -1,0 +1,13 @@
+venv
+*.pyc
+*.zip
+.DS_Store
+*.sqlite3
+*.rdb
+.coverage
+settings_local.py
+static/
+libs/
+node_modules
+.cache
+coverage
