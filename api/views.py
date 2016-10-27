@@ -14,25 +14,9 @@ from .permissions import IsSuperUserOrReadOnly
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    permission_classes = (IsSuperUserOrReadOnly,)
+    #permission_classes = (IsSuperUserOrReadOnly,)
 
 
 class LanguageViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = LanguageSerializer
-    permission_classes = (IsSuperUserOrReadOnly,)
-
-    """@list_route(methods=['get'] )
-    def best_topics(self, request):
-        talks = Talk.objects.order_by('-votes')[:3]
-        serialized_talk = TalkSerializer(talks, many=True)
-        return Response(serialized_talk.data)
-
-    @detail_route(methods=['get', 'put'], )
-    def vote(self, request, pk=None):
-        talk = self.get_object()
-        if request.method == 'PUT':
-            talk.votes += 1
-            talk.save()
-        serialized_talk = TalkSerializer(talk)
-        return Response(serialized_talk.data)"""
