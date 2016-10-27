@@ -39,8 +39,8 @@ class Article(models.Model):
         default='DRF',
     )
     date = models.DateTimeField(auto_now=True)
-    tags = models.ManyToManyField('Tag')
-    categories = models.ManyToManyField('Category')
+    tags = models.ManyToManyField('Tag', blank=True, null=True)
+    categories = models.ManyToManyField('Category', blank=True, null=True)
 
 
 class Language(models.Model):
