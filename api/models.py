@@ -29,18 +29,29 @@ class UserProfile(models.Model):
 
 class Article(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
-    language = models.ForeignKey('Language', on_delete=models.CASCADE)
+    language = models.ForeignKey('Language', on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=200)
-    content = models.CharField(max_length=200)
+    permalink = models.CharField(max_length=200)
+    content = models.TextField()
     status = models.CharField(
         max_length=3,
         choices=CONTENT_STATUS,
         default='DRF',
     )
     date = models.DateTimeField(auto_now=True)
+    tags = models.ManyToManyField('Tag')
+    categories = models.ManyToManyField('Category')
 
 
 class Language(models.Model):
     sign = models.CharField(max_length=2, unique=True)
     name = models.CharField(max_length=200)
+
+
+class Tag(models.Model):
+    title = models.CharField(max_length=200)
+
+
+class Category(models.Model):
+    title = models.CharField(max_length=200)
 
