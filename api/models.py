@@ -49,9 +49,9 @@ class Language(models.Model):
 
 
 class Tag(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, unique=True)
 
 
 class Category(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, unique=True)
 
