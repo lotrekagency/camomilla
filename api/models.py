@@ -31,7 +31,7 @@ class Article(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
     language = models.ForeignKey('Language', on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=200)
-    permalink = models.CharField(max_length=200)
+    permalink = models.CharField(max_length=200, unique=True)
     content = models.TextField()
     status = models.CharField(
         max_length=3,

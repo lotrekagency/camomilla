@@ -15,26 +15,37 @@ from .permissions import IsSuperUserOrReadOnly
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
+    lookup_field = 'permalink'
+
+    def get_dynamic_serializer(self, request):
+        compressed = request.GET.get('compressed', False)
+        current_serializer = ExpandendArticleSerializer
+        if compressed:
+            current_serializer = ArticleSerializer
+        return current_serializer
 
     def list(self, request, *args, **kwargs):
 
         status = request.GET.get('status', None)
+
         if status:
             queryset = Article.objects.filter(status=status)
         else:
             queryset = Article.objects.all()
 
+        current_serializer = self.get_dynamic_serializer(request)
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = ExpandendArticleSerializer(page, many=True)
+            serializer = current_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = ExpandendArticleSerializer(queryset, many=True)
+        serializer = current_serializer(queryset, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
+        current_serializer = self.get_dynamic_serializer(request)
         instance = self.get_object()
-        serializer = ExpandendArticleSerializer(instance)
+        serializer = current_serializer(instance)
         return Response(serializer.data)
 
 
