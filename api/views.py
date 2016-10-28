@@ -6,9 +6,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route
 
 
-from .models import Article, Language, Tag, Category
+from .models import Article, Language, Tag, Category, Content
 from .serializers import ExpandendArticleSerializer, ArticleSerializer
-from .serializers import LanguageSerializer, TagSerializer, CategorySerializer
+from .serializers import LanguageSerializer, TagSerializer, CategorySerializer, ContentSerializer
 from .permissions import IsSuperUserOrReadOnly
 
 
@@ -46,6 +46,29 @@ class ArticleViewSet(viewsets.ModelViewSet):
         current_serializer = self.get_dynamic_serializer(request)
         instance = self.get_object()
         serializer = current_serializer(instance)
+        return Response(serializer.data)
+
+
+class ContentViewSet(viewsets.ModelViewSet):
+    queryset = Content.objects.all()
+    serializer_class = ContentSerializer
+    lookup_field = 'permalink'
+
+    def list(self, request, *args, **kwargs):
+
+        status = request.GET.get('status', None)
+
+        if status:
+            queryset = Content.objects.filter(status=status)
+        else:
+            queryset = Content.objects.all()
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = ContentSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = ContentSerializer(queryset, many=True)
         return Response(serializer.data)
 
 

@@ -43,6 +43,20 @@ class Article(models.Model):
     categories = models.ManyToManyField('Category', blank=True, null=True)
 
 
+class Content(models.Model):
+    author = models.ForeignKey(settings.AUTH_USER_MODEL)
+    title = models.CharField(max_length=200)
+    subtitle = models.CharField(max_length=200, blank=True, null=True, default='')
+    permalink = models.CharField(max_length=200, unique=True)
+    content = models.TextField()
+    status = models.CharField(
+        max_length=3,
+        choices=CONTENT_STATUS,
+        default='DRF',
+    )
+    date = models.DateTimeField(auto_now=True)
+
+
 class Language(models.Model):
     sign = models.CharField(max_length=2, unique=True)
     name = models.CharField(max_length=200)
