@@ -69,3 +69,8 @@ class Tag(models.Model):
 class Category(models.Model):
     title = models.CharField(max_length=200, unique=True)
 
+
+class Media(models.Model):
+    file = models.FileField()
+    name = models.CharField(max_length=200, blank=True, null=True)
+    dimension = models.IntegerField(default=0, blank=True, null=True)

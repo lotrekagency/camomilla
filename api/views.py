@@ -4,10 +4,11 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import detail_route, list_route
 
 
-from .models import Article, Language, Tag, Category, Content
-from .serializers import ExpandendArticleSerializer, ArticleSerializer
+from .models import Article, Language, Tag, Category, Content, Media
+from .serializers import ExpandendArticleSerializer, ArticleSerializer, MediaSerializer
 from .serializers import LanguageSerializer, TagSerializer, CategorySerializer, ContentSerializer
 from .permissions import IsSuperUserOrReadOnly
 
@@ -85,3 +86,26 @@ class TagViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+from django.http import HttpResponse
+
+# LIMIT TO GET!!!!
+class MediaViewSet(viewsets.ModelViewSet):
+    queryset = Media.objects.all()
+    serializer_class = MediaSerializer
+
+    @list_route(methods=['post'])
+    def upload(self, request):
+        Media.objects.create(
+            file=request.FILES['file_contents'],
+            name=request.POST['file_name'],
+            dimension=0
+        )
+        return HttpResponse(status_code=200)
+
+    def _handle_upload_file(file):
+        with open('some/file/name.txt', 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
+
