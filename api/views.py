@@ -52,6 +52,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
         serializer = current_serializer(instance)
         return Response(serializer.data)
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 class ContentViewSet(viewsets.ModelViewSet):
     queryset = Content.objects.all()
@@ -74,6 +77,9 @@ class ContentViewSet(viewsets.ModelViewSet):
 
         serializer = ContentSerializer(queryset, many=True)
         return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 class LanguageViewSet(viewsets.ModelViewSet):
@@ -119,7 +125,7 @@ class SitemapUrlViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'])
     def new(self, request):
-        # DELETE ALL SITEMAPS
+        SitemapUrl.objects.all().delete()
         urls = json.loads(request.POST['urls'])
         for url in urls:
             SitemapUrl.objects.create(url=url)

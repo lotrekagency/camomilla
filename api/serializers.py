@@ -18,12 +18,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ArticleSerializer(serializers.ModelSerializer):
 
+    author = serializers.CharField(read_only=True)
+
     class Meta:
         model = Article
         fields = '__all__'
 
 
 class ContentSerializer(serializers.ModelSerializer):
+
+    author = serializers.CharField(read_only=True)
 
     class Meta:
         model = Content
@@ -49,6 +53,7 @@ class ExpandendArticleSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     categories = CategorySerializer(many=True)
     language = LanguageSerializer()
+    author = serializers.CharField(read_only=True)
 
     class Meta:
         model = Article
