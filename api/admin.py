@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import Article, Language, Tag, Category, Content, Media
+from .models import Article, Language, Tag, Category, Content, Media, UserProfile
+
+
+class UserProfileAdmin(admin.ModelAdmin):
+    pass
 
 
 class ArticleAdmin(admin.ModelAdmin):
@@ -26,6 +30,7 @@ class MediaAdmin(admin.ModelAdmin):
     pass
 
 
+admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Language, LanguageAdmin)
 admin.site.register(Category, CategoryAdmin)

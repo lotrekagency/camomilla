@@ -19,7 +19,11 @@ PERMISSION_LEVELS = (
 
 
 class UserProfile(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
     level = models.CharField(
         max_length=3,
         choices=PERMISSION_LEVELS,

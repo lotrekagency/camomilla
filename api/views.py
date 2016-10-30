@@ -2,18 +2,40 @@ import json
 
 from django.shortcuts import render
 
+from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import viewsets
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.decorators import detail_route, list_route
 
 
-from .models import Article, Language, Tag, Category, Content, Media, SitemapUrl
+from .models import Article, Language, Tag, Category, Content, Media, SitemapUrl, UserProfile
 from .serializers import ExpandendArticleSerializer, ArticleSerializer, MediaSerializer
 from .serializers import LanguageSerializer, TagSerializer, CategorySerializer, ContentSerializer
 from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer
 from .permissions import IsSuperUserOrReadOnly
+
+
+class CamomillaObtainAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        try:
+            return Response(
+                {
+                    'token': token.key,
+                    'user': {
+                        'level' : user.userprofile.level,
+                        'profile_image' : '',
+                    }
+                }
+            )
+        except UserProfile.DoesNotExist:
+            return Response({'token': token.key})
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
