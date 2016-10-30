@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Article, Language, Tag, Category, Content, Media
+from .models import Article, Language, Tag, Category, Content, Media, SitemapUrl
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -53,3 +53,17 @@ class ExpandendArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = '__all__'
+
+
+class SitemapUrlSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SitemapUrl
+        fields = '__all__'
+
+
+class CompactSitemapUrlSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SitemapUrl
+        fields = ('id','url',)

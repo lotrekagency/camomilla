@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render
 
 from rest_framework.response import Response
@@ -7,9 +9,10 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework.decorators import detail_route, list_route
 
 
-from .models import Article, Language, Tag, Category, Content, Media
+from .models import Article, Language, Tag, Category, Content, Media, SitemapUrl
 from .serializers import ExpandendArticleSerializer, ArticleSerializer, MediaSerializer
 from .serializers import LanguageSerializer, TagSerializer, CategorySerializer, ContentSerializer
+from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer
 from .permissions import IsSuperUserOrReadOnly
 
 
@@ -109,3 +112,20 @@ class MediaViewSet(viewsets.ModelViewSet):
             for chunk in f.chunks():
                 destination.write(chunk)
 
+
+class SitemapUrlViewSet(viewsets.ModelViewSet):
+    queryset = SitemapUrl.objects.all()
+    serializer_class = SitemapUrlSerializer
+
+    @list_route(methods=['post'])
+    def new(self, request):
+        # DELETE ALL SITEMAPS
+        urls = json.loads(request.POST['urls'])
+        for url in urls:
+            SitemapUrl.objects.create(url=url)
+        return HttpResponse(status_code=200)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return CompactSitemapUrlSerializer
+        return SitemapUrlSerializer

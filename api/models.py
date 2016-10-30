@@ -41,6 +41,14 @@ class Article(models.Model):
     date = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('Tag', blank=True, null=True)
     categories = models.ManyToManyField('Category', blank=True, null=True)
+    description = models.TextField(blank=True, null=True, default='')
+    canonical = models.CharField(max_length=200, blank=True, null=True, default='')
+    robots = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_image = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_description = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_title = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_type = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_url = models.CharField(max_length=200, blank=True, null=True, default='')
 
 
 class Content(models.Model):
@@ -74,3 +82,16 @@ class Media(models.Model):
     file = models.FileField()
     name = models.CharField(max_length=200, blank=True, null=True)
     dimension = models.IntegerField(default=0, blank=True, null=True)
+
+
+class SitemapUrl(models.Model):
+    url = models.CharField(max_length=200, unique=True)
+    title = models.CharField(max_length=200, blank=True, null=True, default='')
+    description = models.TextField(blank=True, null=True, default='')
+    canonical = models.CharField(max_length=200, blank=True, null=True, default='')
+    robots = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_image = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_description = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_title = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_type = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_url = models.CharField(max_length=200, blank=True, null=True, default='')
