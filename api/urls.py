@@ -1,5 +1,5 @@
 from .views import ArticleViewSet, CategoryViewSet
-from .views import TagViewSet, ContentViewSet, MediaViewSet, SitemapUrlViewSet
+from .views import TagViewSet, ContentViewSet, MediaViewSet, SitemapUrlViewSet, LanguageViewSet
 
 from django.conf.urls import url, include
 from rest_framework import routers
@@ -17,4 +17,5 @@ router.register(r'sitemap', SitemapUrlViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
+    url(r'^languages/', LanguageViewSet.as_view())
 ]
