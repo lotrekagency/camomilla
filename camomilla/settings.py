@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'api'
+    'api',
+    'hvad'
 ]
 
 MIDDLEWARE = [
@@ -140,6 +141,19 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication'
     )
 }
+
+from django.utils.translation import ugettext_lazy as _
+
+LANGUAGE_CODE = 'en'
+
+LANGUAGES = (
+    ('en', _("English")),
+    ('en-us', _("US English")),
+    ('it', _('Italian')),
+    ('nl', _('Dutch')),
+    ('fr', _('French')),
+    ('es', _('Spanish')),
+)
 
 try:
     from .local_settings import *

@@ -1,22 +1,24 @@
 from rest_framework import serializers
-from .models import Article, Language, Tag, Category, Content, Media, SitemapUrl
+from .models import Article, Tag, Category, Content, Media, SitemapUrl
+
+from hvad.contrib.restframework import TranslatableModelSerializer
 
 
-class TagSerializer(serializers.ModelSerializer):
+class TagSerializer(TranslatableModelSerializer):
 
     class Meta:
         model = Tag
         fields = '__all__'
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(TranslatableModelSerializer):
 
     class Meta:
         model = Category
         fields = '__all__'
 
 
-class ArticleSerializer(serializers.ModelSerializer):
+class ArticleSerializer(TranslatableModelSerializer):
 
     author = serializers.CharField(read_only=True)
 
@@ -25,19 +27,12 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ContentSerializer(serializers.ModelSerializer):
+class ContentSerializer(TranslatableModelSerializer):
 
     author = serializers.CharField(read_only=True)
 
     class Meta:
         model = Content
-        fields = '__all__'
-
-
-class LanguageSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Language
         fields = '__all__'
 
 
@@ -48,16 +43,23 @@ class MediaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ExpandendArticleSerializer(serializers.ModelSerializer):
+class ExpandendArticleSerializer(TranslatableModelSerializer):
 
-    tags = TagSerializer(many=True)
-    categories = CategorySerializer(many=True)
-    language = LanguageSerializer()
+    tags = serializers.SerializerMethodField('get_translated_tags')
+    categories = serializers.SerializerMethodField('get_translated_categories')
     author = serializers.CharField(read_only=True)
 
     class Meta:
         model = Article
         fields = '__all__'
+
+    def get_translated_tags(self, obj):
+        tags = obj.tags
+        return TagSerializer(tags, many=True, language=self.language).data
+
+    def get_translated_categories(self, obj):
+        categories = obj.categories
+        return CategorySerializer(categories, many=True, language=self.language).data
 
 
 class SitemapUrlSerializer(serializers.ModelSerializer):

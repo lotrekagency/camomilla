@@ -3,6 +3,8 @@ from django.conf import settings
 
 from django.db import models
 
+from hvad.models import TranslatableModel, TranslatedFields
+
 
 CONTENT_STATUS = (
     ('PUB', 'Published'),
@@ -31,12 +33,14 @@ class UserProfile(models.Model):
     )
 
 
-class Article(models.Model):
+class Article(TranslatableModel):
+    translations = TranslatedFields(
+        title = models.CharField(max_length=200),
+        content = models.TextField(),
+        description = models.TextField(blank=True, null=True, default=''),
+    )
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
-    language = models.ForeignKey('Language', on_delete=models.CASCADE, blank=True, null=True)
-    title = models.CharField(max_length=200)
     permalink = models.CharField(max_length=200, unique=True)
-    content = models.TextField()
     status = models.CharField(
         max_length=3,
         choices=CONTENT_STATUS,
@@ -45,7 +49,6 @@ class Article(models.Model):
     date = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('Tag', blank=True, null=True)
     categories = models.ManyToManyField('Category', blank=True, null=True)
-    description = models.TextField(blank=True, null=True, default='')
     canonical = models.CharField(max_length=200, blank=True, null=True, default='')
     robots = models.CharField(max_length=200, blank=True, null=True, default='')
     og_image = models.CharField(max_length=200, blank=True, null=True, default='')
@@ -55,12 +58,14 @@ class Article(models.Model):
     og_url = models.CharField(max_length=200, blank=True, null=True, default='')
 
 
-class Content(models.Model):
+class Content(TranslatableModel):
+    translations = TranslatedFields(
+        title = models.CharField(max_length=200),
+        subtitle = models.CharField(max_length=200, blank=True, null=True, default=''),
+        content = models.TextField(),
+    )
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
-    title = models.CharField(max_length=200)
-    subtitle = models.CharField(max_length=200, blank=True, null=True, default='')
     permalink = models.CharField(max_length=200, unique=True)
-    content = models.TextField()
     status = models.CharField(
         max_length=3,
         choices=CONTENT_STATUS,
@@ -69,17 +74,19 @@ class Content(models.Model):
     date = models.DateTimeField(auto_now=True)
 
 
-class Language(models.Model):
-    sign = models.CharField(max_length=2, unique=True)
-    name = models.CharField(max_length=200)
+class Tag(TranslatableModel):
+    translations = TranslatedFields(
+        title = models.CharField(max_length=200, unique=True)
+    )
+
+    def __str__(self):
+        return self.safe_translation_getter('title', str(self.pk))
 
 
-class Tag(models.Model):
-    title = models.CharField(max_length=200, unique=True)
-
-
-class Category(models.Model):
-    title = models.CharField(max_length=200, unique=True)
+class Category(TranslatableModel):
+    translations = TranslatedFields(
+        title = models.CharField(max_length=200, unique=True)
+    )
 
 
 class Media(models.Model):
