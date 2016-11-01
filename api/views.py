@@ -2,6 +2,7 @@ import json
 
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.shortcuts import redirect
 
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -146,12 +147,12 @@ class MediaViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'])
     def upload(self, request):
-        Media.objects.create(
+        new_media = Media.objects.create(
             file=request.FILES['file_contents'],
             name=request.POST['file_name'],
             dimension=0
         )
-        return HttpResponse(status_code=200)
+        return redirect('media-detail', pk=new_media.pk)
 
     def _handle_upload_file(file):
         with open('some/file/name.txt', 'wb+') as destination:
@@ -169,7 +170,7 @@ class SitemapUrlViewSet(viewsets.ModelViewSet):
         urls = json.loads(request.POST['urls'])
         for url in urls:
             SitemapUrl.objects.create(url=url)
-        return HttpResponse(status_code=200)
+        return Response({})
 
     def get_serializer_class(self):
         if self.action == 'list':

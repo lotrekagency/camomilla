@@ -91,6 +91,7 @@ class Category(TranslatableModel):
 
 class Media(models.Model):
     file = models.FileField()
+    created = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200, blank=True, null=True)
     dimension = models.IntegerField(default=0, blank=True, null=True)
 

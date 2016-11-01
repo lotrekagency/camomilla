@@ -11,7 +11,7 @@ router.register(r'tags', TagViewSet)
 router.register(r'categories', CategoryViewSet)
 router.register(r'articles', ArticleViewSet)
 router.register(r'contents', ContentViewSet)
-router.register(r'media', MediaViewSet)
+router.register(r'media', MediaViewSet, 'media')
 router.register(r'sitemap', SitemapUrlViewSet)
 
 
