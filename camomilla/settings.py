@@ -40,8 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'api',
-    'hvad',
-    'dynamic_preferences'
+    'hvad'
 ]
 
 MIDDLEWARE = [
