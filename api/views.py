@@ -97,13 +97,13 @@ class ContentViewSet(viewsets.ModelViewSet):
     lookup_field = 'permalink'
 
     def list(self, request, *args, **kwargs):
-
+        user_language = self._get_user_language()
         status = request.GET.get('status', None)
 
         if status:
-            queryset = Content.objects.filter(status=status)
+            queryset = self.get_queryset().filter(status=status)
         else:
-            queryset = Content.objects.all()
+            queryset = self.get_queryset()
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -116,9 +116,13 @@ class ContentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    def _get_user_language(self):
+        return self.request.GET.get('language', 'en')
+
     def get_queryset(self):
-        user_language = self.request.GET.get('language', 'en')
-        return Content.objects.language(user_language).fallbacks().all()
+        user_language = self._get_user_language()
+        contents = Content.objects.language(user_language).fallbacks().all()
+        return contents
 
 
 class TagViewSet(viewsets.ModelViewSet):
