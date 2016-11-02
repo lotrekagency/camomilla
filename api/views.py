@@ -73,9 +73,10 @@ class ArticleViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
+        user_language = self._get_user_language()
         current_serializer = self.get_dynamic_serializer(request)
-        instance = self.get_object()
-        serializer = current_serializer(instance)
+        instance = Article.objects.get(permalink=kwargs['permalink'])
+        serializer = current_serializer(instance, language=user_language)
         return Response(serializer.data)
 
     def perform_create(self, serializer):
@@ -87,8 +88,6 @@ class ArticleViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user_language = self._get_user_language()
         articles = Article.objects.language(user_language).fallbacks().all()
-        for article in articles:
-            article.tags = article.tags.language(user_language).fallbacks().all()
         return articles
 
 
