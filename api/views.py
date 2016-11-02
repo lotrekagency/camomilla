@@ -66,17 +66,17 @@ class ArticleViewSet(viewsets.ModelViewSet):
         current_serializer = self.get_dynamic_serializer(request)
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = current_serializer(page, many=True, language=user_language)
+            serializer = current_serializer(page, many=True, ulanguage=user_language)
             return self.get_paginated_response(serializer.data)
 
-        serializer = current_serializer(queryset, many=True, language=user_language)
+        serializer = current_serializer(queryset, many=True, ulanguage=user_language)
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
         user_language = self._get_user_language()
         current_serializer = self.get_dynamic_serializer(request)
         instance = Article.objects.get(permalink=kwargs['permalink'])
-        serializer = current_serializer(instance, language=user_language)
+        serializer = current_serializer(instance, ulanguage=user_language)
         return Response(serializer.data)
 
     def perform_create(self, serializer):

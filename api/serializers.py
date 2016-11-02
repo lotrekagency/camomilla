@@ -18,7 +18,18 @@ class CategorySerializer(TranslatableModelSerializer):
         fields = '__all__'
 
 
-class ArticleSerializer(TranslatableModelSerializer):
+class UnderTranslateMixin(object):
+
+    def __init__(self, *args, **kwargs):
+        self.ulanguage = 'en'
+        try:
+            self.ulanguage = kwargs.pop('ulanguage')
+        except KeyError:
+            pass
+        super(UnderTranslateMixin, self).__init__(*args, **kwargs)
+
+
+class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
 
     author = serializers.CharField(read_only=True)
 
@@ -43,7 +54,7 @@ class MediaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ExpandendArticleSerializer(TranslatableModelSerializer):
+class ExpandendArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
 
     tags = serializers.SerializerMethodField('get_translated_tags')
     categories = serializers.SerializerMethodField('get_translated_categories')
@@ -54,12 +65,12 @@ class ExpandendArticleSerializer(TranslatableModelSerializer):
         fields = '__all__'
 
     def get_translated_tags(self, obj):
-        tags = obj.tags
-        return TagSerializer(tags, many=True, language=self.language).data
+        tags = Tag.objects.language(self.ulanguage).fallbacks().filter(article__pk=obj.pk)
+        return TagSerializer(tags, many=True).data
 
     def get_translated_categories(self, obj):
-        categories = obj.categories
-        return CategorySerializer(categories, many=True, language=self.language).data
+        categories = Category.objects.language(self.ulanguage).fallbacks().filter(article__pk=obj.pk)
+        return CategorySerializer(categories, many=True).data
 
 
 class SitemapUrlSerializer(serializers.ModelSerializer):
