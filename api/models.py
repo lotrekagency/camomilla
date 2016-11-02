@@ -91,9 +91,66 @@ class Category(TranslatableModel):
 
 class Media(models.Model):
     file = models.FileField()
+    thumbnail = models.ImageField(
+        upload_to=settings.THUMB_FOLDER,
+        max_length=500,
+        null=True,
+        blank=True
+    )
     created = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200, blank=True, null=True)
     dimension = models.IntegerField(default=0, blank=True, null=True)
+
+    def make_thumbnail(self):
+        from PIL import Image
+        import os
+        from django.core.files.base import ContentFile
+
+        from django.core.files.storage import default_storage as storage
+
+        from io import BytesIO
+
+        fh = storage.open(self.file.name, 'rb')
+        try:
+            image = Image.open(fh)
+        except Exception as ex:
+            print (ex)
+            return False
+
+        image.thumbnail((50, 50), Image.ANTIALIAS)
+        fh.close()
+
+        # Path to save to, name, and extension
+        thumb_name, thumb_extension = os.path.splitext(self.file.name)
+        thumb_extension = thumb_extension.lower()
+
+        thumb_filename = thumb_name + '_thumb' + thumb_extension
+
+        if thumb_extension in ['.jpg', '.jpeg']:
+            FTYPE = 'JPEG'
+        elif thumb_extension == '.gif':
+            FTYPE = 'GIF'
+        elif thumb_extension == '.png':
+            FTYPE = 'PNG'
+        else:
+            return False
+
+        temp_thumb = BytesIO()
+        image.save(temp_thumb, FTYPE)
+        temp_thumb.seek(0)
+
+        # Load a ContentFile into the thumbnail field so it gets saved
+        print (thumb_filename)
+        self.thumbnail.save(thumb_filename, ContentFile(temp_thumb.read()), save=True)
+        temp_thumb.close()
+
+        return True
+
+    def save(self, *args, **kwargs):
+        super(Media, self).save()
+        self.dimension = self.file.size
+        if not self.thumbnail:
+            self.make_thumbnail()
 
 
 class SitemapUrl(models.Model):
