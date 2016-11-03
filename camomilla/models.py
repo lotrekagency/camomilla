@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 
 from django.db import models
+from django.db.models.signals import post_save
 
 from hvad.models import TranslatableModel, TranslatedFields
 
@@ -32,6 +33,16 @@ class UserProfile(models.Model):
         default='1',
     )
     image = models.ImageField(null=True, blank=True)
+
+
+def create_user_profile(sender, **kwargs):
+    user = kwargs["instance"]
+    if kwargs["created"]:
+        profile = UserProfile(user=user)
+        profile.save()
+
+
+post_save.connect(create_user_profile, sender=settings.AUTH_USER_MODEL)
 
 
 class Article(TranslatableModel):

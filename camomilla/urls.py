@@ -1,14 +1,23 @@
-from django.contrib import admin
+from .views import ArticleViewSet, CategoryViewSet
+from .views import TagViewSet, ContentViewSet, MediaViewSet
+from .views import SitemapUrlViewSet, LanguageViewSet, UserProfileViewSet
 
-from django.conf import settings
-from django.conf.urls import include, url
-from django.conf.urls.static import static
+from django.conf.urls import url, include
+from rest_framework import routers
 
-from api.views import CamomillaObtainAuthToken
+
+router = routers.DefaultRouter()
+
+router.register(r'tags', TagViewSet)
+router.register(r'categories', CategoryViewSet)
+router.register(r'articles', ArticleViewSet)
+router.register(r'contents', ContentViewSet)
+router.register(r'media', MediaViewSet, 'media')
+router.register(r'sitemap', SitemapUrlViewSet)
+router.register(r'profiles', UserProfileViewSet)
 
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^api-token-auth/', CamomillaObtainAuthToken.as_view()),
-    url(r'^api/', include('api.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    url(r'^', include(router.urls)),
+    url(r'^languages/', LanguageViewSet.as_view())
+]
