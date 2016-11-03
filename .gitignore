@@ -13,3 +13,4 @@ node_modules
 coverage
 camomilla/local_settings.py
 media/
+plugin_*

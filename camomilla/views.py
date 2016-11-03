@@ -32,9 +32,6 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
             return Response(
                 {
                     'token': token.key,
-                    'user': {
-                        UserProfileSerializer(user.userprofile).data
-                    }
                 }
             )
         except UserProfile.DoesNotExist:
