@@ -126,6 +126,7 @@ class Media(models.Model):
         fh = storage.open(self.file.name, 'rb')
         try:
             image = Image.open(fh)
+            self.is_image = True
         except Exception as ex:
             print (ex)
             return False
@@ -138,19 +139,9 @@ class Media(models.Model):
         thumb_extension = thumb_extension.lower()
 
         thumb_filename = thumb_name + '_thumb' + thumb_extension
-        self.is_image = True
-        if thumb_extension in ['.jpg', '.jpeg']:
-            FTYPE = 'JPEG'
-        elif thumb_extension == '.gif':
-            FTYPE = 'GIF'
-        elif thumb_extension == '.png':
-            FTYPE = 'PNG'
-        else:
-            self.is_image = False
-            return False
 
         temp_thumb = BytesIO()
-        image.save(temp_thumb, FTYPE)
+        image.save(temp_thumb, 'PNG')
         temp_thumb.seek(0)
 
         # Load a ContentFile into the thumbnail field so it gets saved
