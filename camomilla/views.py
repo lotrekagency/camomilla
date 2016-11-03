@@ -82,7 +82,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         user_language = self._get_user_language()
         current_serializer = self.get_dynamic_serializer(request)
-        instance = Article.objects.get(permalink=kwargs['permalink'])
+        instance = self.get_queryset().get(permalink=kwargs['permalink'])
         serializer = current_serializer(instance, ulanguage=user_language)
         return Response(serializer.data)
 
