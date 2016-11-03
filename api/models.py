@@ -31,6 +31,7 @@ class UserProfile(models.Model):
         choices=PERMISSION_LEVELS,
         default='1',
     )
+    image = models.ImageField(null=True, blank=True)
 
 
 class Article(TranslatableModel):
@@ -100,8 +101,9 @@ class Media(models.Model):
     created = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200, blank=True, null=True)
     dimension = models.IntegerField(default=0, blank=True, null=True)
+    is_image = models.BooleanField(default=False)
 
-    def make_thumbnail(self):
+    def _make_thumbnail(self):
         from PIL import Image
         import os
         from django.core.files.base import ContentFile
@@ -125,7 +127,7 @@ class Media(models.Model):
         thumb_extension = thumb_extension.lower()
 
         thumb_filename = thumb_name + '_thumb' + thumb_extension
-
+        self.is_image = True
         if thumb_extension in ['.jpg', '.jpeg']:
             FTYPE = 'JPEG'
         elif thumb_extension == '.gif':
@@ -133,6 +135,7 @@ class Media(models.Model):
         elif thumb_extension == '.png':
             FTYPE = 'PNG'
         else:
+            self.is_image = False
             return False
 
         temp_thumb = BytesIO()
@@ -150,7 +153,7 @@ class Media(models.Model):
         super(Media, self).save()
         self.dimension = self.file.size
         if not self.thumbnail:
-            self.make_thumbnail()
+            self._make_thumbnail()
 
 
 class SitemapUrl(models.Model):

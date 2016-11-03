@@ -17,7 +17,7 @@ from rest_framework.decorators import detail_route, list_route
 
 from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile
 from .serializers import ExpandendArticleSerializer, ArticleSerializer, MediaSerializer
-from .serializers import TagSerializer, CategorySerializer, ContentSerializer
+from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
 from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer
 from .permissions import IsSuperUserOrReadOnly
 
@@ -33,13 +33,23 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
                 {
                     'token': token.key,
                     'user': {
-                        'level' : user.userprofile.level,
-                        'profile_image' : '',
+                        UserProfileSerializer(user.userprofile).data
                     }
                 }
             )
         except UserProfile.DoesNotExist:
             return Response({'token': token.key})
+
+
+# LIMIT TO GET, PUT
+class UserProfileViewSet(viewsets.ModelViewSet):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+    @list_route(methods=['get'])
+    def me(self, request):
+        personal_profile = self.get_queryset().get(user=self.request.user)
+        return Response(UserProfileSerializer(personal_profile, context={'request': request}).data)
 
 
 class ArticleViewSet(viewsets.ModelViewSet):

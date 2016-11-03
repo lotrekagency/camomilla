@@ -1,7 +1,14 @@
 from rest_framework import serializers
-from .models import Article, Tag, Category, Content, Media, SitemapUrl
+from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile
 
 from hvad.contrib.restframework import TranslatableModelSerializer
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
 
 
 class TagSerializer(TranslatableModelSerializer):
