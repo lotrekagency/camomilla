@@ -58,6 +58,7 @@ class Article(TranslatableModel):
         choices=CONTENT_STATUS,
         default='DRF',
     )
+    highlight_image = models.ForeignKey('Media', blank=True, null=True)
     date = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('Tag', blank=True, null=True)
     categories = models.ManyToManyField('Category', blank=True, null=True)

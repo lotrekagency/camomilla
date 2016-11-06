@@ -46,7 +46,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     @list_route(methods=['get'])
     def me(self, request):
         personal_profile = self.get_queryset().get(user=self.request.user)
-        return Response(UserProfileSerializer(personal_profile, context={'request': request}).data)
+        return Response(
+            UserProfileSerializer(
+                personal_profile,
+                context={'request': request}
+            ).data
+        )
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
@@ -73,17 +78,28 @@ class ArticleViewSet(viewsets.ModelViewSet):
         current_serializer = self.get_dynamic_serializer(request)
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = current_serializer(page, many=True, ulanguage=user_language)
+            serializer = current_serializer(
+                page, many=True,
+                ulanguage=user_language,
+                context={'request': request}
+            )
             return self.get_paginated_response(serializer.data)
 
-        serializer = current_serializer(queryset, many=True, ulanguage=user_language)
+        serializer = current_serializer(
+            queryset, many=True,
+            ulanguage=user_language,
+            context={'request': request}
+        )
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
         user_language = self._get_user_language()
         current_serializer = self.get_dynamic_serializer(request)
         instance = self.get_queryset().get(permalink=kwargs['permalink'])
-        serializer = current_serializer(instance, ulanguage=user_language)
+        serializer = current_serializer(
+            instance, ulanguage=user_language,
+            context={'request': request}
+        )
         return Response(serializer.data)
 
     def perform_create(self, serializer):

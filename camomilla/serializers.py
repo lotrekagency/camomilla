@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers, permissions
 from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile
 
 from hvad.contrib.restframework import TranslatableModelSerializer
@@ -36,15 +36,6 @@ class UnderTranslateMixin(object):
         super(UnderTranslateMixin, self).__init__(*args, **kwargs)
 
 
-class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
-
-    author = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = Article
-        fields = '__all__'
-
-
 class ContentSerializer(TranslatableModelSerializer):
 
     author = serializers.CharField(read_only=True)
@@ -61,11 +52,23 @@ class MediaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+#http://stackoverflow.com/questions/29950956/drf-simple-foreign-key-assignment-with-nested-serializers
+class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
+
+    author = serializers.CharField(read_only=True)
+    highlight_image_exp = MediaSerializer(source='highlight_image')
+
+    class Meta:
+        model = Article
+        fields = '__all__'
+
+
 class ExpandendArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
 
     tags = serializers.SerializerMethodField('get_translated_tags')
     categories = serializers.SerializerMethodField('get_translated_categories')
     author = serializers.CharField(read_only=True)
+    highlight_image_exp = MediaSerializer(source='highlight_image')
 
     class Meta:
         model = Article
