@@ -153,7 +153,9 @@ class Media(models.Model):
 
     def save(self, *args, **kwargs):
         super(Media, self).save()
-        self.dimension = self.file.size
+        if self.file and not self.dimension:
+            self.dimension = self.file.size
+            self.save()
         if not self.thumbnail:
             self._make_thumbnail()
 
