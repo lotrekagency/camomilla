@@ -56,7 +56,7 @@ class MediaSerializer(serializers.ModelSerializer):
 class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
 
     author = serializers.CharField(read_only=True)
-    highlight_image_exp = MediaSerializer(source='highlight_image')
+    highlight_image_exp = MediaSerializer(source='highlight_image', read_only=True)
 
     class Meta:
         model = Article
@@ -68,7 +68,7 @@ class ExpandendArticleSerializer(UnderTranslateMixin, TranslatableModelSerialize
     tags = serializers.SerializerMethodField('get_translated_tags')
     categories = serializers.SerializerMethodField('get_translated_categories')
     author = serializers.CharField(read_only=True)
-    highlight_image_exp = MediaSerializer(source='highlight_image')
+    highlight_image_exp = MediaSerializer(source='highlight_image', read_only=True)
 
     class Meta:
         model = Article

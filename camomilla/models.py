@@ -50,9 +50,9 @@ class Article(TranslatableModel):
         title = models.CharField(max_length=200),
         content = models.TextField(),
         description = models.TextField(blank=True, null=True, default=''),
+        permalink = models.CharField(max_length=200)
     )
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
-    permalink = models.CharField(max_length=200, unique=True)
     status = models.CharField(
         max_length=3,
         choices=CONTENT_STATUS,
@@ -70,21 +70,27 @@ class Article(TranslatableModel):
     og_type = models.CharField(max_length=200, blank=True, null=True, default='')
     og_url = models.CharField(max_length=200, blank=True, null=True, default='')
 
+    class Meta:
+        unique_together = [('permalink', 'language_code')]
+
 
 class Content(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
         subtitle = models.CharField(max_length=200, blank=True, null=True, default=''),
         content = models.TextField(),
+        permalink = models.CharField(max_length=200)
     )
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
-    permalink = models.CharField(max_length=200, unique=True)
     status = models.CharField(
         max_length=3,
         choices=CONTENT_STATUS,
         default='DRF',
     )
     date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = [('permalink', 'language_code')]
 
 
 class Tag(TranslatableModel):

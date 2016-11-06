@@ -1,6 +1,7 @@
 import json
 
 from django.conf import settings
+from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -68,13 +69,15 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         user_language = self._get_user_language()
-        status = request.GET.get('status', None)
 
+        # Filter by status
+        status = request.GET.get('status', None)
         if status:
             queryset = self.get_queryset().filter(status=status)
         else:
             queryset = self.get_queryset()
 
+        # Support pagination
         current_serializer = self.get_dynamic_serializer(request)
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -85,6 +88,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
             )
             return self.get_paginated_response(serializer.data)
 
+        # Serialize
         serializer = current_serializer(
             queryset, many=True,
             ulanguage=user_language,
@@ -95,7 +99,14 @@ class ArticleViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         user_language = self._get_user_language()
         current_serializer = self.get_dynamic_serializer(request)
-        instance = self.get_queryset().get(permalink=kwargs['permalink'])
+        try:
+            instance = self.get_queryset().get(permalink=kwargs['permalink'])
+        except Exception as ex:
+            # In case you use a different permalink
+            instance = Article.objects.language('all').get(
+                permalink=kwargs['permalink']
+            )
+            instance = self.get_queryset().get(master=instance.pk)
         serializer = current_serializer(
             instance, ulanguage=user_language,
             context={'request': request}
@@ -134,6 +145,21 @@ class ContentViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
 
         serializer = ContentSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        user_language = self._get_user_language()
+        try:
+            instance = self.get_queryset().get(permalink=kwargs['permalink'])
+        except Exception as ex:
+            # In case you use a different permalink
+            instance = Content.objects.language('all').get(
+                permalink=kwargs['permalink']
+            )
+            instance = self.get_queryset().get(master=instance.pk)
+        serializer = ContentSerializer(
+            instance, context={'request': request}
+        )
         return Response(serializer.data)
 
     def perform_create(self, serializer):
