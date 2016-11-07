@@ -19,10 +19,11 @@ from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProf
 from .serializers import ExpandendArticleSerializer, ArticleSerializer, MediaSerializer
 from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
 from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer
-from .permissions import IsSuperUserOrReadOnly
+from .permissions import CamomillaBasePermissions, CamomillaSuperUser
 
 
 class CamomillaObtainAuthToken(ObtainAuthToken):
+
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -40,8 +41,10 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
 
 # LIMIT TO GET, PUT
 class UserProfileViewSet(viewsets.ModelViewSet):
+
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+    http_method_names = ['get', 'put', 'options', 'head']
 
     @list_route(methods=['get'])
     def me(self, request):
@@ -55,9 +58,11 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
+
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     lookup_field = 'permalink'
+    permission_classes = (CamomillaBasePermissions,)
 
     def get_dynamic_serializer(self, request):
         compressed = request.GET.get('compressed', False)
@@ -115,9 +120,11 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
 
 class ContentViewSet(viewsets.ModelViewSet):
+
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
     lookup_field = 'permalink'
+    permission_classes = (CamomillaBasePermissions,)
 
     def list(self, request, *args, **kwargs):
         user_language = self._get_user_language()
@@ -149,8 +156,11 @@ class ContentViewSet(viewsets.ModelViewSet):
 
 
 class TagViewSet(viewsets.ModelViewSet):
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = (CamomillaBasePermissions,)
+
 
     def get_queryset(self):
         user_language = self.request.GET.get('language', 'en')
@@ -158,8 +168,10 @@ class TagViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (CamomillaBasePermissions,)
 
     def get_queryset(self):
         user_language = self.request.GET.get('language', 'en')
@@ -168,10 +180,12 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 # LIMIT TO GET!!!!
 class MediaViewSet(viewsets.ModelViewSet):
+
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
+    http_method_names = ['get']
 
-    @list_route(methods=['post'])
+    @list_route(methods=['post'], permission_classes = (CamomillaBasePermissions,))
     def upload(self, request):
         new_media = Media.objects.create(
             file=request.FILES['file_contents'],
@@ -187,8 +201,10 @@ class MediaViewSet(viewsets.ModelViewSet):
 
 
 class SitemapUrlViewSet(viewsets.ModelViewSet):
+
     queryset = SitemapUrl.objects.all()
     serializer_class = SitemapUrlSerializer
+    permission_classes = (CamomillaSuperUser,)
 
     @list_route(methods=['post'])
     def new(self, request):
