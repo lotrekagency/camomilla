@@ -117,7 +117,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def _get_user_language(self):
-        return self.request.GET.get('language', 'en')
+        return self.request.GET.get(
+            'language', self.request.data.get('language_code', 'en')
+        )
 
     def get_queryset(self):
         user_language = self._get_user_language()
@@ -166,7 +168,9 @@ class ContentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def _get_user_language(self):
-        return self.request.GET.get('language', 'en')
+        return self.request.GET.get(
+            'language', self.request.data.get('language_code', 'en')
+        )
 
     def get_queryset(self):
         user_language = self._get_user_language()
