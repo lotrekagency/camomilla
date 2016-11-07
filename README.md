@@ -10,7 +10,7 @@ In you encounter some problems during mysqlclient installation
 
 ## Setup database
 
-Create camomilla/local_settings.py file and write your database configuration, based on local_settings_example.py:
+Create your_project/local_settings.py file and write your database configuration, based on local_settings_example.py:
 
     DATABASES = {
         'default': {
