@@ -159,6 +159,9 @@ LANGUAGES = (
     ('es', _('Spanish')),
 )
 
+ADMIN_SITE_HEADER = _("Camomilla advanced panel")
+
+
 try:
     from .local_settings import *
 except ImportError:

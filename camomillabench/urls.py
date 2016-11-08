@@ -7,6 +7,8 @@ from django.conf.urls.static import static
 from camomilla.views import CamomillaObtainAuthToken
 
 
+admin.site.site_header = settings.ADMIN_SITE_HEADER
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api-token-auth/', CamomillaObtainAuthToken.as_view()),
