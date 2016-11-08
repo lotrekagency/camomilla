@@ -26,6 +26,7 @@ class UserProfile(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         primary_key=True,
+        related_name='profile'
     )
     level = models.CharField(
         max_length=3,
