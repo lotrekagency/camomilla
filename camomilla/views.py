@@ -208,12 +208,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Category.objects.language(user_language).fallbacks().all()
 
 
-# LIMIT TO GET!!!!
 class MediaViewSet(viewsets.ModelViewSet):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
-    http_method_names = ['get']
 
     @list_route(methods=['post'], permission_classes = (CamomillaBasePermissions,))
     def upload(self, request):
