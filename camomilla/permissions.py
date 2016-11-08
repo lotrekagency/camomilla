@@ -5,6 +5,9 @@ class CamomillaBasePermissions(permissions.BasePermission):
 
     def has_permission(self, request, view):
 
+        if not request.user.is_authenticated():
+            return False
+
         if request.user.profile.level == '1':
             if request.method in permissions.SAFE_METHODS:
                 return True
@@ -20,6 +23,9 @@ class CamomillaBasePermissions(permissions.BasePermission):
         return False
 
     def has_object_permission(self, request, view, obj):
+
+        if not request.user.is_authenticated():
+            return False
 
         if request.user.profile.level == '1':
             if request.method in permissions.SAFE_METHODS:
