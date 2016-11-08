@@ -11,5 +11,4 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api-token-auth/', CamomillaObtainAuthToken.as_view()),
     url(r'^api/', include('camomilla.urls')),
-    url(r'^profileslist/', include('plugin_profileslist.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
