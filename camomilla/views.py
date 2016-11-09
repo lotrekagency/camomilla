@@ -64,12 +64,17 @@ class ArticleViewSet(viewsets.ModelViewSet):
     serializer_class = ArticleSerializer
     lookup_field = 'permalink'
     permission_classes = (CamomillaBasePermissions,)
+    model = Article
+    serializers = {
+        'compressed' : ArticleSerializer,
+        'expanded' : ExpandendArticleSerializer
+    }
 
     def get_dynamic_serializer(self, request):
         compressed = request.GET.get('compressed', False)
-        current_serializer = ExpandendArticleSerializer
+        current_serializer = self.serializers['expanded']
         if compressed:
-            current_serializer = ArticleSerializer
+            current_serializer = self.serializers['compressed']
         return current_serializer
 
     def list(self, request, *args, **kwargs):
@@ -84,6 +89,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
         # Support pagination
         current_serializer = self.get_dynamic_serializer(request)
+        print (current_serializer)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = current_serializer(
@@ -108,7 +114,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
             instance = self.get_queryset().get(permalink=kwargs['permalink'])
         except Exception as ex:
             # In case you use a different permalink
-            instance = Article.objects.language('all').get(
+            instance = self.model.objects.language('all').get(
                 permalink=kwargs['permalink']
             )
             instance = self.get_queryset().get(master=instance.pk)
@@ -128,7 +134,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_language = self._get_user_language()
-        articles = Article.objects.language(user_language).fallbacks().all()
+        articles = self.model.objects.language(user_language).fallbacks().all()
         return articles
 
 

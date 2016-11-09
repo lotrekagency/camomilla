@@ -53,7 +53,7 @@ def create_user_profile(sender, **kwargs):
 post_save.connect(create_user_profile, sender=settings.AUTH_USER_MODEL)
 
 
-class Article(TranslatableModel):
+class ArticleBase(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
         content = models.TextField(),
@@ -66,10 +66,10 @@ class Article(TranslatableModel):
         choices=CONTENT_STATUS,
         default='DRF',
     )
-    highlight_image = models.ForeignKey('Media', blank=True, null=True)
+    highlight_image = models.ForeignKey('camomilla.Media', blank=True, null=True)
     date = models.DateTimeField(auto_now=True)
-    tags = models.ManyToManyField('Tag', blank=True)
-    categories = models.ManyToManyField('Category', blank=True)
+    tags = models.ManyToManyField('camomilla.Tag', blank=True)
+    categories = models.ManyToManyField('camomilla.Category', blank=True)
     canonical = models.CharField(max_length=200, blank=True, null=True, default='')
     robots = models.CharField(max_length=200, blank=True, null=True, default='')
     og_image = models.CharField(max_length=200, blank=True, null=True, default='')
@@ -79,10 +79,14 @@ class Article(TranslatableModel):
     og_url = models.CharField(max_length=200, blank=True, null=True, default='')
 
     class Meta:
+        abstract = True
         unique_together = [('permalink', 'language_code')]
-
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
+
+class Article(ArticleBase):
+    translations = TranslatedFields()   # see note below
+
 
 
 class Content(TranslatableModel):
