@@ -88,12 +88,13 @@ class BaseArticle(TranslatableModel):
     class Meta:
         abstract = True
         unique_together = [('permalink', 'language_code')]
+
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
 
-class Article(BaseArticle):
-    translations = TranslatedFields()   # see note below
 
+class Article(BaseArticle):
+    translations = TranslatedFields()
 
 
 class BaseContent(TranslatableModel):
@@ -114,22 +115,26 @@ class BaseContent(TranslatableModel):
     class Meta:
         unique_together = [('permalink', 'language_code')]
         abstract = True
+
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
 
+
 class Content(BaseContent):
     translations = TranslatedFields()
-
 
 
 class BaseTag(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200, unique=True)
     )
+
     class Meta:
         abstract = True
+
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
+
 
 class Tag(BaseTag):
     translations = TranslatedFields()
@@ -139,10 +144,13 @@ class BaseCategory(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200, unique=True)
     )
+
     class Meta:
         abstract = True
+
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
+
 
 class Category(BaseCategory):
     translations = TranslatedFields()
@@ -209,6 +217,7 @@ class Media(models.Model):
     def __str__(self):
         return self.file.name
 
+
 class BaseSitemapUrl(models.Model):
     url = models.CharField(max_length=200, unique=True)
     title = models.CharField(max_length=200, blank=True, null=True, default='')
@@ -223,6 +232,7 @@ class BaseSitemapUrl(models.Model):
 
     class Meta:
         abstract = True
+
 
 class SitemapUrl(BaseSitemapUrl):
     pass
