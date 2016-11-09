@@ -43,7 +43,10 @@ class UserProfile(models.Model):
 def create_user_profile(sender, **kwargs):
     user = kwargs["instance"]
     if kwargs["created"]:
-        profile = UserProfile(user=user)
+        level = '1'
+        if user.is_superuser:
+            level = '3'
+        profile = UserProfile(user=user, level=level)
         profile.save()
 
 
