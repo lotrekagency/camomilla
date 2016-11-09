@@ -22,7 +22,7 @@ PERMISSION_LEVELS = (
 )
 
 
-class UserProfile(models.Model):
+class BaseUserProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -39,6 +39,13 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+    class Meta:
+        abstract = True
+
+
+class UserProfile(BaseUserProfile):
+    pass
+
 
 def create_user_profile(sender, **kwargs):
     user = kwargs["instance"]
@@ -53,7 +60,7 @@ def create_user_profile(sender, **kwargs):
 post_save.connect(create_user_profile, sender=settings.AUTH_USER_MODEL)
 
 
-class ArticleBase(TranslatableModel):
+class BaseArticle(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
         content = models.TextField(),
@@ -84,12 +91,12 @@ class ArticleBase(TranslatableModel):
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
 
-class Article(ArticleBase):
+class Article(BaseArticle):
     translations = TranslatedFields()   # see note below
 
 
 
-class Content(TranslatableModel):
+class BaseContent(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
         subtitle = models.CharField(max_length=200, blank=True, null=True, default=''),
@@ -106,27 +113,39 @@ class Content(TranslatableModel):
 
     class Meta:
         unique_together = [('permalink', 'language_code')]
-
+        abstract = True
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
 
+class Content(BaseContent):
+    translations = TranslatedFields()
 
-class Tag(TranslatableModel):
+
+
+class BaseTag(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200, unique=True)
     )
-
+    class Meta:
+        abstract = True
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
 
+class Tag(BaseTag):
+    translations = TranslatedFields()
 
-class Category(TranslatableModel):
+
+class BaseCategory(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200, unique=True)
     )
-
+    class Meta:
+        abstract = True
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
+
+class Category(BaseCategory):
+    translations = TranslatedFields()
 
 
 class Media(models.Model):
@@ -190,7 +209,7 @@ class Media(models.Model):
     def __str__(self):
         return self.file.name
 
-class SitemapUrl(models.Model):
+class BaseSitemapUrl(models.Model):
     url = models.CharField(max_length=200, unique=True)
     title = models.CharField(max_length=200, blank=True, null=True, default='')
     description = models.TextField(blank=True, null=True, default='')
@@ -201,3 +220,9 @@ class SitemapUrl(models.Model):
     og_title = models.CharField(max_length=200, blank=True, null=True, default='')
     og_type = models.CharField(max_length=200, blank=True, null=True, default='')
     og_url = models.CharField(max_length=200, blank=True, null=True, default='')
+
+    class Meta:
+        abstract = True
+
+class SitemapUrl(BaseSitemapUrl):
+    pass
