@@ -15,7 +15,7 @@ LANGUAGE_CODE = 'it'
 
 LANGUAGES = (
     ('it', _('Italian')),
-    ('en', _("English")),
+    ('en', _('English')),
 )
 
 # SECURITY WARNING: keep the secret key used in production secret!

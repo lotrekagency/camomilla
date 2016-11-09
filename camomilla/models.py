@@ -3,21 +3,22 @@ from django.conf import settings
 
 from django.db import models
 from django.db.models.signals import post_save
+from django.utils.translation import ugettext_lazy as _
 
 from hvad.models import TranslatableModel, TranslatedFields
 
 
 CONTENT_STATUS = (
-    ('PUB', 'Published'),
-    ('DRF', 'Draft'),
-    ('TRS', 'Trash'),
+    ('PUB', _('Published')),
+    ('DRF', _('Draft')),
+    ('TRS', _('Trash')),
 )
 
 
 PERMISSION_LEVELS = (
-    ('1', '1'),
-    ('2', '2'),
-    ('3', '3'),
+    ('1', _('Guest')),
+    ('2', _('Editor')),
+    ('3', _('Admin')),
 )
 
 
@@ -34,6 +35,9 @@ class UserProfile(models.Model):
         default='1',
     )
     image = models.ImageField(null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username
 
 
 def create_user_profile(sender, **kwargs):
@@ -74,6 +78,9 @@ class Article(TranslatableModel):
     class Meta:
         unique_together = [('permalink', 'language_code')]
 
+    def __str__(self):
+        return self.lazy_translation_getter('title', str(self.pk))
+
 
 class Content(TranslatableModel):
     translations = TranslatedFields(
@@ -93,6 +100,9 @@ class Content(TranslatableModel):
     class Meta:
         unique_together = [('permalink', 'language_code')]
 
+    def __str__(self):
+        return self.lazy_translation_getter('title', str(self.pk))
+
 
 class Tag(TranslatableModel):
     translations = TranslatedFields(
@@ -100,13 +110,16 @@ class Tag(TranslatableModel):
     )
 
     def __str__(self):
-        return self.safe_translation_getter('title', str(self.pk))
+        return self.lazy_translation_getter('title', str(self.pk))
 
 
 class Category(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200, unique=True)
     )
+
+    def __str__(self):
+        return self.lazy_translation_getter('title', str(self.pk))
 
 
 class Media(models.Model):
@@ -167,6 +180,8 @@ class Media(models.Model):
         if not self.thumbnail:
             self._make_thumbnail()
 
+    def __str__(self):
+        return self.file.name
 
 class SitemapUrl(models.Model):
     url = models.CharField(max_length=200, unique=True)
