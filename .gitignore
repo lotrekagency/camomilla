@@ -11,6 +11,6 @@ libs/
 node_modules
 .cache
 coverage
-camomilla/local_settings.py
+camomillabench/local_settings.py
 media/
 plugin_*

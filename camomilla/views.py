@@ -40,7 +40,6 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
             return Response({'token': token.key})
 
 
-# LIMIT TO GET, PUT
 class UserProfileViewSet(viewsets.ModelViewSet):
 
     queryset = UserProfile.objects.all()
@@ -51,7 +50,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     def me(self, request):
         personal_profile = self.get_queryset().get(user=self.request.user)
         return Response(
-            UserProfileSerializer(
+            self.serializer_class(
                 personal_profile,
                 context={'request': request}
             ).data
@@ -64,12 +63,17 @@ class ArticleViewSet(viewsets.ModelViewSet):
     serializer_class = ArticleSerializer
     lookup_field = 'permalink'
     permission_classes = (CamomillaBasePermissions,)
+    model = Article
+    serializers = {
+        'compressed' : ArticleSerializer,
+        'expanded' : ExpandendArticleSerializer
+    }
 
     def get_dynamic_serializer(self, request):
         compressed = request.GET.get('compressed', False)
-        current_serializer = ExpandendArticleSerializer
+        current_serializer = self.serializers['expanded']
         if compressed:
-            current_serializer = ArticleSerializer
+            current_serializer = self.serializers['compressed']
         return current_serializer
 
     def list(self, request, *args, **kwargs):
@@ -108,7 +112,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
             instance = self.get_queryset().get(permalink=kwargs['permalink'])
         except Exception as ex:
             # In case you use a different permalink
-            instance = Article.objects.language('all').get(
+            instance = self.model.objects.language('all').get(
                 permalink=kwargs['permalink']
             )
             instance = self.get_queryset().get(master=instance.pk)
@@ -128,7 +132,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_language = self._get_user_language()
-        articles = Article.objects.language(user_language).fallbacks().all()
+        articles = self.model.objects.language(user_language).fallbacks().all()
         return articles
 
 
@@ -136,6 +140,7 @@ class ContentViewSet(viewsets.ModelViewSet):
 
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
+    model = Content
     lookup_field = 'permalink'
     permission_classes = (CamomillaBasePermissions,)
 
@@ -150,10 +155,10 @@ class ContentViewSet(viewsets.ModelViewSet):
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = ContentSerializer(page, many=True)
+            serializer = self.serializer_class(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = ContentSerializer(queryset, many=True)
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
@@ -162,11 +167,11 @@ class ContentViewSet(viewsets.ModelViewSet):
             instance = self.get_queryset().get(permalink=kwargs['permalink'])
         except Exception as ex:
             # In case you use a different permalink
-            instance = Content.objects.language('all').get(
+            instance = self.model.objects.language('all').get(
                 permalink=kwargs['permalink']
             )
             instance = self.get_queryset().get(master=instance.pk)
-        serializer = ContentSerializer(
+        serializer = self.serializer_class(
             instance, context={'request': request}
         )
         return Response(serializer.data)
@@ -181,7 +186,7 @@ class ContentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_language = self._get_user_language()
-        contents = Content.objects.language(user_language).fallbacks().all()
+        contents = self.model.objects.language(user_language).fallbacks().all()
         return contents
 
 
@@ -190,11 +195,11 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (CamomillaBasePermissions,)
-
+    model = Tag
 
     def get_queryset(self):
         user_language = self.request.GET.get('language', 'en')
-        return Tag.objects.language(user_language).fallbacks().all()
+        return self.model.objects.language(user_language).fallbacks().all()
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -202,10 +207,11 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (CamomillaBasePermissions,)
+    model = Category
 
     def get_queryset(self):
         user_language = self.request.GET.get('language', 'en')
-        return Category.objects.language(user_language).fallbacks().all()
+        return self.model.objects.language(user_language).fallbacks().all()
 
 
 class MediaViewSet(viewsets.ModelViewSet):
