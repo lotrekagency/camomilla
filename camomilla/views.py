@@ -44,6 +44,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+    model = UserProfile
     http_method_names = ['get', 'put', 'options', 'head']
 
     @list_route(methods=['get'])
@@ -218,6 +219,7 @@ class MediaViewSet(viewsets.ModelViewSet):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
+    model = Media
 
     @list_route(methods=['post'], permission_classes = (CamomillaBasePermissions,))
     def upload(self, request):
@@ -239,6 +241,7 @@ class SitemapUrlViewSet(viewsets.ModelViewSet):
     queryset = SitemapUrl.objects.all()
     serializer_class = SitemapUrlSerializer
     permission_classes = (CamomillaSuperUser,)
+    model = SitemapUrl
 
     @list_route(methods=['post'])
     def new(self, request):
