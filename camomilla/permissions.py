@@ -18,7 +18,6 @@ class CamomillaBasePermissions(permissions.BasePermission):
             perm = '{0}.{1}_{2}'.format(
                 model._meta.app_label, permission, model_name
             )
-            print (perm)
             return request.user.has_perm(perm)
 
     def has_permission(self, request, view):
