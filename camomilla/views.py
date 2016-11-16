@@ -218,6 +218,7 @@ class MediaViewSet(viewsets.ModelViewSet):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
+    model = Media
 
     @list_route(methods=['post'], permission_classes = (CamomillaBasePermissions,))
     def upload(self, request):
@@ -233,12 +234,23 @@ class MediaViewSet(viewsets.ModelViewSet):
             for chunk in f.chunks():
                 destination.write(chunk)
 
+    def _get_user_language(self):
+        return self.request.GET.get(
+            'language', self.request.data.get('language_code', 'en')
+        )
+
+    def get_queryset(self):
+        user_language = self._get_user_language()
+        contents = self.model.objects.language(user_language).fallbacks().all()
+        return contents
+
 
 class SitemapUrlViewSet(viewsets.ModelViewSet):
 
     queryset = SitemapUrl.objects.all()
     serializer_class = SitemapUrlSerializer
     permission_classes = (CamomillaSuperUser,)
+    model = SitemapUrl
 
     @list_route(methods=['post'])
     def new(self, request):
@@ -252,6 +264,16 @@ class SitemapUrlViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return CompactSitemapUrlSerializer
         return SitemapUrlSerializer
+
+    def _get_user_language(self):
+        return self.request.GET.get(
+            'language', self.request.data.get('language_code', 'en')
+        )
+
+    def get_queryset(self):
+        user_language = self._get_user_language()
+        contents = self.model.objects.language(user_language).fallbacks().all()
+        return contents
 
 
 class LanguageViewSet(views.APIView):

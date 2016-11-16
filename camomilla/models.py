@@ -60,13 +60,23 @@ def create_user_profile(sender, **kwargs):
 post_save.connect(create_user_profile, sender=settings.AUTH_USER_MODEL)
 
 
+class Page(models.Model):
+    title = models.CharField(max_length=200, blank=True, null=True)
+
+
 class BaseArticle(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
         content = models.TextField(),
         description = models.TextField(blank=True, null=True, default=''),
-        permalink = models.CharField(max_length=200)
+        permalink = models.CharField(max_length=200),
+        og_description = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_title = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_type = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
+        canonical = models.CharField(max_length=200, blank=True, null=True, default='')
     )
+    page = models.ForeignKey('camomilla.Page', blank=True, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
     status = models.CharField(
         max_length=3,
@@ -77,13 +87,7 @@ class BaseArticle(TranslatableModel):
     date = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('camomilla.Tag', blank=True)
     categories = models.ManyToManyField('camomilla.Category', blank=True)
-    canonical = models.CharField(max_length=200, blank=True, null=True, default='')
-    robots = models.CharField(max_length=200, blank=True, null=True, default='')
     og_image = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_description = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_title = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_type = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_url = models.CharField(max_length=200, blank=True, null=True, default='')
 
     class Meta:
         abstract = True
@@ -156,7 +160,11 @@ class Category(BaseCategory):
     translations = TranslatedFields()
 
 
-class Media(models.Model):
+class Media(TranslatableModel):
+    translations = TranslatedFields(
+        alt_text = models.CharField(max_length=200, blank=True, null=True),
+        title = models.CharField(max_length=200, blank=True, null=True)
+    )
     file = models.FileField()
     thumbnail = models.ImageField(
         upload_to=settings.THUMB_FOLDER,
@@ -218,21 +226,24 @@ class Media(models.Model):
         return self.file.name
 
 
-class BaseSitemapUrl(models.Model):
+class BaseSitemapUrl(TranslatableModel):
+
     url = models.CharField(max_length=200, unique=True)
-    title = models.CharField(max_length=200, blank=True, null=True, default='')
-    description = models.TextField(blank=True, null=True, default='')
-    canonical = models.CharField(max_length=200, blank=True, null=True, default='')
-    robots = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_image = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_description = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_title = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_type = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_url = models.CharField(max_length=200, blank=True, null=True, default='')
+    page = models.ForeignKey('camomilla.Page', blank=True, null=True)
+    translations = TranslatedFields(
+        title = models.CharField(max_length=200),
+        description = models.TextField(blank=True, null=True, default=''),
+        permalink = models.CharField(max_length=200),
+        og_description = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_title = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_type = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
+        canonical = models.CharField(max_length=200, blank=True, null=True, default=''),
+    )
 
     class Meta:
         abstract = True
 
 
 class SitemapUrl(BaseSitemapUrl):
-    pass
+    translations = TranslatedFields()

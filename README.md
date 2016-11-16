@@ -44,6 +44,10 @@ In case you want to test and/or use Camomilla 4.0 pre-alpha: we don't want to tr
 
 You need to create your user again as well
 
+## Don't fear the hvader
+
+Feel free to make your models untranslatable, [we have a nice solution for them](https://github.com/KristianOellegaard/django-hvad/issues/277)
+
 ## References for developers
 
 - http://www.django-rest-framework.org/
