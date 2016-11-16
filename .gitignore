@@ -14,3 +14,4 @@ coverage
 camomillabench/local_settings.py
 media/
 plugin_*
+gunicorn_settings.py
