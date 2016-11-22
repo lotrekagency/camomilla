@@ -161,6 +161,10 @@ LANGUAGES = (
 
 ADMIN_SITE_HEADER = _("Camomilla advanced panel")
 
+try:
+    from .deploy_settings import *
+except ImportError:
+    pass
 
 try:
     from .local_settings import *
