@@ -1,5 +1,5 @@
 from rest_framework import serializers, permissions
-from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile
+from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile, Page
 
 from hvad.contrib.restframework import TranslatableModelSerializer
 
@@ -8,6 +8,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
+        fields = '__all__'
+
+
+class PageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Page
         fields = '__all__'
 
 

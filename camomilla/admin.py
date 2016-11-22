@@ -1,7 +1,11 @@
 from django.contrib import admin
-from .models import Article, Tag, Category, Content, Media, UserProfile
+from .models import Article, Tag, Category, Content, Media, UserProfile, Page
 
 from hvad.admin import TranslatableAdmin
+
+
+class PageAdmin(admin.ModelAdmin):
+    pass
 
 
 class UserProfileAdmin(admin.ModelAdmin):
@@ -10,6 +14,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 class ArticleAdmin(TranslatableAdmin):
     pass
+
 
 class TagAdmin(TranslatableAdmin):
     pass
@@ -33,3 +38,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Content, ContentAdmin)
 admin.site.register(Media, MediaAdmin)
+admin.site.register(Page, PageAdmin)

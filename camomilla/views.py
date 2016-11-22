@@ -16,10 +16,10 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework.decorators import detail_route, list_route
 
 
-from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile
+from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile, Page
 from .serializers import ExpandendArticleSerializer, ArticleSerializer, MediaSerializer
 from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
-from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer
+from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer, PageSerializer
 from .permissions import CamomillaBasePermissions, CamomillaSuperUser
 
 
@@ -38,6 +38,13 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
             )
         except UserProfile.DoesNotExist:
             return Response({'token': token.key})
+
+
+class PageViewSet(viewsets.ModelViewSet):
+
+    queryset = Page.objects.all()
+    serializer_class = PageSerializer
+    http_method_names = ['get', 'put', 'options', 'head']
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -81,10 +88,11 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
         # Filter by status
         status = request.GET.get('status', None)
+        # Filter by page
+        page = request.GET.get('page', None)
+        queryset = self.get_queryset()
         if status:
-            queryset = self.get_queryset().filter(status=status)
-        else:
-            queryset = self.get_queryset()
+            queryset = queryset.filter(status=status)
 
         # Support pagination
         current_serializer = self.get_dynamic_serializer(request)
@@ -147,11 +155,13 @@ class ContentViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         user_language = self._get_user_language()
         status = request.GET.get('status', None)
+        page = request.GET.get('page', None)
 
+        queryset = self.get_queryset()
         if status:
             queryset = self.get_queryset().filter(status=status)
-        else:
-            queryset = self.get_queryset()
+        if page:
+            queryset = queryset.filter(page=page)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -255,9 +265,13 @@ class SitemapUrlViewSet(viewsets.ModelViewSet):
     @list_route(methods=['post'])
     def new(self, request):
         SitemapUrl.objects.all().delete()
-        urls = json.loads(request.POST['urls'])
+        urls = request.data['urls']
+        print (urls)
         for url in urls:
-            SitemapUrl.objects.create(url=url)
+            SitemapUrl.objects.create(
+                url=url,
+                language_code='en'
+            )
         return Response({})
 
     def get_serializer_class(self):

@@ -63,6 +63,9 @@ post_save.connect(create_user_profile, sender=settings.AUTH_USER_MODEL)
 class Page(models.Model):
     title = models.CharField(max_length=200, blank=True, null=True)
 
+    def __str__(self):
+        return self.title
+
 
 class BaseArticle(TranslatableModel):
     translations = TranslatedFields(
@@ -76,7 +79,6 @@ class BaseArticle(TranslatableModel):
         og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
         canonical = models.CharField(max_length=200, blank=True, null=True, default='')
     )
-    page = models.ForeignKey('camomilla.Page', blank=True, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
     status = models.CharField(
         max_length=3,
@@ -115,6 +117,7 @@ class BaseContent(TranslatableModel):
         default='DRF',
     )
     date = models.DateTimeField(auto_now=True)
+    page = models.ForeignKey('camomilla.Page', blank=False, null=True)
 
     class Meta:
         unique_together = [('permalink', 'language_code')]
@@ -229,7 +232,7 @@ class Media(TranslatableModel):
 class BaseSitemapUrl(TranslatableModel):
 
     url = models.CharField(max_length=200, unique=True)
-    page = models.ForeignKey('camomilla.Page', blank=True, null=True)
+    page = models.ForeignKey('camomilla.Page', blank=False, null=True)
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
         description = models.TextField(blank=True, null=True, default=''),
@@ -240,6 +243,7 @@ class BaseSitemapUrl(TranslatableModel):
         og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
         canonical = models.CharField(max_length=200, blank=True, null=True, default=''),
     )
+    og_image = models.CharField(max_length=200, blank=True, null=True, default='')
 
     class Meta:
         abstract = True
