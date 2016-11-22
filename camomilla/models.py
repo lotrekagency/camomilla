@@ -161,6 +161,8 @@ class BaseCategory(TranslatableModel):
 
 class Category(BaseCategory):
     translations = TranslatedFields()
+    class Meta:
+        verbose_name_plural = "categories"
 
 
 class Media(TranslatableModel):
@@ -177,7 +179,7 @@ class Media(TranslatableModel):
     )
     created = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200, blank=True, null=True)
-    dimension = models.IntegerField(default=0, blank=True, null=True)
+    size = models.IntegerField(default=0, blank=True, null=True)
     is_image = models.BooleanField(default=False)
 
     def _make_thumbnail(self):
@@ -219,8 +221,8 @@ class Media(TranslatableModel):
 
     def save(self, *args, **kwargs):
         super(Media, self).save()
-        if self.file and not self.dimension:
-            self.dimension = self.file.size
+        if self.file and not self.size:
+            self.size = self.file.size
             self.save()
         if not self.thumbnail:
             self._make_thumbnail()

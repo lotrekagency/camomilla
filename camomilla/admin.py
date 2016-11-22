@@ -28,8 +28,8 @@ class ContentAdmin(TranslatableAdmin):
     pass
 
 
-class MediaAdmin(admin.ModelAdmin):
-    pass
+class MediaAdmin(TranslatableAdmin):
+    exclude = ('thumbnail', 'size', 'is_image')
 
 
 admin.site.register(UserProfile, UserProfileAdmin)
