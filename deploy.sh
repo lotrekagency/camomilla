@@ -19,6 +19,7 @@ virtualenv venv -p $PYTHON_PATH
 pip install -r requirements.txt
 
 pip install gunicorn
+pip install setproctitle
 
 # Prepare FE libraries
 npm install
