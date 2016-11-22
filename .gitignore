@@ -22,3 +22,6 @@ media/
 
 # Camomilla plugins (remove this line in your project)
 plugin_*
+
+# Logs
+error_logs.log
