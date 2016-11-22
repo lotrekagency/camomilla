@@ -70,6 +70,13 @@ class PermissionViewSet(viewsets.ModelViewSet):
     permission_classes = (CamomillaSuperUser,)
     http_method_names = ['get', 'put', 'options', 'head']
 
+    def get_queryset(self):
+        permissions = Permission.objects.filter(
+            Q(content_type__app_label__contains='camomilla') |
+            Q(content_type__app_label__contains='plugin_')
+        )
+        return permissions
+
 
 class UserProfileViewSet(viewsets.ModelViewSet):
 
