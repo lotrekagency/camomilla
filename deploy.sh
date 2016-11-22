@@ -4,29 +4,29 @@
 
 source deploy_settings.sh
 
-# # Prepare the code
-# git stash
-# git checkout master
-# git fetch origin
-# git merge origin/master
+# Prepare the code
+git stash
+git checkout master
+git fetch origin
+git merge origin/master
 
-# # Prepare virtualenv
-# rm -rf venv
-# virtualenv venv -p $PYTHON_PATH
-# . venv/bin/activate
-# pip install -r requirements.txt
+# Prepare virtualenv
+rm -rf venv
+virtualenv venv -p $PYTHON_PATH
+. venv/bin/activate
+pip install -r requirements.txt
 
-# pip install gunicorn
+pip install gunicorn
 
-# # Prepare FE libraries
-# npm install
+# Prepare FE libraries
+npm install
 
-# # Compile static
-# grunt
-# python manage.py collectstatic -l --no-input
+# Compile static
+grunt
+python manage.py collectstatic -l --no-input
 
-# # Migrate the database
-# python manage.py migrate
+# Migrate the database
+python manage.py migrate
 
 # Create MUST HAVE deploy settings
 echo "DEBUG=False" > $PROJECT_NAME/deploy_settings.py
