@@ -232,10 +232,12 @@ class MediaViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'], permission_classes = (CamomillaBasePermissions,))
     def upload(self, request):
-        new_media = Media.objects.create(
+        new_media = Media.objects.language(self._get_user_language()).create(
+            title=request.POST['title'],
+            alt_text=request.POST['alt_text'],
             file=request.FILES['file_contents'],
             name=request.POST['file_name'],
-            dimension=0
+            size=0,
         )
         return redirect('media-detail', pk=new_media.pk)
 
