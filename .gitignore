@@ -25,3 +25,6 @@ plugin_*
 
 # Logs
 error_logs.log
+
+# Sockets
+*.socket
