@@ -89,7 +89,7 @@ class BaseArticle(TranslatableModel):
     date = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('camomilla.Tag', blank=True)
     categories = models.ManyToManyField('camomilla.Category', blank=True)
-    og_image = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_image = models.URLField(max_length=200, blank=True, null=True, default='')
 
     class Meta:
         abstract = True
@@ -245,7 +245,7 @@ class BaseSitemapUrl(TranslatableModel):
         og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
         canonical = models.CharField(max_length=200, blank=True, null=True, default=''),
     )
-    og_image = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_image = models.URLField(max_length=200, blank=True, null=True, default='')
 
     class Meta:
         abstract = True
