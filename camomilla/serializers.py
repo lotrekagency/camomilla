@@ -10,17 +10,19 @@ from django.contrib.auth.models import Permission
 from django.utils.translation import ugettext_lazy as _
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = UserProfile
-        fields = '__all__'
-
-
 class PermissionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Permission
+        fields = '__all__'
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    user_permissions = PermissionSerializer(source='user.user_permissions', many=True)
+
+    class Meta:
+        model = UserProfile
         fields = '__all__'
 
 
