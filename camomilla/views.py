@@ -122,10 +122,11 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
         # Filter by status
         status = request.GET.get('status', None)
+        # Filter by page
+        page = request.GET.get('page', None)
+        queryset = self.get_queryset()
         if status:
-            queryset = self.get_queryset().filter(status=status)
-        else:
-            queryset = self.get_queryset()
+            queryset = queryset.filter(status=status)
 
         # Support pagination
         current_serializer = self.get_dynamic_serializer(request)
@@ -188,11 +189,13 @@ class ContentViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         user_language = self._get_user_language()
         status = request.GET.get('status', None)
+        page = request.GET.get('page', None)
 
+        queryset = self.get_queryset()
         if status:
             queryset = self.get_queryset().filter(status=status)
-        else:
-            queryset = self.get_queryset()
+        if page:
+            queryset = queryset.filter(page=page)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -263,10 +266,12 @@ class MediaViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'], permission_classes = (CamomillaBasePermissions,))
     def upload(self, request):
-        new_media = Media.objects.create(
+        new_media = Media.objects.language(self._get_user_language()).create(
+            title=request.POST['title'],
+            alt_text=request.POST['alt_text'],
             file=request.FILES['file_contents'],
             name=request.POST['file_name'],
-            dimension=0
+            size=0,
         )
         return redirect('media-detail', pk=new_media.pk)
 
@@ -274,6 +279,16 @@ class MediaViewSet(viewsets.ModelViewSet):
         with open('some/file/name.txt', 'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
+
+    def _get_user_language(self):
+        return self.request.GET.get(
+            'language', self.request.data.get('language_code', 'en')
+        )
+
+    def get_queryset(self):
+        user_language = self._get_user_language()
+        contents = self.model.objects.language(user_language).fallbacks().all()
+        return contents
 
 
 class SitemapUrlViewSet(viewsets.ModelViewSet):
@@ -283,18 +298,20 @@ class SitemapUrlViewSet(viewsets.ModelViewSet):
     permission_classes = (CamomillaSuperUser,)
     model = SitemapUrl
 
-    @list_route(methods=['post'])
-    def new(self, request):
-        SitemapUrl.objects.all().delete()
-        urls = json.loads(request.POST['urls'])
-        for url in urls:
-            SitemapUrl.objects.create(url=url)
-        return Response({})
-
     def get_serializer_class(self):
         if self.action == 'list':
             return CompactSitemapUrlSerializer
         return SitemapUrlSerializer
+
+    def _get_user_language(self):
+        return self.request.GET.get(
+            'language', self.request.data.get('language_code', 'en')
+        )
+
+    def get_queryset(self):
+        user_language = self._get_user_language()
+        contents = self.model.objects.language(user_language).fallbacks().all()
+        return contents
 
 
 class LanguageViewSet(views.APIView):

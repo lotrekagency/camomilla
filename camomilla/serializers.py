@@ -121,7 +121,7 @@ class ContentSerializer(TranslatableModelSerializer):
         fields = '__all__'
 
 
-class MediaSerializer(serializers.ModelSerializer):
+class MediaSerializer(TranslatableModelSerializer):
 
     class Meta:
         model = Media
@@ -159,15 +159,15 @@ class ExpandendArticleSerializer(UnderTranslateMixin, TranslatableModelSerialize
         return CategorySerializer(categories, many=True).data
 
 
-class SitemapUrlSerializer(serializers.ModelSerializer):
+class SitemapUrlSerializer(TranslatableModelSerializer):
 
     class Meta:
         model = SitemapUrl
         fields = '__all__'
 
 
-class CompactSitemapUrlSerializer(serializers.ModelSerializer):
+class CompactSitemapUrlSerializer(TranslatableModelSerializer):
 
     class Meta:
         model = SitemapUrl
-        fields = ('id','url',)
+        fields = ('id', 'page', 'title', 'permalink')

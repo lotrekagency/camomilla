@@ -1,4 +1,4 @@
-# Deploy your project
+# Deploy Camomilla core
 
 ## System requirements
 

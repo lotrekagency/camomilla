@@ -86,9 +86,14 @@ class BaseArticle(TranslatableModel):
         title = models.CharField(max_length=200),
         content = models.TextField(),
         description = models.TextField(blank=True, null=True, default=''),
-        permalink = models.CharField(max_length=200)
+        permalink = models.CharField(max_length=200),
+        og_description = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_title = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_type = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
+        canonical = models.CharField(max_length=200, blank=True, null=True, default='')
     )
-    author = models.ForeignKey(settings.AUTH_USER_MODEL)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     status = models.CharField(
         max_length=3,
         choices=CONTENT_STATUS,
@@ -98,13 +103,7 @@ class BaseArticle(TranslatableModel):
     date = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('camomilla.Tag', blank=True)
     categories = models.ManyToManyField('camomilla.Category', blank=True)
-    canonical = models.CharField(max_length=200, blank=True, null=True, default='')
-    robots = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_image = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_description = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_title = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_type = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_url = models.CharField(max_length=200, blank=True, null=True, default='')
+    og_image = models.URLField(max_length=200, blank=True, null=True, default='')
 
     class Meta:
         abstract = True
@@ -125,13 +124,14 @@ class BaseContent(TranslatableModel):
         content = models.TextField(),
         permalink = models.CharField(max_length=200)
     )
-    author = models.ForeignKey(settings.AUTH_USER_MODEL)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     status = models.CharField(
         max_length=3,
         choices=CONTENT_STATUS,
         default='DRF',
     )
     date = models.DateTimeField(auto_now=True)
+    page = models.ForeignKey('camomilla.SitemapUrl', blank=False, null=True)
 
     class Meta:
         unique_together = [('permalink', 'language_code')]
@@ -175,9 +175,15 @@ class BaseCategory(TranslatableModel):
 
 class Category(BaseCategory):
     translations = TranslatedFields()
+    class Meta:
+        verbose_name_plural = "categories"
 
 
-class Media(models.Model):
+class Media(TranslatableModel):
+    translations = TranslatedFields(
+        alt_text = models.CharField(max_length=200, blank=True, null=True),
+        title = models.CharField(max_length=200, blank=True, null=True)
+    )
     file = models.FileField()
     thumbnail = models.ImageField(
         upload_to=settings.THUMB_FOLDER,
@@ -187,7 +193,7 @@ class Media(models.Model):
     )
     created = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200, blank=True, null=True)
-    dimension = models.IntegerField(default=0, blank=True, null=True)
+    size = models.IntegerField(default=0, blank=True, null=True)
     is_image = models.BooleanField(default=False)
 
     def _make_thumbnail(self):
@@ -229,8 +235,8 @@ class Media(models.Model):
 
     def save(self, *args, **kwargs):
         super(Media, self).save()
-        if self.file and not self.dimension:
-            self.dimension = self.file.size
+        if self.file and not self.size:
+            self.size = self.file.size
             self.save()
         if not self.thumbnail:
             self._make_thumbnail()
@@ -239,21 +245,27 @@ class Media(models.Model):
         return self.file.name
 
 
-class BaseSitemapUrl(models.Model):
-    url = models.CharField(max_length=200, unique=True)
-    title = models.CharField(max_length=200, blank=True, null=True, default='')
-    description = models.TextField(blank=True, null=True, default='')
-    canonical = models.CharField(max_length=200, blank=True, null=True, default='')
-    robots = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_image = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_description = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_title = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_type = models.CharField(max_length=200, blank=True, null=True, default='')
-    og_url = models.CharField(max_length=200, blank=True, null=True, default='')
+class BaseSitemapUrl(TranslatableModel):
+
+    page = models.CharField(max_length=200, unique=True)
+    translations = TranslatedFields(
+        title = models.CharField(max_length=200),
+        description = models.TextField(blank=True, null=True, default=''),
+        permalink = models.CharField(max_length=200),
+        og_description = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_title = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_type = models.CharField(max_length=200, blank=True, null=True, default=''),
+        og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
+        canonical = models.CharField(max_length=200, blank=True, null=True, default=''),
+    )
+    og_image = models.URLField(max_length=200, blank=True, null=True, default='')
 
     class Meta:
         abstract = True
 
+    def __str__(self):
+        return self.page
+
 
 class SitemapUrl(BaseSitemapUrl):
-    pass
+    translations = TranslatedFields()
