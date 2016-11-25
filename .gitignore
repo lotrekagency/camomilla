@@ -1,3 +1,4 @@
+# System
 venv
 *.pyc
 *.zip
@@ -5,13 +6,25 @@ venv
 *.sqlite3
 *.rdb
 .coverage
-settings_local.py
+.cache
+coverage
+
+# Settings
+local_settings.py
+deploy_settings.py
+deploy_settings.sh
+
+# Static, media and libs
 static/
 libs/
 node_modules
-.cache
-coverage
-camomillabench/local_settings.py
 media/
+
+# Camomilla plugins (remove this line in your project)
 plugin_*
-gunicorn_settings.py
+
+# Logs
+error_logs.log
+
+# Sockets
+*.socket
