@@ -73,7 +73,9 @@ class PermissionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         permissions = Permission.objects.filter(
             Q(content_type__app_label__contains='camomilla') |
-            Q(content_type__app_label__contains='plugin_')
+            Q(content_type__app_label__contains='plugin_') |
+            Q(content_type__model='token') |
+            Q(content_type__model='user')
         )
         return permissions
 

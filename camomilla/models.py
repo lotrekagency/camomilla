@@ -49,10 +49,20 @@ class UserProfile(BaseUserProfile):
 
     def save(self, *args, **kwargs):
         super(UserProfile, self).save()
-        if self.level != '1':
+        if self.level == '2':
             permissions = Permission.objects.filter(
                 Q(content_type__app_label__contains='camomilla') |
                 Q(content_type__app_label__contains='plugin_')
+            )
+            for permission in permissions:
+                self.user.user_permissions.add(permission)
+
+        if self.level == '3':
+            permissions = Permission.objects.filter(
+                Q(content_type__app_label__contains='camomilla') |
+                Q(content_type__app_label__contains='plugin_') |
+                Q(content_type__model='token') |
+                Q(content_type__model='user')
             )
             for permission in permissions:
                 self.user.user_permissions.add(permission)
