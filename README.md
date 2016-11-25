@@ -36,6 +36,10 @@ And create a super user to start managing your project
 
     $ python manage.py runserver
 
+## Deploy on a real server
+
+Please, read DEPLOY.md
+
 ## A note for pre alpha adopters
 
 In case you want to test and/or use Camomilla 4.0 pre-alpha: we don't want to track a lot of migrations, so we throw away all the migrations before the official release. If you want update Camomilla please delete and create your database again, then launch all the migrations with

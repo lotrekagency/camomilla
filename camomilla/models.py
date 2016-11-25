@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 from django.conf import settings
 
+from django.contrib.auth.models import Permission
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 
@@ -44,7 +46,26 @@ class BaseUserProfile(models.Model):
 
 
 class UserProfile(BaseUserProfile):
-    pass
+
+    def save(self, *args, **kwargs):
+        super(UserProfile, self).save()
+        if self.level == '2':
+            permissions = Permission.objects.filter(
+                Q(content_type__app_label__contains='camomilla') |
+                Q(content_type__app_label__contains='plugin_')
+            )
+            for permission in permissions:
+                self.user.user_permissions.add(permission)
+
+        if self.level == '3':
+            permissions = Permission.objects.filter(
+                Q(content_type__app_label__contains='camomilla') |
+                Q(content_type__app_label__contains='plugin_') |
+                Q(content_type__model='token') |
+                Q(content_type__model='user')
+            )
+            for permission in permissions:
+                self.user.user_permissions.add(permission)
 
 
 def create_user_profile(sender, **kwargs):
