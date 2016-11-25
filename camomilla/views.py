@@ -16,10 +16,10 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework.decorators import detail_route, list_route
 
 
-from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile, Page
+from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile
 from .serializers import ExpandendArticleSerializer, ArticleSerializer, MediaSerializer
 from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
-from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer, PageSerializer
+from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer
 from .permissions import CamomillaBasePermissions, CamomillaSuperUser
 
 
@@ -38,13 +38,6 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
             )
         except UserProfile.DoesNotExist:
             return Response({'token': token.key})
-
-
-class PageViewSet(viewsets.ModelViewSet):
-
-    queryset = Page.objects.all()
-    serializer_class = PageSerializer
-    http_method_names = ['get', 'put', 'options', 'head']
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
@@ -263,18 +256,6 @@ class SitemapUrlViewSet(viewsets.ModelViewSet):
     serializer_class = SitemapUrlSerializer
     permission_classes = (CamomillaSuperUser,)
     model = SitemapUrl
-
-    @list_route(methods=['post'])
-    def new(self, request):
-        SitemapUrl.objects.all().delete()
-        urls = request.data['urls']
-        print (urls)
-        for url in urls:
-            SitemapUrl.objects.create(
-                url=url,
-                language_code='en'
-            )
-        return Response({})
 
     def get_serializer_class(self):
         if self.action == 'list':

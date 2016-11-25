@@ -60,13 +60,6 @@ def create_user_profile(sender, **kwargs):
 post_save.connect(create_user_profile, sender=settings.AUTH_USER_MODEL)
 
 
-class Page(models.Model):
-    title = models.CharField(max_length=200, blank=True, null=True)
-
-    def __str__(self):
-        return self.title
-
-
 class BaseArticle(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
@@ -79,7 +72,7 @@ class BaseArticle(TranslatableModel):
         og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
         canonical = models.CharField(max_length=200, blank=True, null=True, default='')
     )
-    author = models.ForeignKey(settings.AUTH_USER_MODEL)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     status = models.CharField(
         max_length=3,
         choices=CONTENT_STATUS,
@@ -110,14 +103,14 @@ class BaseContent(TranslatableModel):
         content = models.TextField(),
         permalink = models.CharField(max_length=200)
     )
-    author = models.ForeignKey(settings.AUTH_USER_MODEL)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     status = models.CharField(
         max_length=3,
         choices=CONTENT_STATUS,
         default='DRF',
     )
     date = models.DateTimeField(auto_now=True)
-    page = models.ForeignKey('camomilla.Page', blank=False, null=True)
+    page = models.ForeignKey('camomilla.SitemapUrl', blank=False, null=True)
 
     class Meta:
         unique_together = [('permalink', 'language_code')]
@@ -233,8 +226,7 @@ class Media(TranslatableModel):
 
 class BaseSitemapUrl(TranslatableModel):
 
-    url = models.CharField(max_length=200, unique=True)
-    page = models.ForeignKey('camomilla.Page', blank=False, null=True)
+    page = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
         description = models.TextField(blank=True, null=True, default=''),
@@ -249,6 +241,9 @@ class BaseSitemapUrl(TranslatableModel):
 
     class Meta:
         abstract = True
+
+    def __str__(self):
+        return self.page
 
 
 class SitemapUrl(BaseSitemapUrl):

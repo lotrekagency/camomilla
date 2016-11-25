@@ -1,11 +1,7 @@
 from django.contrib import admin
-from .models import Article, Tag, Category, Content, Media, UserProfile, Page
+from .models import Article, Tag, Category, Content, Media, UserProfile, SitemapUrl
 
 from hvad.admin import TranslatableAdmin
-
-
-class PageAdmin(admin.ModelAdmin):
-    pass
 
 
 class UserProfileAdmin(admin.ModelAdmin):
@@ -13,7 +9,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 
 class ArticleAdmin(TranslatableAdmin):
-    pass
+    exclude = ('author',)
 
 
 class TagAdmin(TranslatableAdmin):
@@ -25,11 +21,15 @@ class CategoryAdmin(TranslatableAdmin):
 
 
 class ContentAdmin(TranslatableAdmin):
-    pass
+    exclude = ('author',)
 
 
 class MediaAdmin(TranslatableAdmin):
     exclude = ('thumbnail', 'size', 'is_image')
+
+
+class SitemapUrlAdmin(TranslatableAdmin):
+    pass
 
 
 admin.site.register(UserProfile, UserProfileAdmin)
@@ -38,4 +38,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Content, ContentAdmin)
 admin.site.register(Media, MediaAdmin)
-admin.site.register(Page, PageAdmin)
+admin.site.register(SitemapUrl, SitemapUrlAdmin)

@@ -1,5 +1,5 @@
 from rest_framework import serializers, permissions
-from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile, Page
+from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile
 
 from hvad.contrib.restframework import TranslatableModelSerializer
 
@@ -8,13 +8,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = '__all__'
-
-
-class PageSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Page
         fields = '__all__'
 
 
@@ -97,8 +90,8 @@ class SitemapUrlSerializer(TranslatableModelSerializer):
         fields = '__all__'
 
 
-class CompactSitemapUrlSerializer(serializers.ModelSerializer):
+class CompactSitemapUrlSerializer(TranslatableModelSerializer):
 
     class Meta:
         model = SitemapUrl
-        fields = ('id','url',)
+        fields = ('id', 'page', 'title', 'permalink')
