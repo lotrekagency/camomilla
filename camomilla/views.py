@@ -1,10 +1,14 @@
 import json
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
+
 from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import redirect
+
 
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -19,7 +23,7 @@ from rest_framework.decorators import detail_route, list_route
 from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile
 from .serializers import ExpandendArticleSerializer, ArticleSerializer, MediaSerializer
 from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
-from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer
+from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer, UserSerializer, PermissionSerializer
 from .permissions import CamomillaBasePermissions, CamomillaSuperUser
 
 
@@ -40,10 +44,47 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
             return Response({'token': token.key})
 
 
+class UserViewSet(viewsets.ModelViewSet):
+
+    queryset = get_user_model().objects.all()
+    serializer_class = UserSerializer
+    model = get_user_model()
+    permission_classes = (CamomillaSuperUser,)
+
+    @detail_route(methods=['post'])
+    def kickout(self, request, pk=None):
+        user = get_user_model().objects.get(pk=pk)
+        try:
+            user.auth_token.delete()
+        except:
+            pass
+
+        return Response({})
+
+
+class PermissionViewSet(viewsets.ModelViewSet):
+
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+    model = Permission
+    permission_classes = (CamomillaSuperUser,)
+    http_method_names = ['get', 'put', 'options', 'head']
+
+    def get_queryset(self):
+        permissions = Permission.objects.filter(
+            Q(content_type__app_label__contains='camomilla') |
+            Q(content_type__app_label__contains='plugin_') |
+            Q(content_type__model='token') |
+            Q(content_type__model='user')
+        )
+        return permissions
+
+
 class UserProfileViewSet(viewsets.ModelViewSet):
 
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+    model = UserProfile
     http_method_names = ['get', 'put', 'options', 'head']
 
     @list_route(methods=['get'])
@@ -218,6 +259,7 @@ class MediaViewSet(viewsets.ModelViewSet):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
+    model = Media
 
     @list_route(methods=['post'], permission_classes = (CamomillaBasePermissions,))
     def upload(self, request):
@@ -239,6 +281,7 @@ class SitemapUrlViewSet(viewsets.ModelViewSet):
     queryset = SitemapUrl.objects.all()
     serializer_class = SitemapUrlSerializer
     permission_classes = (CamomillaSuperUser,)
+    model = SitemapUrl
 
     @list_route(methods=['post'])
     def new(self, request):
