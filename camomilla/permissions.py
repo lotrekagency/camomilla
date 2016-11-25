@@ -9,6 +9,8 @@ class CamomillaBasePermissions(permissions.BasePermission):
         else:
             permission = ''
             model_name = model.__name__.lower()
+            if request.method == 'GET':
+                permission = 'read'
             if request.method == 'DELETE':
                 permission = 'delete'
             if request.method == 'POST':

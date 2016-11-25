@@ -49,6 +49,16 @@ class UserProfile(BaseUserProfile):
 
     def save(self, *args, **kwargs):
         super(UserProfile, self).save()
+
+        if self.level == '1':
+            permissions = Permission.objects.filter(
+                Q(content_type__app_label__contains='camomilla') |
+                Q(content_type__app_label__contains='plugin_'),
+                codename__contains='read'
+            )
+            for permission in permissions:
+                self.user.user_permissions.add(permission)
+
         if self.level == '2':
             permissions = Permission.objects.filter(
                 Q(content_type__app_label__contains='camomilla') |
@@ -66,6 +76,11 @@ class UserProfile(BaseUserProfile):
             )
             for permission in permissions:
                 self.user.user_permissions.add(permission)
+
+    class Meta:
+        permissions = (
+            ("read_userprofile", _("Can read user profile")),
+        )
 
 
 def create_user_profile(sender, **kwargs):
@@ -116,6 +131,11 @@ class BaseArticle(TranslatableModel):
 class Article(BaseArticle):
     translations = TranslatedFields()
 
+    class Meta:
+        permissions = (
+            ("read_article", _("Can read article")),
+        )
+
 
 class BaseContent(TranslatableModel):
     translations = TranslatedFields(
@@ -144,6 +164,11 @@ class BaseContent(TranslatableModel):
 class Content(BaseContent):
     translations = TranslatedFields()
 
+    class Meta:
+        permissions = (
+            ("read_content", _("Can read content")),
+        )
+
 
 class BaseTag(TranslatableModel):
     translations = TranslatedFields(
@@ -160,6 +185,11 @@ class BaseTag(TranslatableModel):
 class Tag(BaseTag):
     translations = TranslatedFields()
 
+    class Meta:
+        permissions = (
+            ("read_tag", _("Can read tag")),
+        )
+
 
 class BaseCategory(TranslatableModel):
     translations = TranslatedFields(
@@ -175,8 +205,12 @@ class BaseCategory(TranslatableModel):
 
 class Category(BaseCategory):
     translations = TranslatedFields()
+
     class Meta:
         verbose_name_plural = "categories"
+        permissions = (
+            ("read_category", _("Can read category")),
+        )
 
 
 class Media(TranslatableModel):
@@ -195,6 +229,11 @@ class Media(TranslatableModel):
     name = models.CharField(max_length=200, blank=True, null=True)
     size = models.IntegerField(default=0, blank=True, null=True)
     is_image = models.BooleanField(default=False)
+
+    class Meta:
+        permissions = (
+            ("read_media", _("Can read media")),
+        )
 
     def _make_thumbnail(self):
         from PIL import Image
@@ -269,3 +308,8 @@ class BaseSitemapUrl(TranslatableModel):
 
 class SitemapUrl(BaseSitemapUrl):
     translations = TranslatedFields()
+
+    class Meta:
+        permissions = (
+            ("read_sitemapurl", _("Can read sitemap url")),
+        )
