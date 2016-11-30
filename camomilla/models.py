@@ -80,6 +80,11 @@ class CamomillaBaseUser(AbstractUser):
         )
 
 
+if settings.AUTH_USER_MODEL == "camomilla.CamomillaUser":
+    class CamomillaUser(CamomillaBaseUser):
+        pass
+
+
 class BaseArticle(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
