@@ -1,7 +1,7 @@
 from rest_framework import serializers, permissions
 from rest_framework.authtoken.models import Token
 
-from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile
+from .models import Article, Tag, Category, Content, Media, SitemapUrl
 
 from hvad.contrib.restframework import TranslatableModelSerializer
 
@@ -19,10 +19,10 @@ class PermissionSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
 
-    user_permissions = PermissionSerializer(source='user.user_permissions', many=True)
+    user_permissions = PermissionSerializer(read_only=True, many=True)
 
     class Meta:
-        model = UserProfile
+        model = get_user_model()
         fields = '__all__'
 
 
@@ -31,7 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     password = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
     repassword = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
-    level = serializers.CharField(source="profile.level", required=False)
+    level = serializers.CharField(required=False)
     has_token = serializers.SerializerMethodField('get_token', read_only=True)
 
     def get_token(self, obj):
@@ -58,15 +58,12 @@ class UserSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             username=validated_data['username'],
             first_name=validated_data['first_name'],
-            last_name=validated_data['last_name']
+            last_name=validated_data['last_name'],
+            level=validated_data['level']
         )
         if validated_data.get('password', ''):
             user.set_password(validated_data['password'])
         user.save()
-        profile = validated_data.get('profile', '')
-        if profile:
-            user.profile.level = profile['level']
-        user.profile.save()
         return user
 
     def update(self, instance, validated_data):
@@ -74,16 +71,14 @@ class UserSerializer(serializers.ModelSerializer):
         instance.username = validated_data.get('username', instance.username)
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.level = validated_data.get('level', instance.level)
         if validated_data.get('password', ''):
             instance.set_password(validated_data['password'])
-        profile = validated_data.get('profile', '')
-        if profile:
-            instance.profile.level = profile['level']
-        instance.profile.save()
         permissions = validated_data.get('user_permissions', [])
         instance.user_permissions.clear()
         for permission in permissions:
             instance.user_permissions.add(permission)
+        instance.save()
         return instance
 
 

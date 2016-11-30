@@ -1,7 +1,11 @@
 from django.contrib import admin
-from .models import Article, Tag, Category, Content, Media, UserProfile, SitemapUrl
+from .models import Article, Tag, Category, Content, Media, SitemapUrl, CamomillaUser
 
 from hvad.admin import TranslatableAdmin
+
+
+class CamomillaUserAdmin(admin.ModelAdmin):
+    pass
 
 
 class UserProfileAdmin(admin.ModelAdmin):
@@ -32,7 +36,7 @@ class SitemapUrlAdmin(TranslatableAdmin):
     pass
 
 
-admin.site.register(UserProfile, UserProfileAdmin)
+admin.site.register(CamomillaUser, CamomillaUserAdmin)
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Tag, TagAdmin)

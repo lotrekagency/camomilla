@@ -27,7 +27,7 @@ class CamomillaBasePermissions(permissions.BasePermission):
         if not request.user.is_authenticated():
             return False
 
-        if request.user.profile.level == '3':
+        if request.user.level == '3':
             return True
         else:
             return self._check_custom_permissions(request, view.model)
@@ -39,7 +39,7 @@ class CamomillaBasePermissions(permissions.BasePermission):
         if not request.user.is_authenticated():
             return False
 
-        if request.user.profile.level == '3':
+        if request.user.level == '3':
             return True
         else:
             return self._check_custom_permissions(request, view.model)
@@ -52,9 +52,9 @@ class CamomillaSuperUser(permissions.BasePermission):
     def has_permission(self, request, view):
         if not request.user.is_authenticated():
             return False
-        return request.user.profile.level == '3'
+        return request.user.level == '3'
 
     def has_object_permission(self, request, view, obj):
         if not request.user.is_authenticated():
             return False
-        return request.user.profile.level == '3'
+        return request.user.level == '3'

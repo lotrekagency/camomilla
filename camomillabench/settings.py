@@ -28,6 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+AUTH_USER_MODEL = "camomilla.CamomillaUser"
+
 # Application definition
 
 INSTALLED_APPS = [
