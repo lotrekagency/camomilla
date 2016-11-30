@@ -36,11 +36,14 @@ class CamomillaBaseUser(AbstractUser):
 
     def save(self, *args, **kwargs):
 
-        orig = self.__class__.objects.get(pk=self.pk)
+        try:
+            orig = self.__class__.objects.get(pk=self.pk)
+        except:
+            orig = None
 
         super(CamomillaBaseUser, self).save()
 
-        if orig.level == self.level:
+        if orig and orig.level == self.level:
             return self
 
         if self.level == '1':
@@ -75,10 +78,6 @@ class CamomillaBaseUser(AbstractUser):
         permissions = (
             ("read_userprofile", _("Can read user profile")),
         )
-
-
-class CamomillaUser(CamomillaBaseUser):
-    pass
 
 
 class BaseArticle(TranslatableModel):
