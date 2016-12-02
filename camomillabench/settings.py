@@ -28,7 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-AUTH_USER_MODEL = "camomilla.CamomillaUser"
+AUTH_USER_MODEL = "plugin_profileslist.MyCustomProfile"
 
 # Application definition
 
@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'camomilla',
-    'hvad'
+    'hvad',
+    'plugin_profileslist'
 ]
 
 MIDDLEWARE = [
