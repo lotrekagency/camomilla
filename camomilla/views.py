@@ -20,7 +20,7 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework.decorators import detail_route, list_route
 
 
-from .models import Article, Tag, Category, Content, Media, SitemapUrl, UserProfile
+from .models import Article, Tag, Category, Content, Media, SitemapUrl
 from .serializers import ExpandendArticleSerializer, ArticleSerializer, MediaSerializer
 from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
 from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer, UserSerializer, PermissionSerializer
@@ -35,12 +35,8 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         try:
-            return Response(
-                {
-                    'token': token.key,
-                }
-            )
-        except UserProfile.DoesNotExist:
+            return Response({'token': token.key})
+        except:
             return Response({'token': token.key})
 
 
@@ -82,14 +78,14 @@ class PermissionViewSet(viewsets.ModelViewSet):
 
 class UserProfileViewSet(viewsets.ModelViewSet):
 
-    queryset = UserProfile.objects.all()
+    queryset = get_user_model().objects.all()
     serializer_class = UserProfileSerializer
-    model = UserProfile
+    model = get_user_model()
     http_method_names = ['get', 'put', 'options', 'head']
 
     @list_route(methods=['get'])
     def me(self, request):
-        personal_profile = self.get_queryset().get(user=self.request.user)
+        personal_profile = request.user
         return Response(
             self.serializer_class(
                 personal_profile,

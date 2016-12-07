@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 
 from django.contrib.auth.models import Permission
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save
@@ -24,13 +25,8 @@ PERMISSION_LEVELS = (
 )
 
 
-class BaseUserProfile(models.Model):
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        related_name='profile'
-    )
+class CamomillaBaseUser(AbstractUser):
+
     level = models.CharField(
         max_length=3,
         choices=PERMISSION_LEVELS,
@@ -38,17 +34,17 @@ class BaseUserProfile(models.Model):
     )
     image = models.ImageField(null=True, blank=True)
 
-    def __str__(self):
-        return self.user.username
-
-    class Meta:
-        abstract = True
-
-
-class UserProfile(BaseUserProfile):
-
     def save(self, *args, **kwargs):
-        super(UserProfile, self).save()
+
+        try:
+            orig = self.__class__.objects.get(pk=self.pk)
+        except:
+            orig = None
+
+        super(CamomillaBaseUser, self).save()
+
+        if orig and orig.level == self.level:
+            return self
 
         if self.level == '1':
             permissions = Permission.objects.filter(
@@ -57,7 +53,7 @@ class UserProfile(BaseUserProfile):
                 codename__contains='read'
             )
             for permission in permissions:
-                self.user.user_permissions.add(permission)
+                self.user_permissions.add(permission)
 
         if self.level == '2':
             permissions = Permission.objects.filter(
@@ -65,7 +61,7 @@ class UserProfile(BaseUserProfile):
                 Q(content_type__app_label__contains='plugin_')
             )
             for permission in permissions:
-                self.user.user_permissions.add(permission)
+                self.user_permissions.add(permission)
 
         if self.level == '3':
             permissions = Permission.objects.filter(
@@ -75,25 +71,13 @@ class UserProfile(BaseUserProfile):
                 Q(content_type__model='user')
             )
             for permission in permissions:
-                self.user.user_permissions.add(permission)
+                self.user_permissions.add(permission)
 
     class Meta:
+        abstract = True
         permissions = (
             ("read_userprofile", _("Can read user profile")),
         )
-
-
-def create_user_profile(sender, **kwargs):
-    user = kwargs["instance"]
-    if kwargs["created"]:
-        level = '1'
-        if user.is_superuser:
-            level = '3'
-        profile = UserProfile(user=user, level=level)
-        profile.save()
-
-
-post_save.connect(create_user_profile, sender=settings.AUTH_USER_MODEL)
 
 
 class BaseArticle(TranslatableModel):
@@ -123,6 +107,9 @@ class BaseArticle(TranslatableModel):
     class Meta:
         abstract = True
         unique_together = [('permalink', 'language_code')]
+        permissions = (
+            ("read_article", _("Can read article")),
+        )
 
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
@@ -130,11 +117,6 @@ class BaseArticle(TranslatableModel):
 
 class Article(BaseArticle):
     translations = TranslatedFields()
-
-    class Meta:
-        permissions = (
-            ("read_article", _("Can read article")),
-        )
 
 
 class BaseContent(TranslatableModel):
@@ -156,6 +138,9 @@ class BaseContent(TranslatableModel):
     class Meta:
         unique_together = [('permalink', 'language_code')]
         abstract = True
+        permissions = (
+            ("read_content", _("Can read content")),
+        )
 
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
@@ -163,11 +148,6 @@ class BaseContent(TranslatableModel):
 
 class Content(BaseContent):
     translations = TranslatedFields()
-
-    class Meta:
-        permissions = (
-            ("read_content", _("Can read content")),
-        )
 
 
 class BaseTag(TranslatableModel):
@@ -177,6 +157,9 @@ class BaseTag(TranslatableModel):
 
     class Meta:
         abstract = True
+        permissions = (
+            ("read_tag", _("Can read tag")),
+        )
 
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
@@ -184,11 +167,6 @@ class BaseTag(TranslatableModel):
 
 class Tag(BaseTag):
     translations = TranslatedFields()
-
-    class Meta:
-        permissions = (
-            ("read_tag", _("Can read tag")),
-        )
 
 
 class BaseCategory(TranslatableModel):
@@ -198,6 +176,10 @@ class BaseCategory(TranslatableModel):
 
     class Meta:
         abstract = True
+        verbose_name_plural = "categories"
+        permissions = (
+            ("read_category", _("Can read category")),
+        )
 
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
@@ -205,12 +187,6 @@ class BaseCategory(TranslatableModel):
 
 class Category(BaseCategory):
     translations = TranslatedFields()
-
-    class Meta:
-        verbose_name_plural = "categories"
-        permissions = (
-            ("read_category", _("Can read category")),
-        )
 
 
 class Media(TranslatableModel):
@@ -301,6 +277,9 @@ class BaseSitemapUrl(TranslatableModel):
 
     class Meta:
         abstract = True
+        permissions = (
+            ("read_sitemapurl", _("Can read sitemap url")),
+        )
 
     def __str__(self):
         return self.page
@@ -308,8 +287,3 @@ class BaseSitemapUrl(TranslatableModel):
 
 class SitemapUrl(BaseSitemapUrl):
     translations = TranslatedFields()
-
-    class Meta:
-        permissions = (
-            ("read_sitemapurl", _("Can read sitemap url")),
-        )
