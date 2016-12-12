@@ -10,6 +10,37 @@ If you encounter some problems during mysqlclient installation on Mac, please re
 
 If you encounter some problems during mysqlclient installation on Windows, follow the instructions displayed on your console, you need the Visual C++ compiler installed.
 
+## Settings
+
+Camomilla brings a lot of default settings you can include in your project's ones
+
+    from camomilla.defaults import *
+
+Remember to add all the required applications in your project
+
+    INSTALLED_APPS = [
+        ...
+        'rest_framework',
+        'rest_framework.authtoken',
+        'camomilla',
+        'hvad',
+        ...
+    ]
+
+At the end of your settings file remember to include local_settings and deploy_settings
+
+
+    try:
+        from .deploy_settings import *
+    except ImportError:
+        pass
+
+    try:
+        from .local_settings import *
+    except ImportError:
+        print ("\n\nWARNING: No local_settings.py found! Please look at the README.md file!\n\n")
+
+
 ## Setup database
 
 Create your_project/local_settings.py file and write your database configuration, based on local_settings_example.py:
