@@ -19,7 +19,7 @@ fi
 pkill gunicorn_$PROJECT_NAME
 
 # Prepare the code
-if [ $1 -eq 'reset' ]; then
+if [ "$1" = "reset" ]; then
     git stash
     git checkout master
     git fetch origin
