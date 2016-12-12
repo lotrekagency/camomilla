@@ -3,14 +3,28 @@
 # Get configuration
 source deploy_settings.sh
 
+# Check configuration
+
+if [ -z "$PROJECT_NAME" ]; then
+    echo "Please set PROJECT_NAME variable!"
+    exit 1
+fi
+
+if [ ! -f $PROJECT_NAME/local_settings.py ]; then
+    echo "Please define $PROJECT_NAME/local_settings.py!"
+    exit 1
+fi
+
 # Kill the old process
 pkill gunicorn_$PROJECT_NAME
 
 # Prepare the code
-git stash
-git checkout master
-git fetch origin
-git merge origin/master
+if [ $1 -eq 'reset' ]; then
+    git stash
+    git checkout master
+    git fetch origin
+    git merge origin/master
+fi
 
 # Prepare virtualenv
 rm -rf venv
