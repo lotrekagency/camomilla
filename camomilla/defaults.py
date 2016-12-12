@@ -1,5 +1,8 @@
+import os
+
 from django.utils.translation import ugettext_lazy as _
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 LANGUAGE_CODE = 'it'
 
@@ -28,6 +31,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+STATICFILES_DIRS = []
+if os.path.exists(os.path.join(BASE_DIR, 'build')):
+    STATICFILES_DIRS.append(os.path.join(BASE_DIR, 'build'))
+if os.path.exists(os.path.join(BASE_DIR, 'public')):
+    STATICFILES_DIRS.append(os.path.join(BASE_DIR, 'public'))
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

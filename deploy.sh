@@ -39,7 +39,7 @@ pip install setproctitle
 npm install
 
 # Compile static
-grunt
+grunt build
 python manage.py collectstatic -l --no-input
 
 # Migrate the database
