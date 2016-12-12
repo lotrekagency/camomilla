@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.contrib.admin.sites import AlreadyRegistered
 from .models import Article, Tag, Category, Content, Media, SitemapUrl
 
 from hvad.admin import TranslatableAdmin
@@ -37,7 +38,10 @@ class SitemapUrlAdmin(TranslatableAdmin):
     pass
 
 
-admin.site.register(get_user_model(), CamomillaUserAdmin)
+try:
+    admin.site.register(get_user_model(), CamomillaUserAdmin)
+except AlreadyRegistered:
+    raise Exception ('Uhm.. Maybe you need to define your own AUTH_USER_MODEL. Please follow the README.md')
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Tag, TagAdmin)
