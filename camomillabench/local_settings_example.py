@@ -21,4 +21,5 @@ LANGUAGES = (
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'abe1z$e@ii490wzee=-%s(dh-2o5y3(wgj7sl6)0wiyb0k6-4i'
 
-ULR_PREFIX = 'panel'
+# Uncomment this to support the url prefix
+# ULR_PREFIX = 'panel'
