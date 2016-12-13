@@ -238,7 +238,7 @@ class Media(TranslatableModel):
         thumb_filename = thumb_name + '_thumb' + thumb_extension
 
         temp_thumb = BytesIO()
-        image.save(temp_thumb, 'PNG')
+        image.convert('RGB').save(temp_thumb, 'PNG', optimize=True)
         temp_thumb.seek(0)
 
         # Load a ContentFile into the thumbnail field so it gets saved
