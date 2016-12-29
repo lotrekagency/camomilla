@@ -9,7 +9,13 @@ from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 
 from hvad.models import TranslatableModel, TranslatedFields
+
 import uuid
+
+
+def create_content_id():
+  return str(uuid.uuid4())[0:8]
+
 
 CONTENT_STATUS = (
     ('PUB', _('Published')),
@@ -118,8 +124,6 @@ class BaseArticle(TranslatableModel):
 class Article(BaseArticle):
     translations = TranslatedFields()
 
-def create_content_id():
-  return str(uuid.uuid4())[0:8]
 
 class BaseContent(TranslatableModel):
     translations = TranslatedFields(
@@ -128,7 +132,7 @@ class BaseContent(TranslatableModel):
         permalink = models.CharField(max_length=200, blank=True, null=True),
         content = models.TextField()
     )
-    identifier = models.CharField(max_length=200,unique=True,default=create_content_id)
+    identifier = models.CharField(max_length=200)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     status = models.CharField(
         max_length=3,
@@ -140,6 +144,7 @@ class BaseContent(TranslatableModel):
 
     class Meta:
         abstract = True
+        unique_together = [('page', 'identifier')]
         permissions = (
             ("read_content", _("Can read content")),
         )
