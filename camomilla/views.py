@@ -179,7 +179,7 @@ class ContentViewSet(viewsets.ModelViewSet):
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
     model = Content
-    lookup_field = 'permalink'
+    lookup_field = 'identifier'
     permission_classes = (CamomillaBasePermissions,)
 
     def list(self, request, *args, **kwargs):
@@ -199,21 +199,6 @@ class ContentViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
 
         serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
-
-    def retrieve(self, request, *args, **kwargs):
-        user_language = self._get_user_language()
-        try:
-            instance = self.get_queryset().get(permalink=kwargs['permalink'])
-        except Exception as ex:
-            # In case you use a different permalink
-            instance = self.model.objects.language('all').get(
-                permalink=kwargs['permalink']
-            )
-            instance = self.get_queryset().get(master=instance.pk)
-        serializer = self.serializer_class(
-            instance, context={'request': request}
-        )
         return Response(serializer.data)
 
     def perform_create(self, serializer):
