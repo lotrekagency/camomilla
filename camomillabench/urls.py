@@ -17,7 +17,7 @@ urlpatterns = [
 
 try:
     urlpatterns = [
-        url(r'^{0}/'.format(settings.ULR_PREFIX), include(urlpatterns)),
+        url(r'^{0}/'.format(settings.URL_PREFIX), include(urlpatterns)),
     ]
 except AttributeError as ex:
     pass
