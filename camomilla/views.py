@@ -21,7 +21,7 @@ from rest_framework.decorators import detail_route, list_route
 
 
 from .models import Article, Tag, Category, Content, Media, SitemapUrl
-from .serializers import ExpandendArticleSerializer, ArticleSerializer, MediaSerializer
+from .serializers import ExpandedArticleSerializer, ArticleSerializer, MediaSerializer
 from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
 from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer, UserSerializer, PermissionSerializer
 from .permissions import CamomillaBasePermissions, CamomillaSuperUser
@@ -103,7 +103,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     model = Article
     serializers = {
         'compressed' : ArticleSerializer,
-        'expanded' : ExpandendArticleSerializer
+        'expanded' : ExpandedArticleSerializer
     }
 
     def get_dynamic_serializer(self, request):
