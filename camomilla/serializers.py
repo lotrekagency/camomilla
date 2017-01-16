@@ -134,7 +134,7 @@ class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
         fields = '__all__'
 
 
-class ExpandendArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
+class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
 
     tags = serializers.SerializerMethodField('get_translated_tags')
     categories = serializers.SerializerMethodField('get_translated_categories')
