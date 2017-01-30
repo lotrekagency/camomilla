@@ -9,9 +9,8 @@ from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 
 from hvad.models import TranslatableModel, TranslatedFields
-
 import uuid
-
+from django.utils.text import slugify
 
 def create_content_id():
   return str(uuid.uuid4())[0:8]
@@ -91,7 +90,7 @@ class BaseArticle(TranslatableModel):
         title = models.CharField(max_length=200),
         content = models.TextField(),
         description = models.TextField(blank=True, null=True, default=''),
-        permalink = models.CharField(max_length=200),
+        permalink = models.SlugField(max_length=200),
         og_description = models.CharField(max_length=200, blank=True, null=True, default=''),
         og_title = models.CharField(max_length=200, blank=True, null=True, default=''),
         og_type = models.CharField(max_length=200, blank=True, null=True, default=''),
@@ -159,7 +158,8 @@ class Content(BaseContent):
 
 class BaseTag(TranslatableModel):
     translations = TranslatedFields(
-        title = models.CharField(max_length=200, unique=True)
+        title = models.CharField(max_length=200, unique=True),
+        slug = models.SlugField(blank=True)
     )
 
     class Meta:
@@ -171,9 +171,14 @@ class BaseTag(TranslatableModel):
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super(BaseTag, self).save(*args, **kwargs)
 
 class Tag(BaseTag):
     translations = TranslatedFields()
+
 
 
 class BaseCategory(TranslatableModel):

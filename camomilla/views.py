@@ -27,6 +27,13 @@ from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer, User
 from .permissions import CamomillaBasePermissions, CamomillaSuperUser
 
 
+class GetUserLanguageMixin(object):
+    def _get_user_language(self):
+        return self.request.GET.get(
+            'language', self.request.data.get('language_code', settings.LANGUAGE_CODE)
+        )
+
+
 class CamomillaObtainAuthToken(ObtainAuthToken):
 
     def post(self, request, *args, **kwargs):
@@ -94,7 +101,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         )
 
 
-class ArticleViewSet(viewsets.ModelViewSet):
+class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
@@ -163,18 +170,13 @@ class ArticleViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def _get_user_language(self):
-        return self.request.GET.get(
-            'language', self.request.data.get('language_code', 'en')
-        )
-
     def get_queryset(self):
         user_language = self._get_user_language()
         articles = self.model.objects.language(user_language).fallbacks().all()
         return articles
 
 
-class ContentViewSet(viewsets.ModelViewSet):
+class ContentViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
@@ -204,11 +206,6 @@ class ContentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def _get_user_language(self):
-        return self.request.GET.get(
-            'language', self.request.data.get('language_code', 'en')
-        )
-
     def get_queryset(self):
         user_language = self._get_user_language()
         contents = self.model.objects.language(user_language).fallbacks().all()
@@ -223,7 +220,7 @@ class TagViewSet(viewsets.ModelViewSet):
     model = Tag
 
     def get_queryset(self):
-        user_language = self.request.GET.get('language', 'en')
+        user_language = self.request.GET.get('language', settings.LANGUAGE_CODE)
         return self.model.objects.language(user_language).fallbacks().all()
 
 
@@ -239,7 +236,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return self.model.objects.language(user_language).fallbacks().all()
 
 
-class MediaViewSet(viewsets.ModelViewSet):
+
+
+class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
@@ -261,18 +260,13 @@ class MediaViewSet(viewsets.ModelViewSet):
             for chunk in f.chunks():
                 destination.write(chunk)
 
-    def _get_user_language(self):
-        return self.request.GET.get(
-            'language', self.request.data.get('language_code', 'en')
-        )
-
     def get_queryset(self):
         user_language = self._get_user_language()
         contents = self.model.objects.language(user_language).fallbacks().all()
         return contents
 
 
-class SitemapUrlViewSet(viewsets.ModelViewSet):
+class SitemapUrlViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     queryset = SitemapUrl.objects.all()
     serializer_class = SitemapUrlSerializer
@@ -283,11 +277,6 @@ class SitemapUrlViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return CompactSitemapUrlSerializer
         return SitemapUrlSerializer
-
-    def _get_user_language(self):
-        return self.request.GET.get(
-            'language', self.request.data.get('language_code', 'en')
-        )
 
     def get_queryset(self):
         user_language = self._get_user_language()
