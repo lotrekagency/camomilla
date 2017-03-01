@@ -84,3 +84,7 @@ CACHES = {
         }
     }
 }
+
+SITE_URL = 'http://localhost:8000'
+
+PREFIX_DEFAULT_LANGUAGE = True
