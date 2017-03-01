@@ -1,5 +1,7 @@
-from .models import SitemapUrl
+from django.conf import settings
 import urllib.parse
+
+from .models import SitemapUrl
 
 
 def get_complete_url(request, url, language=''):
