@@ -107,7 +107,7 @@ class BaseArticle(TranslatableModel):
     date = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('camomilla.Tag', blank=True)
     categories = models.ManyToManyField('camomilla.Category', blank=True)
-    og_image = models.URLField(max_length=200, blank=True, null=True, default='')
+    og_image = models.ImageField(blank=True, null=True, default='')
 
     class Meta:
         abstract = True
@@ -237,10 +237,12 @@ class Media(TranslatableModel):
             image = Image.open(fh)
             self.is_image = True
         except Exception as ex:
-            print (ex)
             return False
 
-        image.thumbnail((50, 50), Image.ANTIALIAS)
+        image.thumbnail(
+            (settings.CAMOMILLA_THUMBNAIL_WIDTH, settings.CAMOMILLA_THUMBNAIL_HEIGHT),
+            Image.ANTIALIAS
+        )
         fh.close()
 
         # Path to save to, name, and extension
@@ -254,7 +256,6 @@ class Media(TranslatableModel):
         temp_thumb.seek(0)
 
         # Load a ContentFile into the thumbnail field so it gets saved
-        print (thumb_filename)
         self.thumbnail.save(thumb_filename, ContentFile(temp_thumb.read()), save=True)
         temp_thumb.close()
 
@@ -285,7 +286,7 @@ class BaseSitemapUrl(TranslatableModel):
         og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
         canonical = models.CharField(max_length=200, blank=True, null=True, default=''),
     )
-    og_image = models.URLField(max_length=200, blank=True, null=True, default='')
+    og_image = models.ImageField(blank=True, null=True, default='')
 
     class Meta:
         abstract = True
