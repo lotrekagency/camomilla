@@ -158,12 +158,13 @@ class Content(BaseContent):
 
 class BaseTag(TranslatableModel):
     translations = TranslatedFields(
-        title = models.CharField(max_length=200, unique=True),
+        title = models.CharField(max_length=200),
         slug = models.SlugField(blank=True)
     )
 
     class Meta:
         abstract = True
+        unique_together = [('title', 'language_code')]
         permissions = (
             ("read_tag", _("Can read tag")),
         )
@@ -172,13 +173,12 @@ class BaseTag(TranslatableModel):
         return self.lazy_translation_getter('title', str(self.pk))
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
+        self.slug = slugify(self.title)
         super(BaseTag, self).save(*args, **kwargs)
+
 
 class Tag(BaseTag):
     translations = TranslatedFields()
-
 
 
 class BaseCategory(TranslatableModel):
