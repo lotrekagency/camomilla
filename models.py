@@ -227,6 +227,10 @@ class Media(TranslatableModel):
         super(Media, self).__init__(*args, **kwargs)
         self.__original_file = self.file
 
+    def regenerate_thumbnail(self):
+        if self.file:
+            self._make_thumbnail()
+
     def _make_thumbnail(self):
         self.__original_file = self.file
         from PIL import Image
@@ -237,7 +241,11 @@ class Media(TranslatableModel):
 
         from io import BytesIO
 
-        fh = storage.open(self.file.name, 'rb')
+        try:
+            fh = storage.open(self.file.name, 'rb')
+        except FileNotFoundError:
+            self.is_image = False
+            return False
         try:
             image = Image.open(fh)
             self.is_image = True
