@@ -65,11 +65,7 @@ LANGUAGE_CODE = 'en'
 
 LANGUAGES = (
     ('en', _("English")),
-    ('en-us', _("US English")),
     ('it', _('Italian')),
-    ('nl', _('Dutch')),
-    ('fr', _('French')),
-    ('es', _('Spanish')),
 )
 
 ADMIN_SITE_HEADER = _("Camomilla advanced panel")
@@ -85,8 +81,8 @@ CACHES = {
     }
 }
 
-CAMOMILLA_THUMBNAIL_WIDTH = 400
-CAMOMILLA_THUMBNAIL_HEIGHT = 400
+CAMOMILLA_THUMBNAIL_WIDTH = 50
+CAMOMILLA_THUMBNAIL_HEIGHT = 50
 
 SITE_URL = 'http://localhost:8000'
 
