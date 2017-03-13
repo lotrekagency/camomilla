@@ -223,7 +223,12 @@ class Media(TranslatableModel):
             ("read_media", _("Can read media")),
         )
 
+    def __init__(self, *args, **kwargs):
+        super(Media, self).__init__(*args, **kwargs)
+        self.__original_file = self.file
+
     def _make_thumbnail(self):
+        self.__original_file = self.file
         from PIL import Image
         import os
         from django.core.files.base import ContentFile
@@ -261,13 +266,12 @@ class Media(TranslatableModel):
 
         return True
 
-    def save(self, *args, **kwargs):
-        super(Media, self).save()
-        if self.file and not self.size:
-            self.size = self.file.size
-            self.save()
-        if not self.thumbnail:
+    def save(self, force_insert=False, force_update=False, *args, **kwargs):
+        super(Media, self).save(force_insert, force_update, *args, **kwargs)
+        if self.file != self.__original_file:
             self._make_thumbnail()
+        if self.file:
+            self.size = self.file.size
 
     def __str__(self):
         return self.file.name
