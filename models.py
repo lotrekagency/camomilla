@@ -247,7 +247,8 @@ class Media(TranslatableModel):
             self.is_image = False
             return False
         try:
-            image = Image.open(fh)
+            orig_image = Image.open(fh)
+            image = orig_image.copy()
             self.is_image = True
         except Exception as ex:
             return False
