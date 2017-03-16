@@ -7,6 +7,8 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
+
 
 from hvad.models import TranslatableModel, TranslatedFields
 import uuid
@@ -217,6 +219,17 @@ class Media(TranslatableModel):
     name = models.CharField(max_length=200, blank=True, null=True)
     size = models.IntegerField(default=0, blank=True, null=True)
     is_image = models.BooleanField(default=False)
+
+    def image_preview(self):
+        if self.is_image and self.file:
+            return mark_safe('<img src="{0}" />'.format(self.file.url))
+
+    def image_thumb_preview(self):
+        if self.is_image and self.thumbnail:
+            return mark_safe('<img src="{0}" />'.format(self.thumbnail.url))
+
+    image_preview.short_description = _('Preview')
+    image_thumb_preview.short_description = _('Thumbnail')
 
     class Meta:
         permissions = (

@@ -32,7 +32,8 @@ class ContentAdmin(TranslatableAdmin):
 
 class MediaAdmin(TranslatableAdmin):
     exclude = ('thumbnail', 'size', 'is_image')
-
+    readonly_fields = ('image_preview', 'image_thumb_preview')
+    list_display = ('__str__', 'name', 'image_thumb_preview',)
 
 class SitemapUrlAdmin(TranslatableAdmin):
     pass
