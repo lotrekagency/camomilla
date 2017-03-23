@@ -99,13 +99,13 @@ class BaseArticle(TranslatableModel):
         og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
         canonical = models.CharField(max_length=200, blank=True, null=True, default='')
     )
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
     status = models.CharField(
         max_length=3,
         choices=CONTENT_STATUS,
         default='DRF',
     )
-    highlight_image = models.ForeignKey('camomilla.Media', blank=True, null=True)
+    highlight_image = models.ForeignKey('camomilla.Media', blank=True, null=True, on_delete=models.SET_NULL)
     date = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField('camomilla.Tag', blank=True)
     categories = models.ManyToManyField('camomilla.Category', blank=True)
@@ -134,14 +134,14 @@ class BaseContent(TranslatableModel):
         content = models.TextField()
     )
     identifier = models.CharField(max_length=200)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
     status = models.CharField(
         max_length=3,
         choices=CONTENT_STATUS,
         default='DRF',
     )
     date = models.DateTimeField(auto_now=True)
-    page = models.ForeignKey('camomilla.SitemapUrl', blank=False, null=True)
+    page = models.ForeignKey('camomilla.SitemapUrl', blank=False, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         abstract = True
