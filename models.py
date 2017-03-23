@@ -305,7 +305,7 @@ class BaseSitemapUrl(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
         description = models.TextField(blank=True, null=True, default=''),
-        permalink = models.CharField(max_length=200),
+        permalink = models.CharField(max_length=200, blank=True),
         og_description = models.CharField(max_length=200, blank=True, null=True, default=''),
         og_title = models.CharField(max_length=200, blank=True, null=True, default=''),
         og_type = models.CharField(max_length=200, blank=True, null=True, default=''),

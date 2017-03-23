@@ -4,12 +4,18 @@ from django.utils.translation import get_language
 from .models import SitemapUrl
 
 
+def get_host_url(request):
+    if request:
+        return '{0}://{1}'.format(
+            request.scheme, request.META['HTTP_HOST']
+        )
+
+
 def get_complete_url(request, url, language=''):
-    if language == settings.LANGUAGE_CODE:
-        if settings.PREFIX_DEFAULT_LANGUAGE:
-            language = ''
+    if language == settings.LANGUAGE_CODE and not settings.PREFIX_DEFAULT_LANGUAGE:
+        language = ''
     i18n_url = urllib.parse.urljoin(language + '/', url)
-    complete_url = urllib.parse.urljoin(settings.SITE_URL, i18n_url)
+    complete_url = urllib.parse.urljoin(get_host_url(request), i18n_url)
     return complete_url
 
 
@@ -23,10 +29,13 @@ def get_seo(request, page_requested, lang='', model=SitemapUrl):
             meta_tag.og_title = meta_tag.title
         if not meta_tag.og_description:
             meta_tag.og_description = meta_tag.description
+        permalink = meta_tag.permalink
+        if not permalink:
+            permalink = request.path
         if not meta_tag.canonical:
-            meta_tag.canonical = get_complete_url(request, meta_tag.permalink,lang)
+            meta_tag.canonical = get_complete_url(request, permalink, lang)
         else:
-            meta_tag.canonical = get_complete_url(request, meta_tag.canonical,lang)
+            meta_tag.canonical = get_complete_url(request, meta_tag.canonical, lang)
         if not meta_tag.og_url:
             meta_tag.og_url = meta_tag.canonical
         else:
