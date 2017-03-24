@@ -1,4 +1,4 @@
-# Camomilla 4.0 (pre-alpha)
+# Camomilla 4.0 (beta)
 
 ## Install
 
@@ -90,6 +90,16 @@ More about user customization [here](https://docs.djangoproject.com/en/1.10/topi
 ## Run the server
 
     $ python manage.py runserver
+
+## Run tests
+
+Put Camomilla in a real Django project, then run
+
+    $ coverage run --source='camomilla' manage.py test camomilla.tests
+
+To see the coverage use
+
+    $ coverage report
 
 ## Deploy on a real server
 

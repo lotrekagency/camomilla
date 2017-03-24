@@ -12,12 +12,12 @@ def get_host_url(request):
 
 
 def get_complete_url(request, url, language=''):
-    if language == settings.LANGUAGE_CODE and not settings.PREFIX_DEFAULT_LANGUAGE:
+    prefix = getattr(settings, 'PREFIX_DEFAULT_LANGUAGE', False)
+    if language == settings.LANGUAGE_CODE and not prefix:
         language = ''
     i18n_url = urllib.parse.urljoin(language + '/', url)
     complete_url = urllib.parse.urljoin(get_host_url(request), i18n_url)
     return complete_url
-
 
 
 def get_seo(request, page_requested, lang='', model=SitemapUrl):
