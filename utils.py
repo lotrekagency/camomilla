@@ -20,11 +20,12 @@ def get_complete_url(request, url, language=''):
     return complete_url
 
 
-def get_seo(request, identifier, lang='', model=SitemapUrl):
+def get_seo(request, identifier, lang='', model=SitemapUrl, attr='page'):
     if not lang:
         lang = get_language()
     try:
-        meta_tag = model.objects.language().get(page=identifier)
+        kwargs = {attr: identifier}
+        meta_tag = model.objects.language().get(**kwargs)
         if not meta_tag.og_title:
             meta_tag.og_title = meta_tag.title
         if not meta_tag.og_description:
@@ -45,5 +46,5 @@ def get_seo(request, identifier, lang='', model=SitemapUrl):
         return None
 
 
-def get_article_seo(request, identifier, lang=''):
-    return get_seo(request, identifier, lang, Article)
+def get_article_with_seo(request, identifier, lang=''):
+    return get_seo(request, identifier, lang, Article, 'identifier')

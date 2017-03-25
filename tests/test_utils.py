@@ -7,8 +7,8 @@ from requests import RequestException
 from django.test import RequestFactory
 
 
-from camomilla.utils import get_host_url, get_complete_url, get_seo
-from camomilla.models import SitemapUrl
+from camomilla.utils import get_article_with_seo, get_host_url, get_complete_url, get_seo
+from camomilla.models import SitemapUrl, Article
 
 
 class UtilsTestCase(TestCase):
@@ -88,3 +88,18 @@ class UtilsTestCase(TestCase):
         seo_obj = get_seo(request, 'path')
         self.assertEqual(seo_obj.og_url, 'http://localhost/og_url')
         self.assertEqual(seo_obj.canonical, 'http://localhost/canonical')
+
+
+    def test_get_article_with_seo(self):
+        """Our beloved get_seo utility with auto attributes"""
+        Article.objects.language().create(
+            identifier='art1', permalink='perma/link',
+            canonical='canonical', og_url='og_url'
+        )
+
+        request_factory = RequestFactory()
+        request = request_factory.get('/path')
+        request.META['HTTP_HOST'] = 'localhost'
+        article = get_article_with_seo(request, 'art1')
+        self.assertEqual(article.og_url, 'http://localhost/og_url')
+        self.assertEqual(article.canonical, 'http://localhost/canonical')
