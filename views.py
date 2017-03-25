@@ -236,8 +236,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return self.model.objects.language(user_language).fallbacks().all()
 
 
-
-
 class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     queryset = Media.objects.all()

@@ -1,7 +1,7 @@
 from django.conf import settings
 import urllib.parse
 from django.utils.translation import get_language
-from .models import SitemapUrl
+from .models import SitemapUrl, Article
 
 
 def get_host_url(request):
@@ -20,11 +20,11 @@ def get_complete_url(request, url, language=''):
     return complete_url
 
 
-def get_seo(request, page_requested, lang='', model=SitemapUrl):
+def get_seo(request, identifier, lang='', model=SitemapUrl):
     if not lang:
         lang = get_language()
     try:
-        meta_tag = model.objects.language().get(page=page_requested)
+        meta_tag = model.objects.language().get(page=identifier)
         if not meta_tag.og_title:
             meta_tag.og_title = meta_tag.title
         if not meta_tag.og_description:
@@ -43,3 +43,7 @@ def get_seo(request, page_requested, lang='', model=SitemapUrl):
         return meta_tag
     except model.DoesNotExist:
         return None
+
+
+def get_article_seo(request, identifier, lang=''):
+    return get_seo(request, identifier, lang, Article)
