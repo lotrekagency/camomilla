@@ -11,13 +11,13 @@ class CamomillaUserAdmin(admin.ModelAdmin):
 
 
 class ArticleAdmin(TranslatableAdmin):
-    exclude = ('author',)
-    #readonly_fields = ('slug',)
+    exclude = ('slug',)
+    readonly_fields = ('get_slug', 'author')
 
 
 class TagAdmin(TranslatableAdmin):
-    #readonly_fields = ('slug',)
-    pass
+    exclude = ('slug',)
+    readonly_fields = ('get_slug',)
 
 
 class CategoryAdmin(TranslatableAdmin):

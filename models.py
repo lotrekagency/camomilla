@@ -31,6 +31,20 @@ PERMISSION_LEVELS = (
 )
 
 
+class SlugMixin(object):
+
+    slug_attr = 'title'
+
+    def get_slug(self):
+        return self.slug
+
+    get_slug.short_description = _('Slug')
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(getattr(self, self.slug_attr))
+        super(SlugMixin, self).save(*args, **kwargs)
+
+
 class CamomillaBaseUser(AbstractUser):
     level = models.CharField(
         max_length=3,
@@ -85,7 +99,7 @@ class CamomillaBaseUser(AbstractUser):
         )
 
 
-class BaseArticle(TranslatableModel):
+class BaseArticle(TranslatableModel, SlugMixin):
     identifier = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
@@ -122,8 +136,7 @@ class BaseArticle(TranslatableModel):
         return self.lazy_translation_getter('title', str(self.pk))
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
-        super(BaseArticle, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class Article(BaseArticle):
@@ -162,7 +175,7 @@ class Content(BaseContent):
     translations = TranslatedFields()
 
 
-class BaseTag(TranslatableModel):
+class BaseTag(SlugMixin, TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
         slug = models.SlugField(blank=True)
@@ -177,10 +190,6 @@ class BaseTag(TranslatableModel):
 
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
-        super(BaseTag, self).save(*args, **kwargs)
 
 
 class Tag(BaseTag):
