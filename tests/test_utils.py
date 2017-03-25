@@ -19,7 +19,7 @@ class UtilsTestCase(TestCase):
     def test_get_host_url(self):
         """Our beloved get_host_url utility"""
         request_factory = RequestFactory()
-        request = request_factory.get('/path', data={'name': 'test'})
+        request = request_factory.get('/path')
         request.META['HTTP_HOST'] = 'localhost'
         host_url = get_host_url(request)
         self.assertEqual(host_url, 'http://localhost')
@@ -27,7 +27,7 @@ class UtilsTestCase(TestCase):
     def test_get_complete_url(self):
         """Our beloved get_complete_url utility"""
         request_factory = RequestFactory()
-        request = request_factory.get('/path', data={'name': 'test'})
+        request = request_factory.get('/path')
         request.META['HTTP_HOST'] = 'localhost'
         complete_url = get_complete_url(request, 'path')
         self.assertEqual(complete_url, 'http://localhost/path')
@@ -36,12 +36,55 @@ class UtilsTestCase(TestCase):
         complete_url = get_complete_url(request, 'path', 'fr')
         self.assertEqual(complete_url, 'http://localhost/fr/path')
 
-    def test_get_seo(self):
-        """Our beloved get_seo utility"""
+    def test_get_seo_clean(self):
+        """Our beloved get_seo utility with auto attributes"""
         SitemapUrl.objects.language().create(page='path')
 
         request_factory = RequestFactory()
-        request = request_factory.get('/path', data={'name': 'test'})
+        request = request_factory.get('/path')
         request.META['HTTP_HOST'] = 'localhost'
         seo_obj = get_seo(request, 'path')
-        print (seo_obj)
+        self.assertEqual(seo_obj.og_url, 'http://localhost/path')
+        self.assertEqual(seo_obj.canonical, 'http://localhost/path')
+
+        self.assertEqual(get_seo(request, 'notexist'), None)
+
+    def test_get_seo_permalink(self):
+        """Our beloved get_seo utility with auto attributes"""
+        SitemapUrl.objects.language().create(
+            page='path', permalink='perma/link'
+        )
+
+        request_factory = RequestFactory()
+        request = request_factory.get('/path')
+        request.META['HTTP_HOST'] = 'localhost'
+        seo_obj = get_seo(request, 'path')
+        self.assertEqual(seo_obj.og_url, 'http://localhost/perma/link')
+        self.assertEqual(seo_obj.canonical, 'http://localhost/perma/link')
+
+    def test_get_seo_og_url(self):
+        """Our beloved get_seo utility with auto attributes"""
+        SitemapUrl.objects.language().create(
+            page='path', canonical='canonical'
+        )
+
+        request_factory = RequestFactory()
+        request = request_factory.get('/path')
+        request.META['HTTP_HOST'] = 'localhost'
+        seo_obj = get_seo(request, 'path')
+        self.assertEqual(seo_obj.og_url, 'http://localhost/canonical')
+        self.assertEqual(seo_obj.canonical, 'http://localhost/canonical')
+
+    def test_get_seo_combo_url(self):
+        """Our beloved get_seo utility with auto attributes"""
+        SitemapUrl.objects.language().create(
+            page='path', permalink='perma/link',
+            canonical='canonical', og_url='og_url'
+        )
+
+        request_factory = RequestFactory()
+        request = request_factory.get('/path')
+        request.META['HTTP_HOST'] = 'localhost'
+        seo_obj = get_seo(request, 'path')
+        self.assertEqual(seo_obj.og_url, 'http://localhost/og_url')
+        self.assertEqual(seo_obj.canonical, 'http://localhost/canonical')
