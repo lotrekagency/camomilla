@@ -1,18 +1,37 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.admin.sites import AlreadyRegistered
+from django import forms
+
+from redactor.widgets import RedactorEditor
+
 from .models import Article, Tag, Category, Content, Media, SitemapUrl
 
 from hvad.admin import TranslatableAdmin
+from hvad.forms import TranslatableModelForm
 
 
 class CamomillaUserAdmin(admin.ModelAdmin):
     pass
 
 
+class UserProfileAdmin(admin.ModelAdmin):
+    pass
+
+
+class ArticleAdminForm(TranslatableModelForm):
+    class Meta:
+        model = Article
+        exclude = ('slug',)
+        widgets = {
+           'content': RedactorEditor(),
+        }
+
+
 class ArticleAdmin(TranslatableAdmin):
-    exclude = ('slug',)
-    readonly_fields = ('get_slug', 'author')
+    readonly_fields = ('get_slug', 'author',)
+    filter_horizontal = ('tags', 'categories')
+    form = ArticleAdminForm
 
 
 class TagAdmin(TranslatableAdmin):
@@ -24,8 +43,17 @@ class CategoryAdmin(TranslatableAdmin):
     pass
 
 
+class ContentAdminForm(TranslatableModelForm):
+    class Meta:
+        model = Content
+        exclude = ('author',)
+        widgets = {
+           'content': RedactorEditor(),
+        }
+
+
 class ContentAdmin(TranslatableAdmin):
-    exclude = ('author',)
+    form = ContentAdminForm
 
 
 class MediaAdmin(TranslatableAdmin):
