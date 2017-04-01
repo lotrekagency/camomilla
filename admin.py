@@ -29,7 +29,8 @@ class ArticleAdminForm(TranslatableModelForm):
 
 
 class ArticleAdmin(TranslatableAdmin):
-    readonly_fields = ('get_slug', 'author',)
+    readonly_fields = ('get_slug',)
+    exclude = ('slug',)
     filter_horizontal = ('tags', 'categories')
     form = ArticleAdminForm
 
