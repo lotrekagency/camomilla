@@ -21,7 +21,8 @@ class MediaSelectMultiple(CheckboxSelectMultiple):
                 'thumb': thumb_url,
                 'value': choice[0],
                 'label': choice[1],
-                'selected': True if choice[0] in choices_selected else False
+                'selected': True if choices_selected and choice[0] in choices_selected else False
+
             })
         return choices
 
