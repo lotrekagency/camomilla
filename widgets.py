@@ -8,7 +8,7 @@ from camomilla.models import Media
 
 class MediaSelectMultiple(CheckboxSelectMultiple):
 
-    template_name = 'camomilla/widgets/checkbox.html'
+    template_name = 'camomilla/widgets/media_select_multiple.html'
 
     def _build_choices(self, name, all_choices, choices_selected):
         choices = []

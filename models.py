@@ -1,4 +1,5 @@
 import uuid
+import json
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -256,6 +257,15 @@ class Media(TranslatableModel):
     def regenerate_thumbnail(self):
         if self.file:
             self._make_thumbnail()
+
+    @property
+    def json_repr(self):
+        json_r = {
+            'id': self.pk,
+            'thumbnail': self.thumbnail.url,
+            'label': self.__str__()
+        }
+        return json.dumps(json_r)
 
     def _make_thumbnail(self):
         self.__original_file = self.file

@@ -1,0 +1,57 @@
+<script type="text/javascript">
+  generateMediaRow = function(name, value, thumb, label, checked) {
+    var template = [
+        "<li>",
+            "<label for='id_<<name>>_<<value>>'>",
+                "<img src='<<thumb>>' width='50' height='50' />",
+                "<input id='id_<<name>>_<<value>>' name='<<name>>' type='checkbox' value='<<value>>' required='' <<checked>> > <<label>>",
+            "</label>",
+        "</li>"
+    ].join('\n');
+    template = template.replace(/<<name>>/g, name);
+    template = template.replace(/<<value>>/g, value);
+    template = template.replace(/<<thumb>>/g, thumb);
+    template = template.replace(/<<label>>/g, label);
+    template = template.replace(/<<checked>>/g, checked);
+    return template
+  };
+</script>
+
+<ul id="id_checkbox_{{name}}">
+
+
+</ul>
+<input type="hidden" id="id_{{name}}">
+
+<script type="text/javascript">
+    setTimeout(function() {
+      (function($) {
+
+        {% for choice in choices %}
+        var row = generateMediaRow(
+          '{{name}}', '{{choice.value}}',
+          '{{choice.thumb}}', '{{choice.label}}',
+          {% if choice.selected %}'checked'{%else%}''{% endif %}
+        );
+        $("#id_checkbox_{{name}}").append(row);
+        {% endfor %}
+
+        window._dismissAddRelatedObjectPopup = window.dismissAddRelatedObjectPopup;
+        window.dismissAddRelatedObjectPopup = function (win, newId, newRepr) {
+          var name = windowname_to_id(win.name);
+          var elem = document.getElementById(name);
+          if (elem) {
+              $(elem).data('repr', JSON.parse(newRepr));
+          }
+          window._dismissAddRelatedObjectPopup(win, newId, newRepr);
+        }
+
+        $('#id_{{name}}').on('change', function(e) {
+          var data = $(this).data().repr;
+          var row = generateMediaRow('{{name}}', data.id, data.thumbnail, data.label, 'checked');
+          $("#id_checkbox_{{name}}").append(row)
+        });
+
+      })(django.jQuery);
+    }, 50);
+</script>

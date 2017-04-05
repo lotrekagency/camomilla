@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.admin.sites import AlreadyRegistered
 from django import forms
+from django.http import HttpResponse
 
 from redactor.widgets import RedactorEditor
 
@@ -61,6 +62,16 @@ class MediaAdmin(TranslatableAdmin):
     exclude = ('thumbnail', 'size', 'is_image')
     readonly_fields = ('image_preview', 'image_thumb_preview')
     list_display = ('__str__', 'name', 'image_thumb_preview',)
+
+    def response_add(self, request, obj):
+        if request.GET.get('_popup', ''):
+            return HttpResponse('''
+               <script type="text/javascript">
+                  opener.dismissAddRelatedObjectPopup(window, %s, '%s');
+               </script>''' % (obj.id, obj.json_repr)
+            )
+        else:
+            return super(MediaAdmin, self).response_add(request, obj)
 
 
 class SitemapUrlAdmin(TranslatableAdmin):
