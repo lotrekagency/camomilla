@@ -1,7 +1,35 @@
+<style type="text/css">
+
+.media-select {
+    width: 600px;
+}
+
+
+.media-select input[type='text']{
+    width: 90%;
+}
+
+.media-select-item {
+    text-overflow: ellipsis;
+    white-space:  nowrap;
+    overflow: hidden;
+    width: 100%;
+    display: inline-block;
+}
+
+.media-select-item-wrapper {
+    width: 90%;
+    height: 250px;
+    overflow: auto;
+    border: 1px solid #ccc;
+}
+
+</style>
+
 <script type="text/javascript">
   var generateMediaRow = function(name, value, thumb, label, checked) {
     var template = [
-        "<li>",
+        "<li class='media-select-item'>",
             "<label for='id_<<name>>_<<value>>'>",
                 "<img src='<<thumb>>' width='50' height='50' />",
                 "<input id='id_<<name>>_<<value>>' name='<<name>>' type='checkbox' value='<<value>>' required='' <<checked>> > <<label>>",
@@ -17,9 +45,16 @@
   };
 </script>
 
-<ul id="id_checkbox_{{name}}" class="media-select-multiple">
-</ul>
+<div class='media-select'>
+    <div>
+        <input type="text" name="">
+    </div>
+    <div>
+        <ul id="id_checkbox_{{name}}" class="media-select-multiple media-select-item-wrapper">
 
+        </ul>
+    </div>
+</div>
 <input type="hidden" id="id_{{name}}">
 
 <script type="text/javascript">
