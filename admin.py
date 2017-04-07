@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import AlreadyRegistered
 from django import forms
 from django.http import HttpResponse
@@ -12,8 +13,10 @@ from hvad.admin import TranslatableAdmin
 from hvad.forms import TranslatableModelForm
 
 
-class CamomillaUserAdmin(admin.ModelAdmin):
-    pass
+class CamomillaUserAdmin(UserAdmin):
+    fieldsets = ()
+    exclude = ('groups',)
+    readonly_fields = ('last_login', 'date_joined',)
 
 
 class UserProfileAdmin(admin.ModelAdmin):
