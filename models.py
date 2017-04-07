@@ -319,6 +319,8 @@ class Media(TranslatableModel):
             self.size = self.file.size
 
     def __str__(self):
+        if self.name:
+            return self.name
         return self.file.name
 
 
