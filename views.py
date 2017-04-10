@@ -279,8 +279,9 @@ class SitemapUrlViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         user_language = self._get_user_language()
         contents = self.model.objects.language(user_language).fallbacks().all()
+        request_get = self.request.GET
         if request_get.get('permalink',''):
-            queryset = queryset.filter(permlalink=request_get.get('permalink',''))
+            contents = contents.filter(permalink=request_get.get('permalink',''))
         return contents
 
 
