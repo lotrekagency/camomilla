@@ -1,3 +1,4 @@
+{% load i18n %}
 <style type="text/css">
 
 .media-select {
@@ -47,7 +48,7 @@
 
 <div class='media-select'>
     <div>
-        <input type="text" name="">
+        <input type="text" name="" id="id_search_checkbox_{{name}}" placeholder="{% trans 'Search image...' %}">
     </div>
     <div>
         <ul id="id_checkbox_{{name}}" class="media-select-multiple media-select-item-wrapper">
@@ -82,6 +83,14 @@
           }
           window._dismissAddRelatedObjectPopup(win, newId, newRepr);
         }
+
+        console.log($('#id_search_checkbox_{{name}}'));
+
+        $('#id_search_checkbox_{{name}}').on('keyup', function() {
+          console.log('ch');
+          $('#id_checkbox_{{name}} li').hide();
+          $('#id_checkbox_{{name}} li:contains(' + $(this).val() + ')').show();
+        });
 
         $('#id_{{name}}').on('change', function(e) {
           var data = $(this).data().repr;
