@@ -56,9 +56,6 @@ class CamomillaBaseUser(AbstractUser):
 
     def save(self, *args, **kwargs):
 
-        if not self.pk:
-            self.set_password(self.password)
-
         try:
             orig = self.__class__.objects.get(pk=self.pk)
         except:
