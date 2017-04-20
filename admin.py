@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
+
 from django.contrib.admin.sites import AlreadyRegistered
 from django import forms
 from django.http import HttpResponse
@@ -11,6 +13,9 @@ from .models import Article, Tag, Category, Content, Media, SitemapUrl
 
 from hvad.admin import TranslatableAdmin
 from hvad.forms import TranslatableModelForm
+
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 
 class CamomillaUserAdmin(UserAdmin):
@@ -93,3 +98,9 @@ admin.site.register(Tag, TagAdmin)
 admin.site.register(Content, ContentAdmin)
 admin.site.register(Media, MediaAdmin)
 admin.site.register(SitemapUrl, SitemapUrlAdmin)
+admin.site.unregister(Group)
+
+admin.site.index_title = '{0} {1}'.format(
+    _('Administration panel for'),
+    getattr(settings, 'PROJECT_TITLE', 'Camomilla')
+)

@@ -22,8 +22,31 @@ else:
 
 from camomilla.models import Media
 
+if django.VERSION < (1, 11):
 
-class SortedCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
+    class BaseSortedCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
+
+        def build_attrs(self, attrs=None, **kwargs):
+            attrs = super(BaseSortedCheckboxSelectMultiple, self).\
+                build_attrs(attrs, **kwargs)
+            classes = attrs.setdefault('class', '').split()
+            classes.append('sortedm2m')
+            attrs['class'] = ' '.join(classes)
+            return attrs
+else:
+
+    class BaseSortedCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
+
+        def build_attrs(self, base_attrs, extra_attrs=None):
+            attrs = super(BaseSortedCheckboxSelectMultiple, self).\
+                build_attrs(base_attrs, extra_attrs)
+            classes = extra_attrs.setdefault('class', '').split()
+            classes.append('sortedm2m')
+            extra_attrs['class'] = ' '.join(classes)
+            return extra_attrs
+
+
+class SortedCheckboxSelectMultiple(BaseSortedCheckboxSelectMultiple):
     class Media:
         js = (
             'mediasortedm2m/widget.js',
@@ -33,25 +56,14 @@ class SortedCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
             'mediasortedm2m/widget.css',
         )}
 
-    def build_attrs(self, base_attrs, extra_attrs=None):
-        print(base_attrs)
-        print(extra_attrs)
-        attrs = super(SortedCheckboxSelectMultiple, self).\
-            build_attrs(base_attrs, extra_attrs)
-        classes = extra_attrs.setdefault('class', '').split()
-        classes.append('sortedm2m')
-        extra_attrs['class'] = ' '.join(classes)
-        print(extra_attrs)
-        return extra_attrs
 
     def render(self, name, value, attrs=None, choices=()):
-        print (name)
         if value is None: value = []
         has_id = attrs and 'id' in attrs
-        final_attrs = self.build_attrs(self.attrs, attrs)
-
-        print ('VALUWE')
-        print(value)
+        if django.VERSION < (1, 11):
+            final_attrs = self.build_attrs(attrs, name=name)
+        else:
+            final_attrs = self.build_attrs(self.attrs, attrs)
         # Normalize to strings
         str_values = [force_text(v) for v in value]
 
@@ -61,7 +73,6 @@ class SortedCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
         for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
             # If an ID attribute was given, add a numeric index as a suffix,
             # so that the checkboxes don't all have the same ID attribute.
-            print (attrs)
             if has_id:
                 final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
                 label_for = ' for="%s"' % conditional_escape(final_attrs['id'])
@@ -92,15 +103,11 @@ class SortedCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
 
         # re-order `selected` array according str_values which is a set of `option_value`s in the order they should be shown on screen
         ordered = []
-        print (str_values)
         for value in str_values:
             for select in selected:
                 if value == select['option_value']:
-                    print (select['option_value'])
                     ordered.append(select)
         selected = ordered
-
-        print (selected)
 
         html = render_to_string(
             'mediasortedm2m/sorted_checkbox_select_multiple_widget.html',
@@ -130,10 +137,7 @@ class SortedMultipleChoiceField(forms.ModelMultipleChoiceField):
     widget = SortedCheckboxSelectMultiple
 
     def clean(self, value):
-        print (value)
         queryset = super(SortedMultipleChoiceField, self).clean(value)
-        print ('QUERYSET')
-        print (queryset)
         if value is None or not hasattr(queryset, '__iter__'):
             return queryset
         key = self.to_field_name or 'pk'
