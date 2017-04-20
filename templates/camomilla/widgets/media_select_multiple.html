@@ -1,4 +1,8 @@
 {% load i18n %}
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
 <style type="text/css">
 
 .media-select {
@@ -30,10 +34,10 @@
 <script type="text/javascript">
   var generateMediaRow = function(name, value, thumb, label, checked) {
     var template = [
-        "<li class='media-select-item'>",
+        "<li class='media-select-item checkbox-row'>",
             "<label for='id_<<name>>_<<value>>'>",
                 "<img src='<<thumb>>' width='50' height='50' />",
-                "<input id='id_<<name>>_<<value>>' name='<<name>>' type='checkbox' value='<<value>>' required='' <<checked>> > <<label>>",
+                "<input style='display: inline-block;' id='id_<<name>>_<<value>>' name='<<name>>' type='checkbox' value='<<value>>' required='' <<checked>> > <span> <<label>> </span>",
             "</label>",
         "</li>"
     ].join('\n');
@@ -87,7 +91,6 @@
         console.log($('#id_search_checkbox_{{name}}'));
 
         $('#id_search_checkbox_{{name}}').on('keyup', function() {
-          console.log('ch');
           $('#id_checkbox_{{name}} li').hide();
           $('#id_checkbox_{{name}} li:contains(' + $(this).val() + ')').show();
         });
@@ -104,6 +107,14 @@
           });
         });
 
-      })(django.jQuery);
+        $( function() {
+          $( "#id_checkbox_{{name}}" ).sortable();
+          $( "#id_checkbox_{{name}}" ).disableSelection();
+        });
+
+      })($);
     }, 50);
+</script>
+<script>
+
 </script>
