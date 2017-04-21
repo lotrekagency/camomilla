@@ -23,6 +23,23 @@ class CamomillaUserAdmin(UserAdmin):
     exclude = ('groups',)
     readonly_fields = ('last_login', 'date_joined',)
 
+    def get_queryset(self, request):
+        qs = super(CamomillaUserAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(username=request.user.username)
+
+    def get_form(self, request, obj=None, **kwargs):
+        current_user = request.user
+        if not current_user.is_superuser:
+            self.exclude = (
+                'groups', 'is_superuser', 'user_permissions',
+                'is_staff', 'is_active', 'level'
+            )
+        form = super(CamomillaUserAdmin, self).get_form(request, obj, **kwargs)
+        form.current_user = current_user
+        return form
+
 
 class UserProfileAdmin(admin.ModelAdmin):
     pass

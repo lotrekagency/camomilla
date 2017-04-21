@@ -19,6 +19,10 @@
     color: black;
 }
 
+.module h2, .module caption, .inline-group h2 {
+    background: #ccd857;
+}
+
 a:link, a:visited {
     color: black;
     text-decoration: none;
@@ -38,6 +42,14 @@ div.breadcrumbs {
 
 .button.default, input[type=submit].default, .submit-row input.default {
     background: black;
+}
+
+.dashboard #content {
+    width: 800px;
+}
+
+.dashboard #content-related {
+    display: none;
 }
 
 @media (max-width: 991px) {

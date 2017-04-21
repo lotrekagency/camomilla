@@ -262,7 +262,7 @@ class Media(TranslatableModel):
     def json_repr(self):
         json_r = {
             'id': self.pk,
-            'thumbnail': self.thumbnail.url,
+            'thumbnail': '' if not self.is_image else self.thumbnail.url,
             'label': self.__str__()
         }
         return json.dumps(json_r)
