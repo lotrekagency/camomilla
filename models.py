@@ -56,9 +56,6 @@ class CamomillaBaseUser(AbstractUser):
 
     def save(self, *args, **kwargs):
 
-        if not self.pk:
-            self.set_password(self.password)
-
         try:
             orig = self.__class__.objects.get(pk=self.pk)
         except:
@@ -222,7 +219,8 @@ class Category(BaseCategory):
 class Media(TranslatableModel):
     translations = TranslatedFields(
         alt_text = models.CharField(max_length=200, blank=True, null=True),
-        title = models.CharField(max_length=200, blank=True, null=True)
+        title = models.CharField(max_length=200, blank=True, null=True),
+        description = models.TextField(blank=True, null=True)
     )
     file = models.FileField()
     thumbnail = models.ImageField(
@@ -264,7 +262,7 @@ class Media(TranslatableModel):
     def json_repr(self):
         json_r = {
             'id': self.pk,
-            'thumbnail': self.thumbnail.url,
+            'thumbnail': '' if not self.is_image else self.thumbnail.url,
             'label': self.__str__()
         }
         return json.dumps(json_r)

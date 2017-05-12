@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
+
 from django.contrib.admin.sites import AlreadyRegistered
 from django import forms
 from django.http import HttpResponse
@@ -12,11 +14,31 @@ from .models import Article, Tag, Category, Content, Media, SitemapUrl
 from hvad.admin import TranslatableAdmin
 from hvad.forms import TranslatableModelForm
 
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
+
 
 class CamomillaUserAdmin(UserAdmin):
     fieldsets = ()
     exclude = ('groups',)
     readonly_fields = ('last_login', 'date_joined',)
+
+    def get_queryset(self, request):
+        qs = super(CamomillaUserAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(username=request.user.username)
+
+    def get_form(self, request, obj=None, **kwargs):
+        current_user = request.user
+        if not current_user.is_superuser:
+            self.exclude = (
+                'groups', 'is_superuser', 'user_permissions',
+                'is_staff', 'is_active', 'level'
+            )
+        form = super(CamomillaUserAdmin, self).get_form(request, obj, **kwargs)
+        form.current_user = current_user
+        return form
 
 
 class UserProfileAdmin(admin.ModelAdmin):
@@ -93,3 +115,9 @@ admin.site.register(Tag, TagAdmin)
 admin.site.register(Content, ContentAdmin)
 admin.site.register(Media, MediaAdmin)
 admin.site.register(SitemapUrl, SitemapUrlAdmin)
+admin.site.unregister(Group)
+
+admin.site.index_title = '{0} {1}'.format(
+    _('Administration panel for'),
+    getattr(settings, 'PROJECT_TITLE', 'Camomilla')
+)

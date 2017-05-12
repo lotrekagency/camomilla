@@ -15,7 +15,6 @@ deploy_settings.py
 deploy_settings.sh
 
 # Static, media and libs
-static/
 libs/
 node_modules
 media/
