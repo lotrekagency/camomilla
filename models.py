@@ -249,6 +249,8 @@ class Media(TranslatableModel):
         permissions = (
             ("read_media", _("Can read media")),
         )
+        ordering = ['-created']
+
 
     def __init__(self, *args, **kwargs):
         super(Media, self).__init__(*args, **kwargs)

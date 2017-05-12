@@ -165,4 +165,4 @@ class CompactSitemapUrlSerializer(TranslatableModelSerializer):
 
     class Meta:
         model = SitemapUrl
-        fields = ('id', 'page', 'title','description', 'permalink')
+        fields = ('id', 'page', 'title','description', 'permalink', 'og_image')
