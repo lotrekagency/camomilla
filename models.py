@@ -321,7 +321,9 @@ class Media(TranslatableModel):
         return True
 
     def _optimize(self):
-        opt_command = settings.OPTIMIZATION_COMMAND.format(self.file.name)
+        opt_command = settings.OPTIMIZATION_COMMAND.format(
+            os.path.join(settings.MEDIA_ROOT, self.file.name)
+        )
         os.system(opt_command)
 
     def save(self, *args, **kwargs):
