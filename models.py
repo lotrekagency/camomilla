@@ -329,6 +329,7 @@ class Media(TranslatableModel):
             self._make_thumbnail()
         if self.file:
             self.size = self.file.size
+            self._optimize()
         super(Media, self).save(*args, **kwargs)
 
     def __str__(self):
