@@ -239,11 +239,11 @@ class Media(TranslatableModel):
     is_image = models.BooleanField(default=False)
 
     def image_preview(self):
-        if self.is_image and self.file:
+        if self.file:
             return mark_safe('<img src="{0}" />'.format(self.file.url))
 
     def image_thumb_preview(self):
-        if self.is_image and self.thumbnail:
+        if self.thumbnail:
             return mark_safe('<img src="{0}" />'.format(self.thumbnail.url))
 
     image_preview.short_description = _('Preview')
@@ -278,6 +278,7 @@ class Media(TranslatableModel):
         return json.dumps(json_r)
 
     def _make_thumbnail(self):
+        print ('MAKE')
         self.__original_file = self.file
         from PIL import Image
         import os
@@ -289,7 +290,8 @@ class Media(TranslatableModel):
 
         try:
             fh = storage.open(self.file.name, 'rb')
-        except FileNotFoundError:
+        except FileNotFoundError as ex:
+            print (ex)
             self.is_image = False
             return False
         try:
@@ -333,22 +335,34 @@ class Media(TranslatableModel):
             os.path.join(settings.MEDIA_ROOT, self.file.name)
         )
         try:
-            p = Popen([opt_command])
+            p = Popen(opt_command, shell=True)
         except FileNotFoundError as ex:
             print (ex)
 
-    def save(self, *args, **kwargs):
-        if self.file != self.__original_file or not self.pk:
-            self._make_thumbnail()
-        if self.file:
-            self.size = self.file.size
-            self._async_optimize()
-        super(Media, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     super(Media, self).save(*args, **kwargs)
+    #     if self.file != self.__original_file or not self.pk:
+    #         self._make_thumbnail()
+    #     if self.file:
+    #         self.size = self.file.size
+    #     super(Media, self).save(*args, **kwargs)
 
     def __str__(self):
         if self.name:
             return self.name
         return self.file.name
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=Media, dispatch_uid="make thumbnails")
+def update_media(sender, instance, **kwargs):
+    print (instance.pk)
+    instance._make_thumbnail()
+    Media.objects.filter(pk=instance.pk).update(
+        size=instance.file.size,
+        thumbnail=instance.thumbnail,
+    )
 
 
 class BaseSitemapUrl(TranslatableModel):
