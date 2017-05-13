@@ -8,8 +8,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for media in Media.objects.all():
-            if media.is_image:
-                media.regenerate_thumbnail()
-                self.stdout.write(self.style.SUCCESS(
-                    'Successfully regenerated thumbnail for {0}'.format(media.file.url)
-                ))
+            media.regenerate_thumbnail()
+            media.save()
+            self.stdout.write(self.style.SUCCESS(
+                'Successfully regenerated thumbnail for {0}'.format(media.file.url)
+            ))
