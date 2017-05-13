@@ -357,7 +357,6 @@ from django.dispatch import receiver
 
 @receiver(post_save, sender=Media, dispatch_uid="make thumbnails")
 def update_media(sender, instance, **kwargs):
-    print (instance.pk)
     instance._make_thumbnail()
     Media.objects.filter(pk=instance.pk).update(
         size=instance.file.size,
