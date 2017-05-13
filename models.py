@@ -270,7 +270,6 @@ class Media(TranslatableModel):
         return json.dumps(json_r)
 
     def _make_thumbnail(self):
-        print ('MAKE')
         self.__original_file = self.file
         from PIL import Image
         import os
@@ -316,11 +315,8 @@ class Media(TranslatableModel):
         return True
 
     def save(self, *args, **kwargs):
-        print (self.file)
-        print (self.__original_file)
         if self.file != self.__original_file or not self.pk:
             self._make_thumbnail()
-        print (self.file.size)
         if self.file:
             self.size = self.file.size
         super(Media, self).save(*args, **kwargs)
