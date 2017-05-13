@@ -15,6 +15,8 @@ from django.utils.text import slugify
 
 from hvad.models import TranslatableModel, TranslatedFields
 
+from subprocess import Popen
+
 
 def create_content_id():
   return str(uuid.uuid4())[0:8]
@@ -326,12 +328,21 @@ class Media(TranslatableModel):
         )
         os.system(opt_command)
 
+    def _async_optimize(self):
+        opt_command = settings.OPTIMIZATION_COMMAND.format(
+            os.path.join(settings.MEDIA_ROOT, self.file.name)
+        )
+        try:
+            p = Popen([opt_command])
+        except FileNotFoundError as ex:
+            print (ex)
+
     def save(self, *args, **kwargs):
         if self.file != self.__original_file or not self.pk:
             self._make_thumbnail()
         if self.file:
             self.size = self.file.size
-            self._optimize()
+            self._async_optimize()
         super(Media, self).save(*args, **kwargs)
 
     def __str__(self):
