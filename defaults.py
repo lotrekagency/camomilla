@@ -94,3 +94,6 @@ REDACTOR_OPTIONS = {
 
 REDACTOR_OPTIONS = {}
 REDACTOR_UPLOAD = 'uploads/'
+
+OPTIMIZATION_COMMAND = 'xvfb-run -a trimage -f {0}'
+

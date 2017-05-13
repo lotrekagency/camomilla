@@ -1,3 +1,5 @@
+import os
+
 import uuid
 import json
 
@@ -260,6 +262,10 @@ class Media(TranslatableModel):
         if self.file:
             self._make_thumbnail()
 
+    def optimize(self):
+        if self.file:
+            self._optimize()
+
     @property
     def json_repr(self):
         json_r = {
@@ -314,13 +320,16 @@ class Media(TranslatableModel):
 
         return True
 
+    def _optimize(self):
+        opt_command = settings.OPTIMIZATION_COMMAND.format(self.file.name)
+        os.system(opt_command)
+
     def save(self, *args, **kwargs):
         if self.file != self.__original_file or not self.pk:
             self._make_thumbnail()
         if self.file:
             self.size = self.file.size
         super(Media, self).save(*args, **kwargs)
-
 
     def __str__(self):
         if self.name:
