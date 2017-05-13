@@ -270,6 +270,7 @@ class Media(TranslatableModel):
         return json.dumps(json_r)
 
     def _make_thumbnail(self):
+        print ('MAKE')
         self.__original_file = self.file
         from PIL import Image
         import os
@@ -289,6 +290,7 @@ class Media(TranslatableModel):
             image = orig_image.copy()
             self.is_image = True
         except Exception as ex:
+            print (ex)
             return False
 
         image.thumbnail(
@@ -308,17 +310,21 @@ class Media(TranslatableModel):
         temp_thumb.seek(0)
 
         # Load a ContentFile into the thumbnail field so it gets saved
-        self.thumbnail.save(thumb_filename, ContentFile(temp_thumb.read()), save=True)
+        self.thumbnail.save(thumb_filename, ContentFile(temp_thumb.read()), save=False)
         temp_thumb.close()
 
         return True
 
-    def save(self, force_insert=False, force_update=False, *args, **kwargs):
-        super(Media, self).save(force_insert, force_update, *args, **kwargs)
-        if self.file != self.__original_file:
+    def save(self, *args, **kwargs):
+        print (self.file)
+        print (self.__original_file)
+        if self.file != self.__original_file or not self.pk:
             self._make_thumbnail()
+        print (self.file.size)
         if self.file:
             self.size = self.file.size
+        super(Media, self).save(*args, **kwargs)
+
 
     def __str__(self):
         if self.name:
