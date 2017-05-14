@@ -95,5 +95,6 @@ REDACTOR_OPTIONS = {
 REDACTOR_OPTIONS = {}
 REDACTOR_UPLOAD = 'uploads/'
 
-OPTIMIZATION_COMMAND = 'xvfb-run -a trimage -f {0}'
+PNG_OPTIMIZATION_COMMAND = 'pngquant {0} -f --ext .png'
+JPEG_OPTIMIZATION_COMMAND = 'jpegoptim {0}'
 

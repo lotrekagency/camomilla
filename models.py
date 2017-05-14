@@ -220,6 +220,14 @@ class Category(BaseCategory):
     translations = TranslatedFields()
 
 
+from PIL import Image
+import os
+from django.core.files.base import ContentFile
+
+from django.core.files.storage import default_storage as storage
+
+from io import BytesIO
+
 class Media(TranslatableModel):
     translations = TranslatedFields(
         alt_text = models.CharField(max_length=200, blank=True, null=True),
@@ -280,13 +288,6 @@ class Media(TranslatableModel):
     def _make_thumbnail(self):
         print ('MAKE')
         self.__original_file = self.file
-        from PIL import Image
-        import os
-        from django.core.files.base import ContentFile
-
-        from django.core.files.storage import default_storage as storage
-
-        from io import BytesIO
 
         try:
             fh = storage.open(self.file.name, 'rb')
@@ -324,28 +325,41 @@ class Media(TranslatableModel):
 
         return True
 
+    def _optimize_command(self):
+
+        try:
+            fh = storage.open(self.file.name, 'rb')
+        except FileNotFoundError as ex:
+            return ''
+        try:
+            my_image = Image.open(fh)
+        except Exception as ex:
+            print (ex)
+            return ''
+
+        if my_image.format == 'JPEG':
+            opt_command = settings.JPEG_OPTIMIZATION_COMMAND.format(
+                os.path.join(settings.MEDIA_ROOT, self.file.name)
+            )
+            return opt_command
+        elif my_image.format == 'PNG':
+            opt_command = settings.PNG_OPTIMIZATION_COMMAND.format(
+                os.path.join(settings.MEDIA_ROOT, self.file.name)
+            )
+            return opt_command
+        else:
+            return ''
+
     def _optimize(self):
-        opt_command = settings.OPTIMIZATION_COMMAND.format(
-            os.path.join(settings.MEDIA_ROOT, self.file.name)
-        )
+        opt_command = self._optimize_command()
         os.system(opt_command)
 
-    def _async_optimize(self):
-        opt_command = settings.OPTIMIZATION_COMMAND.format(
-            os.path.join(settings.MEDIA_ROOT, self.file.name)
-        )
+    def _optimize_async(self):
+        opt_command = self._optimize_command()
         try:
             p = Popen(opt_command, shell=True)
         except FileNotFoundError as ex:
             print (ex)
-
-    # def save(self, *args, **kwargs):
-    #     super(Media, self).save(*args, **kwargs)
-    #     if self.file != self.__original_file or not self.pk:
-    #         self._make_thumbnail()
-    #     if self.file:
-    #         self.size = self.file.size
-    #     super(Media, self).save(*args, **kwargs)
 
     def __str__(self):
         if self.name:
@@ -362,6 +376,7 @@ def update_media(sender, instance, **kwargs):
         size=instance.file.size,
         thumbnail=instance.thumbnail,
     )
+    instance._optimize_async()
 
 
 class BaseSitemapUrl(TranslatableModel):
