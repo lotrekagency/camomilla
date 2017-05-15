@@ -8,7 +8,9 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
+from django.dispatch import receiver
+
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
@@ -261,12 +263,7 @@ class Media(TranslatableModel):
         permissions = (
             ("read_media", _("Can read media")),
         )
-        ordering = ['-created']
-
-
-    def __init__(self, *args, **kwargs):
-        super(Media, self).__init__(*args, **kwargs)
-        self.__original_file = self.file
+        ordering = ['-pk']
 
     def regenerate_thumbnail(self):
         if self.file:
@@ -286,8 +283,6 @@ class Media(TranslatableModel):
         return json.dumps(json_r)
 
     def _make_thumbnail(self):
-        print ('MAKE')
-        self.__original_file = self.file
 
         try:
             fh = storage.open(self.file.name, 'rb')
@@ -361,22 +356,48 @@ class Media(TranslatableModel):
         except FileNotFoundError as ex:
             print (ex)
 
+    def _remove_file(self):
+        if self.file:
+            file_to_remove = os.path.join(settings.MEDIA_ROOT, self.file.name)
+            if os.path.isfile(file_to_remove):
+                os.remove(file_to_remove)
+
+    def _remove_thumbnail(self):
+        if self.thumbnail:
+            file_to_remove = os.path.join(settings.MEDIA_ROOT, self.thumbnail.name)
+            if os.path.isfile(file_to_remove):
+                os.remove(file_to_remove)
+
+    def _get_file_size(self):
+        if self.file:
+            file_to_calc = os.path.join(settings.MEDIA_ROOT, self.file.name)
+            if os.path.isfile(file_to_calc):
+                return self.file.size
+            else:
+                return 0
+
     def __str__(self):
         if self.name:
             return self.name
         return self.file.name
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 @receiver(post_save, sender=Media, dispatch_uid="make thumbnails")
 def update_media(sender, instance, **kwargs):
+    instance._remove_thumbnail()
     instance._make_thumbnail()
     Media.objects.filter(pk=instance.pk).update(
-        size=instance.file.size,
+        size=instance._get_file_size(),
         thumbnail=instance.thumbnail,
+        is_image=instance.is_image
     )
     instance._optimize_async()
+
+
+@receiver(pre_delete, sender=Media, dispatch_uid="make thumbnails")
+def delete_media_files(sender, instance, **kwargs):
+    instance._remove_thumbnail()
+    instance._remove_file()
 
 
 class BaseSitemapUrl(TranslatableModel):
