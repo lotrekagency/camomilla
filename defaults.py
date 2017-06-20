@@ -86,8 +86,6 @@ CAMOMILLA_THUMBNAIL_HEIGHT = 50
 
 SITE_URL = 'http://localhost:8000'
 
-PREFIX_DEFAULT_LANGUAGE = True
-
 REDACTOR_OPTIONS = {
     'air' : True
 }
