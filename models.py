@@ -148,7 +148,6 @@ class BaseArticle(TranslatableModel, SlugMixin):
 class Article(BaseArticle):
     translations = TranslatedFields()
 
-
 class BaseContent(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
