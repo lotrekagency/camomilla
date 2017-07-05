@@ -30,9 +30,9 @@ def get_seo(request, identifier, lang='', model=SitemapUrl, attr='page'):
             meta_tag.og_title = meta_tag.title
         if not meta_tag.og_description:
             meta_tag.og_description = meta_tag.description
-        permalink = meta_tag.permalink
-        if not permalink:
-            permalink = request.path
+        permalink = request.path
+        if not meta_tag.permalink:
+            meta_tag.permalink = permalink
         if not meta_tag.canonical:
             meta_tag.canonical = get_complete_url(request, permalink, lang)
         else:
@@ -42,6 +42,7 @@ def get_seo(request, identifier, lang='', model=SitemapUrl, attr='page'):
         else:
             meta_tag.og_url = get_complete_url(request, meta_tag.og_url,lang)
         return meta_tag
+
     except model.DoesNotExist:
         return None
 
