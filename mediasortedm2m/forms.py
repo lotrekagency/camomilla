@@ -85,6 +85,7 @@ class SortedCheckboxSelectMultiple(BaseSortedCheckboxSelectMultiple):
             option_label = conditional_escape(force_text(option_label))
 
             media_obj = Media.objects.get(id=option_value)
+            thumb_url = ''
             if media_obj.is_image and media_obj.thumbnail:
                 thumb_url = media_obj.thumbnail.url
 
