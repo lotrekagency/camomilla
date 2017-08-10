@@ -127,6 +127,7 @@ class BaseArticle(TranslatableModel, SlugMixin):
     )
     highlight_image = models.ForeignKey('camomilla.Media', blank=True, null=True, on_delete=models.SET_NULL)
     date = models.DateTimeField(auto_now=True)
+    date_to_show = models.DateTimeField(null=True, blank=True)
     tags = models.ManyToManyField('camomilla.Tag', blank=True)
     categories = models.ManyToManyField('camomilla.Category', blank=True)
     og_image = models.ImageField(blank=True, null=True, default='')
