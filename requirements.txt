@@ -1,4 +1,4 @@
-django-hvad==1.6.0
+django-hvad==1.8.0
 djangorestframework==3.5.2
 Pillow==3.4.2
 django-wysiwyg-redactor==0.5.0
