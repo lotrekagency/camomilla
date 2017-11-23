@@ -419,6 +419,8 @@ class BaseSitemapUrl(TranslatableModel):
         permissions = (
             ("read_sitemapurl", _("Can read sitemap url")),
         )
+        verbose_name = 'Page'
+        verbose_name_plural = 'Pages'
 
     def __str__(self):
         return self.page
@@ -426,3 +428,6 @@ class BaseSitemapUrl(TranslatableModel):
 
 class SitemapUrl(BaseSitemapUrl):
     translations = TranslatedFields()
+
+
+Page = SitemapUrl

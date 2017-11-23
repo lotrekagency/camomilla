@@ -20,7 +20,7 @@ def get_complete_url(request, url, language=''):
     return complete_url
 
 
-def get_seo(request, identifier, lang='', model=SitemapUrl, attr='page'):
+def get_page(request, identifier, lang='', model=SitemapUrl, attr='page'):
     if not lang:
         lang = get_language()
     try:
@@ -45,6 +45,10 @@ def get_seo(request, identifier, lang='', model=SitemapUrl, attr='page'):
 
     except model.DoesNotExist:
         return None
+
+
+def get_seo(request, identifier, lang='', model=SitemapUrl, attr='page'):
+    return get_page(request, identifier, lang, model, attr)
 
 
 def get_article_with_seo(request, identifier, lang=''):

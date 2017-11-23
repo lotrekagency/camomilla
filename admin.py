@@ -9,7 +9,7 @@ from django.http import HttpResponse
 
 from redactor.widgets import RedactorEditor
 
-from .models import Article, Tag, Category, Content, Media, SitemapUrl
+from .models import Article, Tag, Category, Content, Media, Page
 
 from hvad.admin import TranslatableAdmin
 from hvad.forms import TranslatableModelForm
@@ -102,6 +102,8 @@ class MediaAdmin(TranslatableAdmin):
 class SitemapUrlAdmin(TranslatableAdmin):
     pass
 
+class PageAdmin(TranslatableAdmin):
+    pass
 
 try:
     admin.site.register(get_user_model(), CamomillaUserAdmin)
@@ -114,7 +116,7 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Content, ContentAdmin)
 admin.site.register(Media, MediaAdmin)
-admin.site.register(SitemapUrl, SitemapUrlAdmin)
+admin.site.register(Page, PageAdmin)
 admin.site.unregister(Group)
 
 admin.site.index_title = '{0} {1}'.format(
