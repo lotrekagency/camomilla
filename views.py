@@ -285,7 +285,6 @@ class SitemapUrlViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         return contents
 
 
-
 class LanguageViewSet(views.APIView):
 
     def get(self, request, *args, **kwargs):

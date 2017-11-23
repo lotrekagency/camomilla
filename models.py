@@ -18,6 +18,7 @@ from django.utils.text import slugify
 from hvad.models import TranslatableModel, TranslatedFields
 
 from subprocess import Popen
+from .mixins import SeoMixin, SlugMixin
 
 
 def create_content_id():
@@ -36,20 +37,6 @@ PERMISSION_LEVELS = (
     ('2', _('Editor')),
     ('3', _('Admin')),
 )
-
-
-class SlugMixin(object):
-
-    slug_attr = 'title'
-
-    def get_slug(self):
-        return self.slug
-
-    get_slug.short_description = _('Slug')
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(getattr(self, self.slug_attr))
-        super(SlugMixin, self).save(*args, **kwargs)
 
 
 class CamomillaBaseUser(AbstractUser):
@@ -105,19 +92,13 @@ class CamomillaBaseUser(AbstractUser):
         )
 
 
-class BaseArticle(TranslatableModel, SlugMixin):
+class BaseArticle(SeoMixin):
+
+    seo_attr = 'permalink'
+
     identifier = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields(
-        title = models.CharField(max_length=200),
         content = models.TextField(),
-        description = models.TextField(blank=True, null=True, default=''),
-        permalink = models.SlugField(max_length=200),
-        og_description = models.CharField(max_length=200, blank=True, null=True, default=''),
-        og_title = models.CharField(max_length=200, blank=True, null=True, default=''),
-        og_type = models.CharField(max_length=200, blank=True, null=True, default=''),
-        og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
-        canonical = models.CharField(max_length=200, blank=True, null=True, default=''),
-        slug = models.SlugField(blank=True)
     )
     author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
     status = models.CharField(
@@ -127,10 +108,9 @@ class BaseArticle(TranslatableModel, SlugMixin):
     )
     highlight_image = models.ForeignKey('camomilla.Media', blank=True, null=True, on_delete=models.SET_NULL)
     date = models.DateTimeField(auto_now=True)
-    date_to_show = models.DateTimeField(null=True, blank=True)
+    pubblication_date = models.DateTimeField(null=True, blank=True)
     tags = models.ManyToManyField('camomilla.Tag', blank=True)
     categories = models.ManyToManyField('camomilla.Category', blank=True)
-    og_image = models.ImageField(blank=True, null=True, default='')
 
     class Meta:
         abstract = True
@@ -142,28 +122,19 @@ class BaseArticle(TranslatableModel, SlugMixin):
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
 
 class Article(BaseArticle):
     translations = TranslatedFields()
 
+
 class BaseContent(TranslatableModel):
+    identifier = models.CharField(max_length=200)
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
         subtitle = models.CharField(max_length=200, blank=True, null=True, default=''),
         permalink = models.CharField(max_length=200, blank=True, null=True),
         content = models.TextField()
     )
-    identifier = models.CharField(max_length=200)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
-    status = models.CharField(
-        max_length=3,
-        choices=CONTENT_STATUS,
-        default='DRF',
-    )
-    date = models.DateTimeField(auto_now=True)
     page = models.ForeignKey('camomilla.SitemapUrl', blank=False, null=True, on_delete=models.SET_NULL)
 
     class Meta:
@@ -220,6 +191,29 @@ class BaseCategory(TranslatableModel):
 
 class Category(BaseCategory):
     translations = TranslatedFields()
+
+
+class BaseSitemapUrl(SeoMixin):
+    identifier = models.CharField(max_length=200, unique=True)
+    translations = TranslatedFields()
+
+    class Meta:
+        abstract = True
+        permissions = (
+            ("read_sitemapurl", _("Can read sitemap url")),
+        )
+        verbose_name = 'Page'
+        verbose_name_plural = 'Pages'
+
+    def __str__(self):
+        return self.identifier
+
+
+class SitemapUrl(BaseSitemapUrl):
+    translations = TranslatedFields()
+
+
+Page = SitemapUrl
 
 
 from PIL import Image
@@ -398,36 +392,3 @@ def update_media(sender, instance, **kwargs):
 def delete_media_files(sender, instance, **kwargs):
     instance._remove_thumbnail()
     instance._remove_file()
-
-
-class BaseSitemapUrl(TranslatableModel):
-    page = models.CharField(max_length=200, unique=True)
-    translations = TranslatedFields(
-        title = models.CharField(max_length=200),
-        description = models.TextField(blank=True, null=True, default=''),
-        permalink = models.CharField(max_length=200, blank=True),
-        og_description = models.CharField(max_length=200, blank=True, null=True, default=''),
-        og_title = models.CharField(max_length=200, blank=True, null=True, default=''),
-        og_type = models.CharField(max_length=200, blank=True, null=True, default=''),
-        og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
-        canonical = models.CharField(max_length=200, blank=True, null=True, default=''),
-    )
-    og_image = models.ImageField(blank=True, null=True, default='')
-
-    class Meta:
-        abstract = True
-        permissions = (
-            ("read_sitemapurl", _("Can read sitemap url")),
-        )
-        verbose_name = 'Page'
-        verbose_name_plural = 'Pages'
-
-    def __str__(self):
-        return self.page
-
-
-class SitemapUrl(BaseSitemapUrl):
-    translations = TranslatedFields()
-
-
-Page = SitemapUrl

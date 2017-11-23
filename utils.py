@@ -1,7 +1,8 @@
 from django.conf import settings
 import urllib.parse
 from django.utils.translation import get_language
-from .models import SitemapUrl, Article
+
+from django.apps import apps
 
 
 def get_host_url(request):
@@ -20,7 +21,9 @@ def get_complete_url(request, url, language=''):
     return complete_url
 
 
-def get_page(request, identifier, lang='', model=SitemapUrl, attr='page'):
+def get_page(request, identifier, lang='', model=None, attr='page'):
+    if not model:
+        model = apps.get_model(app_label='camomilla', model_name='SitemapUrl'),
     if not lang:
         lang = get_language()
     try:
@@ -47,9 +50,15 @@ def get_page(request, identifier, lang='', model=SitemapUrl, attr='page'):
         return None
 
 
-def get_seo(request, identifier, lang='', model=SitemapUrl, attr='page'):
+def get_seo(request, identifier, lang='', model=None, attr='identifier'):
+    if not model:
+        model = apps.get_model(app_label='camomilla', model_name='SitemapUrl'),
     return get_page(request, identifier, lang, model, attr)
 
 
 def get_article_with_seo(request, identifier, lang=''):
-    return get_seo(request, identifier, lang, Article, 'identifier')
+    return get_seo(
+        request, identifier, 
+        lang, apps.get_model(app_label='camomilla', model_name='Article'), 
+        'identifier'
+    )
