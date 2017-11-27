@@ -1,5 +1,6 @@
 # System
 venv
+*.mo
 *.pyc
 *.zip
 .DS_Store
