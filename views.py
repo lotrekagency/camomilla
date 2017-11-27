@@ -232,7 +232,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     model = Category
 
     def get_queryset(self):
-        user_language = self.request.GET.get('language', 'en')
+        user_language = self.request.GET.get('language', settings.LANGUAGE_CODE)
         return self.model.objects.language(user_language).fallbacks().all()
 
 

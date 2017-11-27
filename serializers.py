@@ -126,7 +126,6 @@ class MediaSerializer(TranslatableModelSerializer):
 #http://stackoverflow.com/questions/29950956/drf-simple-foreign-key-assignment-with-nested-serializers
 class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
 
-    author = serializers.CharField(read_only=True)
     highlight_image_exp = MediaSerializer(source='highlight_image', read_only=True)
 
     class Meta:
