@@ -214,7 +214,7 @@ class ContentViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         return contents
 
 
-class TagViewSet(viewsets.ModelViewSet):
+class TagViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -222,11 +222,11 @@ class TagViewSet(viewsets.ModelViewSet):
     model = Tag
 
     def get_queryset(self):
-        user_language = self.request.GET.get('language', settings.LANGUAGE_CODE)
+        user_language = self._get_user_language()
         return self.model.objects.language(user_language).fallbacks().all()
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -234,7 +234,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     model = Category
 
     def get_queryset(self):
-        user_language = self.request.GET.get('language', settings.LANGUAGE_CODE)
+        user_language = self._get_user_language()
         return self.model.objects.language(user_language).fallbacks().all()
 
 

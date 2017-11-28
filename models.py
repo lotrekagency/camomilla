@@ -152,10 +152,9 @@ class Content(BaseContent):
     translations = TranslatedFields()
 
 
-class BaseTag(SlugMixin, TranslatableModel):
+class BaseTag(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
-        slug = models.SlugField(blank=True)
     )
 
     class Meta:
@@ -175,11 +174,12 @@ class Tag(BaseTag):
 
 class BaseCategory(TranslatableModel):
     translations = TranslatedFields(
-        title = models.CharField(max_length=200, unique=True)
+        title = models.CharField(max_length=200)
     )
 
     class Meta:
         abstract = True
+        unique_together = [('title', 'language_code')]
         verbose_name_plural = "categories"
         permissions = (
             ("read_category", _("Can read category")),

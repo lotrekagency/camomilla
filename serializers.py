@@ -7,7 +7,12 @@ from hvad.contrib.restframework import TranslatableModelSerializer
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.db import IntegrityError
+
 from django.utils.translation import ugettext_lazy as _
+
+from rest_framework.validators import UniqueTogetherValidator, ValidationError
+from rest_framework.response import Response
 
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -84,12 +89,44 @@ class UserSerializer(serializers.ModelSerializer):
 
 class TagSerializer(TranslatableModelSerializer):
 
+    def create(self, validated_data):
+        try:
+             return super(TagSerializer, self).create(validated_data)
+        except IntegrityError:
+            raise ValidationError({
+                "title" : ["Esiste già un Tag con questo titolo"]
+            })
+
+    def update(self, instance, data):
+        try:
+             return super(TagSerializer, self).update(instance, data)
+        except IntegrityError:
+            return Response({
+                'title' : ['Esiste già un Tag con questo titolo']
+            })
+
     class Meta:
         model = Tag
         fields = '__all__'
 
 
 class CategorySerializer(TranslatableModelSerializer):
+
+    def create(self, validated_data):
+        try:
+             return super(CategorySerializer, self).create(validated_data)
+        except IntegrityError:
+            raise ValidationError({
+                "title" : ["Esiste già una Categoria con questo titolo"]
+            })
+
+    def update(self, instance, data):
+        try:
+             return super(CategorySerializer, self).update(instance, data)
+        except IntegrityError:
+            raise ValidationError({
+                "title" : ["Esiste già una Categoria con questo titolo"]
+            })
 
     class Meta:
         model = Category

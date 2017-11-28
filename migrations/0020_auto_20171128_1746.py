@@ -10,7 +10,7 @@ import django.db.models.manager
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camomilla', '0017_auto_20171127_1215'),
+        ('camomilla', '0019_remove_tagtranslation_slug'),
     ]
 
     operations = [

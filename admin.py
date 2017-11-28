@@ -61,8 +61,7 @@ class ArticleAdmin(TranslatableAdmin):
 
 
 class TagAdmin(TranslatableAdmin):
-    exclude = ('slug',)
-    readonly_fields = ('get_slug',)
+    pass
 
 
 class CategoryAdmin(TranslatableAdmin):
@@ -102,6 +101,19 @@ class MediaAdmin(TranslatableAdmin):
 
 class SitemapUrlAdmin(TranslatableAdmin):
     pass
+    # def __init__(self, *args, **kwargs):
+    #     super(SitemapUrlAdmin, self).__init__(*args, **kwargs)
+    #     self.fieldsets = (
+    #         ('SEO', {
+    #             'fields': (
+    #                 'title', 'description', 'permalink', 
+    #                 'og_image', 'og_description',
+    #                 'og_title', 'og_type', 'og_url', 
+    #                 'canonical',
+    #             ),
+    #         }),
+    #     )
+        
 
 class PageAdmin(TranslatableAdmin):
     pass
