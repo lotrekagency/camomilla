@@ -1,7 +1,7 @@
 from rest_framework import serializers, permissions
 from rest_framework.authtoken.models import Token
 
-from .models import Article, Tag, Category, Content, Media, SitemapUrl
+from .models import Article, Tag, Category, Content, Media, SitemapUrl, MediaFolder
 
 from hvad.contrib.restframework import TranslatableModelSerializer
 
@@ -118,8 +118,20 @@ class ContentSerializer(TranslatableModelSerializer):
 
 class MediaSerializer(TranslatableModelSerializer):
 
+    def exclude_fields(self, fields_to_exclude=None):
+        if isinstance(fields_to_exclude, list):
+            for f in fields_to_exclude:
+                f in self.fields.fields and self.fields.fields.pop(f) or next()
     class Meta:
         model = Media
+        fields = '__all__'
+
+
+
+class MediaFolderSerializer(TranslatableModelSerializer):
+    icon = MediaSerializer(read_only=True)
+    class Meta:
+        model = MediaFolder
         fields = '__all__'
 
 

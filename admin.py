@@ -9,7 +9,8 @@ from django.http import HttpResponse
 
 from redactor.widgets import RedactorEditor
 
-from .models import Article, Tag, Category, Content, Media, Page
+from .models import Article, Tag, Category, Content, Media, SitemapUrl, MediaFolder
+
 
 from hvad.admin import TranslatableAdmin
 from hvad.forms import TranslatableModelForm
@@ -67,6 +68,8 @@ class TagAdmin(TranslatableAdmin):
 class CategoryAdmin(TranslatableAdmin):
     pass
 
+class MediaFolderAdmin(TranslatableAdmin):
+    pass
 
 class ContentAdminForm(TranslatableModelForm):
     class Meta:
@@ -111,6 +114,7 @@ except AlreadyRegistered:
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(MediaFolder, MediaFolderAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Content, ContentAdmin)
 admin.site.register(Media, MediaAdmin)

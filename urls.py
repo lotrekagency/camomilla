@@ -1,4 +1,4 @@
-from .views import ArticleViewSet, CategoryViewSet
+from .views import ArticleViewSet, CategoryViewSet, MediaFolderViewSet
 from .views import TagViewSet, ContentViewSet, MediaViewSet, PermissionViewSet
 from .views import SitemapUrlViewSet, LanguageViewSet, UserProfileViewSet, UserViewSet
 
@@ -13,6 +13,7 @@ router.register(r'categories', CategoryViewSet)
 router.register(r'articles', ArticleViewSet)
 router.register(r'contents', ContentViewSet)
 router.register(r'media', MediaViewSet, 'media')
+router.register(r'media-folders', MediaFolderViewSet, 'media_folders')
 router.register(r'sitemap', SitemapUrlViewSet)
 router.register(r'profiles', UserProfileViewSet)
 router.register(r'users', UserViewSet)

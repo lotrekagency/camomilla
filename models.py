@@ -224,6 +224,31 @@ from django.core.files.storage import default_storage as storage
 
 from io import BytesIO
 
+class BaseMediaFolder(TranslatableModel):
+    translations = TranslatedFields(
+        description = models.CharField(max_length=200, blank=True, null=True),
+        title = models.CharField(max_length=200, blank=True, null=True),
+    )
+    slug = models.SlugField()
+    creation_date = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
+    icon = models.ForeignKey('camomilla.Media', on_delete=models.SET_NULL,
+                              null=True, blank=True,  verbose_name=_('Image cover'))
+    updir = models.ForeignKey('self', on_delete=models.CASCADE,
+                                 null=True, blank=True)
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        to_string = self.slug
+        if self.title:
+            to_string+=" - "+self.title
+        return to_string
+
+
+class MediaFolder(BaseMediaFolder):
+    translations = TranslatedFields()
+
 class Media(TranslatableModel):
     translations = TranslatedFields(
         alt_text = models.CharField(max_length=200, blank=True, null=True),
@@ -241,7 +266,7 @@ class Media(TranslatableModel):
     name = models.CharField(max_length=200, blank=True, null=True)
     size = models.IntegerField(default=0, blank=True, null=True)
     is_image = models.BooleanField(default=False)
-
+    folder = models.ForeignKey(MediaFolder, null=True, blank=True, related_name="media_folder")
     def image_preview(self):
         if self.file:
             return mark_safe('<img src="{0}" />'.format(self.file.url))

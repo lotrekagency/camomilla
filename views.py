@@ -18,10 +18,12 @@ from rest_framework import generics, mixins, views
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import parser_classes
+from rest_framework.parsers import FormParser, MultiPartParser
 
 
-from .models import Article, Tag, Category, Content, Media, SitemapUrl
-from .serializers import ExpandedArticleSerializer, ArticleSerializer, MediaSerializer
+from .models import Article, Tag, Category, Content, Media, SitemapUrl, MediaFolder
+from .serializers import ExpandedArticleSerializer, ArticleSerializer, MediaSerializer, MediaFolderSerializer
 from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
 from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer, UserSerializer, PermissionSerializer
 from .permissions import CamomillaBasePermissions, CamomillaSuperUser
@@ -236,22 +238,88 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return self.model.objects.language(user_language).fallbacks().all()
 
 
+class MediaFolderViewSet(viewsets.ModelViewSet):
+    model = MediaFolder
+    serializer_class = MediaFolderSerializer
+
+    def get_queryset(self):
+        return self.model.objects.all()
+
+    def get_mixed_response(self, request, *args, **kwargs):
+        updir = None
+        parent_folder = None
+
+        if 'pk' in kwargs:
+            updir = kwargs['pk']
+            parent_folder = MediaFolderSerializer(self.model.objects.get(pk=updir).updir).data
+
+        folder_queryset = self.model.objects.filter(updir__pk=updir)
+        media_queryset = Media.objects.filter(folder__pk=updir)
+
+        folder_serializer = MediaFolderSerializer(
+            folder_queryset, many=True,
+         )
+        media_serializer = MediaSerializer(
+            media_queryset, many=True,
+         )
+        return {'folders':folder_serializer.data, "media":media_serializer.data, "parent_folder": parent_folder }
+
+    def list(self, request, *args, **kwargs):
+        return Response(self.get_mixed_response(request, *args, **kwargs))
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(self.get_mixed_response(request, *args, **kwargs))
+
+
+
 class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
     model = Media
 
+
+
     @list_route(methods=['post'], permission_classes = (CamomillaBasePermissions,))
+    @parser_classes((FormParser, MultiPartParser,))
     def upload(self, request):
-        new_media = Media.objects.language(self._get_user_language()).create(
-            title=request.POST['title'],
-            alt_text=request.POST['alt_text'],
-            file=request.FILES['file_contents'],
-            name=request.POST['file_name'],
-            size=0,
-        )
+        if request.data and 'file' in request.data:
+            new_media = Media(
+                language_code = self._get_user_language(),
+                title = request.data.get('title',''),
+                alt_text = request.data.get('alt_text',''),
+                name = request.data.get('file_name',''),
+                description = request.data.get('description',''),
+                size=0,
+            )
+            upload = request.data['file']
+
+            new_media.file.save(upload.name,upload)
+            new_media.save()
+        else:
+            new_media = Media.objects.language(self._get_user_language()).create(
+                title=request.POST['title'],
+                alt_text=request.POST['alt_text'],
+                file=request.FILES['file_contents'],
+                name=request.POST['file_name'],
+                size=0,
+            )
+
         return redirect('media-detail', pk=new_media.pk)
+
+    def update(self, request, *args, **kwargs):
+        print(request.data)
+        partial = False
+        if 'PATCH' in request.method:
+            partial = True
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        if 'PATCH' in request.method and 'file' in request.data :
+            serializer.exclude_fields(['file','thumbnail'])
+        if not serializer.is_valid():
+            return Response(serializer.errors)
+        serializer.save()
+        return Response(serializer.data)
 
     def _handle_upload_file(file):
         with open('some/file/name.txt', 'wb+') as destination:
