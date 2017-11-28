@@ -9,7 +9,7 @@ from django.http import HttpResponse
 
 from redactor.widgets import RedactorEditor
 
-from .models import Article, Tag, Category, Content, Media, SitemapUrl, MediaFolder
+from .models import Article, Tag, Category, Content, Media, SitemapUrl, Page, MediaFolder
 
 
 from hvad.admin import TranslatableAdmin
