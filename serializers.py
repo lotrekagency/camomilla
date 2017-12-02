@@ -1,3 +1,4 @@
+
 from rest_framework import serializers, permissions
 from rest_framework.authtoken.models import Token
 
@@ -180,7 +181,7 @@ class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
     class Meta:
         model = Article
         fields = '__all__'
-
+        
 
 class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
 
@@ -213,4 +214,4 @@ class CompactSitemapUrlSerializer(TranslatableModelSerializer):
 
     class Meta:
         model = SitemapUrl
-        fields = ('id', 'page', 'title','description', 'permalink', 'og_image')
+        fields = ('id', 'identifier', 'title','description', 'permalink', 'og_image')
