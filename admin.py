@@ -73,7 +73,6 @@ class MediaFolderAdmin(TranslatableAdmin):
 class ContentAdminForm(TranslatableModelForm):
     class Meta:
         model = Content
-        exclude = ('author',)
         widgets = {
            'content': RedactorEditor(),
         }

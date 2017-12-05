@@ -147,8 +147,6 @@ class UnderTranslateMixin(object):
 
 class ContentSerializer(TranslatableModelSerializer):
 
-    author = serializers.CharField(read_only=True)
-
     class Meta:
         model = Content
         fields = '__all__'

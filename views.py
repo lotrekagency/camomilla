@@ -206,9 +206,6 @@ class ContentViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
     def get_queryset(self):
         user_language = self._get_user_language()
         contents = self.model.objects.language(user_language).fallbacks().all()
