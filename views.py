@@ -56,6 +56,11 @@ class UserViewSet(viewsets.ModelViewSet):
     model = get_user_model()
     permission_classes = (CamomillaSuperUser,)
 
+    @list_route()
+    def current(self,request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
     @detail_route(methods=['post'])
     def kickout(self, request, pk=None):
         user = get_user_model().objects.get(pk=pk)
