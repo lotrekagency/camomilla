@@ -16,6 +16,20 @@ from rest_framework.validators import UniqueTogetherValidator, ValidationError
 from rest_framework.response import Response
 
 
+class CamomillaBaseTranslatableModelSerializer(TranslatableModelSerializer):
+
+    def get_field_names(self, declared_fields, info):
+        expanded_fields = super(
+            CamomillaBaseTranslatableModelSerializer, self
+        ).get_field_names(declared_fields, info)
+
+        if getattr(self.Meta, 'extra_fields', None):
+            print (expanded_fields)
+            return expanded_fields
+        else:
+            return expanded_fields
+
+
 class PermissionSerializer(serializers.ModelSerializer):
 
     class Meta:
