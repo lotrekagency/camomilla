@@ -28,7 +28,7 @@ class SeoMixin(TranslatableModel):
             lang = get_language()
         try:
             kwargs = {model.seo_attr: identifier}
-            meta_tag = model.objects.language().get(**kwargs)
+            meta_tag, _ = model.objects.language().get_or_create(**kwargs)
             if not meta_tag.og_title:
                 meta_tag.og_title = meta_tag.title
             if not meta_tag.og_description:

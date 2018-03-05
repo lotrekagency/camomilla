@@ -145,7 +145,7 @@ class BaseContent(TranslatableModel):
         )
 
     def __str__(self):
-        return self.lazy_translation_getter('title', str(self.pk))
+        return self.page.identifier + " > " + self.identifier
 
 
 class Content(BaseContent):
