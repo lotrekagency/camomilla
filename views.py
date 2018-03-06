@@ -32,7 +32,8 @@ from .permissions import CamomillaBasePermissions, CamomillaSuperUser
 class GetUserLanguageMixin(object):
     def _get_user_language(self):
         return self.request.GET.get(
-            'language', self.request.data.get('language_code', settings.LANGUAGE_CODE)
+            'language', self.request.data.get(
+                'language_code', settings.LANGUAGE_CODE)
         )
 
 
@@ -57,7 +58,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (CamomillaSuperUser,)
 
     @list_route()
-    def current(self,request):
+    def current(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
@@ -116,8 +117,8 @@ class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
     permission_classes = (CamomillaBasePermissions,)
     model = Article
     serializers = {
-        'compressed' : ArticleSerializer,
-        'expanded' : ExpandedArticleSerializer
+        'compressed': ArticleSerializer,
+        'expanded': ExpandedArticleSerializer
     }
 
     def get_dynamic_serializer(self, request):
@@ -175,7 +176,7 @@ class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def perform_create(self, serializer):
-        
+
         serializer.save(author=self.request.user)
 
     def get_queryset(self):
@@ -254,18 +255,19 @@ class MediaFolderViewSet(viewsets.ModelViewSet):
 
         if 'pk' in kwargs:
             updir = kwargs['pk']
-            parent_folder = MediaFolderSerializer(self.model.objects.get(pk=updir).updir).data
+            parent_folder = MediaFolderSerializer(
+                self.model.objects.get(pk=updir).updir).data
 
         folder_queryset = self.model.objects.filter(updir__pk=updir)
         media_queryset = Media.objects.filter(folder__pk=updir)
 
         folder_serializer = MediaFolderSerializer(
             folder_queryset, many=True,
-         )
+        )
         media_serializer = MediaSerializer(
             media_queryset, many=True,
-         )
-        return {'folders':folder_serializer.data, "media":media_serializer.data, "parent_folder": parent_folder }
+        )
+        return {'folders': folder_serializer.data, "media": media_serializer.data, "parent_folder": parent_folder}
 
     def list(self, request, *args, **kwargs):
         return Response(self.get_mixed_response(request, *args, **kwargs))
@@ -274,31 +276,30 @@ class MediaFolderViewSet(viewsets.ModelViewSet):
         return Response(self.get_mixed_response(request, *args, **kwargs))
 
 
-
 class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
     model = Media
 
-
-
-    @list_route(methods=['post'], permission_classes = (CamomillaBasePermissions,))
+    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
     @parser_classes((FormParser, MultiPartParser,))
     def upload(self, request):
         if request.data and 'file' in request.data:
             new_media = Media(
-                language_code = self._get_user_language(),
-                title = request.data.get('title',''),
-                alt_text = request.data.get('alt_text',''),
-                name = request.data.get('file_name',''),
-                description = request.data.get('description',''),
+                language_code=self._get_user_language(),
+                title=request.data.get('title', ''),
+                alt_text=request.data.get('alt_text', ''),
+                name=request.data.get('file_name', ''),
+                description=request.data.get('description', ''),
                 size=0,
             )
             upload = request.data['file']
 
-            new_media.file.save(upload.name,upload)
+            new_media.file.save(upload.name, upload)
             new_media.save()
+            serializer = MediaSerializer(new_media)
+            return Response(serializer.data)
         else:
             new_media = Media.objects.language(self._get_user_language()).create(
                 title=request.POST['title'],
@@ -316,9 +317,10 @@ class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         if 'PATCH' in request.method:
             partial = True
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        if 'PATCH' in request.method and 'file' in request.data :
-            serializer.exclude_fields(['file','thumbnail'])
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial)
+        if 'PATCH' in request.method and 'file' in request.data:
+            serializer.exclude_fields(['file', 'thumbnail'])
         if not serializer.is_valid():
             return Response(serializer.errors)
         serializer.save()
@@ -351,8 +353,9 @@ class SitemapUrlViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         user_language = self._get_user_language()
         contents = self.model.objects.language(user_language).fallbacks().all()
         request_get = self.request.GET
-        if request_get.get('permalink',''):
-            contents = contents.filter(permalink=request_get.get('permalink',''))
+        if request_get.get('permalink', ''):
+            contents = contents.filter(
+                permalink=request_get.get('permalink', ''))
         return contents
 
 
@@ -363,7 +366,7 @@ class LanguageViewSet(views.APIView):
         languages = []
         for key, language in settings.LANGUAGES:
             languages.append({
-                'id' : key,
-                'name' : language
+                'id': key,
+                'name': language
             })
         return Response(languages)
