@@ -23,7 +23,7 @@ def get_complete_url(request, url, language=''):
 
 def get_page(request, identifier, lang='', model=None, attr='page'):
     if not model:
-        model = apps.get_model(app_label='camomilla', model_name='SitemapUrl'),
+        model = apps.get_model(app_label='camomilla', model_name='SitemapUrl')
     if not lang:
         lang = get_language()
     try:
@@ -52,7 +52,7 @@ def get_page(request, identifier, lang='', model=None, attr='page'):
 
 def get_seo(request, identifier, lang='', model=None, attr='identifier'):
     if not model:
-        model = apps.get_model(app_label='camomilla', model_name='SitemapUrl'),
+        model = apps.get_model(app_label='camomilla', model_name='SitemapUrl')
     return get_page(request, identifier, lang, model, attr)
 
 
