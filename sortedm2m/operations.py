@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.migrations.operations import AlterField
 
-from sortedm2m.fields import SORT_VALUE_FIELD_NAME
+from .fields import SORT_VALUE_FIELD_NAME
 from .compat import get_field
 from .compat import get_apps_from_state
 from .compat import allow_migrate_model
