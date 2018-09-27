@@ -181,7 +181,11 @@ class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_language = self._get_user_language()
-        articles = self.model.objects.language(user_language).fallbacks().all() if user_language == 'fallbacks' else self.model.objects.language(user_language).all()
+        fallbacks = False
+        if len(user_language.split('-')) == 2 and user_language.split('-')[0] == 'fallbacks':
+            fallbacks = True
+            user_language = user_language.split('-')[1]
+        articles = self.model.objects.language(user_language).fallbacks().all() if fallbacks else self.model.objects.language(user_language).all()
         return articles
 
 
@@ -362,11 +366,10 @@ class SitemapUrlViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 class LanguageViewSet(views.APIView):
 
     def get(self, request, *args, **kwargs):
-
         languages = []
         for key, language in settings.LANGUAGES:
             languages.append({
                 'id': key,
                 'name': language
             })
-        return Response(languages)
+        return Response({'language_code': settings.LANGUAGE_CODE, 'languages': languages})
