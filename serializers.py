@@ -160,6 +160,21 @@ class UnderTranslateMixin(object):
 
 
 class ContentSerializer(TranslatableModelSerializer):
+    def create(self, validated_data):
+        try:
+             return super(ContentSerializer, self).create(validated_data)
+        except IntegrityError:
+            raise ValidationError({
+                "identifier" : ["Esiste già un contenuto con questo identifier"]
+            })
+
+    def update(self, instance, data):
+        try:
+             return super(ContentSerializer, self).update(instance, data)
+        except IntegrityError:
+            return Response({
+                'identifier' : ['Esiste già un contenuto con questo identifier']
+            })
 
     class Meta:
         model = Content
@@ -190,9 +205,32 @@ class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
 
     highlight_image_exp = MediaSerializer(source='highlight_image', read_only=True)
 
+    def create(self, validated_data):
+        try:
+             return super(ArticleSerializer, self).create(validated_data)
+        except IntegrityError:
+            raise ValidationError({
+                "permalink" : ["Esiste già un articolo con questo permalink"]
+            })
+
+    def update(self, instance, data):
+        try:
+             return super(ArticleSerializer, self).update(instance, data)
+        except IntegrityError:
+            return Response({
+                'permalink' : ['Esiste già un articolo con questo permalink']
+            })
+
     class Meta:
         model = Article
         fields = '__all__'
+        validators = [
+        serializers.UniqueTogetherValidator(
+            queryset=model.objects.all(),
+            fields=('permalink', 'language_code'),
+            message=_("This permalink already exist associated with this language.")
+            )
+        ]
         
 
 class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
@@ -202,9 +240,32 @@ class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer
     author = serializers.CharField(read_only=True)
     highlight_image_exp = MediaSerializer(source='highlight_image', read_only=True)
 
+    def create(self, validated_data):
+        try:
+             return super(ExpandedArticleSerializer, self).create(validated_data)
+        except IntegrityError:
+            raise ValidationError({
+                "permalink" : ["Esiste già un articolo con questo permalink"]
+            })
+
+    def update(self, instance, data):
+        try:
+             return super(ExpandedArticleSerializer, self).update(instance, data)
+        except IntegrityError:
+            return Response({
+                'permalink' : ['Esiste già un articolo con questo permalink']
+            })
+
     class Meta:
         model = Article
         fields = '__all__'
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=model.objects.all(),
+                fields=('permalink', 'language_code'),
+                message=_("This permalink already exist associated with this language.")
+            )
+        ]
 
     def get_translated_tags(self, obj):
         tags = Tag.objects.language(self.ulanguage).fallbacks().filter(article__pk=obj.pk)
