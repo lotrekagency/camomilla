@@ -181,7 +181,7 @@ class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         user_language = self._get_user_language()
-        articles = self.model.objects.language(user_language).fallbacks().all()
+        articles = self.model.objects.language(user_language).fallbacks().all() if user_language == 'fallbacks' else self.model.objects.language(user_language).all()
         return articles
 
 
