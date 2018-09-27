@@ -224,13 +224,6 @@ class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
     class Meta:
         model = Article
         fields = '__all__'
-        validators = [
-        serializers.UniqueTogetherValidator(
-            queryset=model.objects.all(),
-            fields=('permalink', 'language_code'),
-            message=_("This permalink already exist associated with this language.")
-            )
-        ]
         
 
 class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
@@ -259,13 +252,6 @@ class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer
     class Meta:
         model = Article
         fields = '__all__'
-        validators = [
-            serializers.UniqueTogetherValidator(
-                queryset=model.objects.all(),
-                fields=('permalink', 'language_code'),
-                message=_("This permalink already exist associated with this language.")
-            )
-        ]
 
     def get_translated_tags(self, obj):
         tags = Tag.objects.language(self.ulanguage).fallbacks().filter(article__pk=obj.pk)
