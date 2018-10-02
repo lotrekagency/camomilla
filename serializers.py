@@ -263,7 +263,7 @@ class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer
 
 
 class SitemapUrlSerializer(TranslatableModelSerializer):
-
+    content_set = ContentSerializer(read_only=True, many=True)
     class Meta:
         model = SitemapUrl
         fields = '__all__'

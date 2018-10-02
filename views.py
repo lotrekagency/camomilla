@@ -35,6 +35,14 @@ class GetUserLanguageMixin(object):
             'language', self.request.data.get(
                 'language_code', settings.LANGUAGE_CODE)
         )
+    def get_queryset(self):
+        user_language = self._get_user_language()
+        fallbacks = False
+        if len(user_language.split('-')) == 2 and user_language.split('-')[0] == 'fallbacks':
+            fallbacks = True
+            user_language = user_language.split('-')[1]
+        return self.model.objects.language(user_language).fallbacks().all() if fallbacks else self.model.objects.language(user_language).all()
+        
 
 
 class CamomillaObtainAuthToken(ObtainAuthToken):
@@ -179,14 +187,6 @@ class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
         serializer.save(author=self.request.user)
 
-    def get_queryset(self):
-        user_language = self._get_user_language()
-        fallbacks = False
-        if len(user_language.split('-')) == 2 and user_language.split('-')[0] == 'fallbacks':
-            fallbacks = True
-            user_language = user_language.split('-')[1]
-        articles = self.model.objects.language(user_language).fallbacks().all() if fallbacks else self.model.objects.language(user_language).all()
-        return articles
 
 
 class ContentViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
@@ -216,10 +216,6 @@ class ContentViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
-    def get_queryset(self):
-        user_language = self._get_user_language()
-        contents = self.model.objects.language(user_language).fallbacks().all()
-        return contents
 
 
 class TagViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
@@ -229,9 +225,6 @@ class TagViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
     permission_classes = (CamomillaBasePermissions,)
     model = Tag
 
-    def get_queryset(self):
-        user_language = self._get_user_language()
-        return self.model.objects.language(user_language).fallbacks().all()
 
 
 class CategoryViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
@@ -241,9 +234,6 @@ class CategoryViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
     permission_classes = (CamomillaBasePermissions,)
     model = Category
 
-    def get_queryset(self):
-        user_language = self._get_user_language()
-        return self.model.objects.language(user_language).fallbacks().all()
 
 
 class MediaFolderViewSet(viewsets.ModelViewSet):
