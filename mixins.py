@@ -20,7 +20,7 @@ class SeoMixin(TranslatableModel):
         og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
         canonical = models.CharField(max_length=200, blank=True, null=True, default=''),
     )
-    og_image = models.ImageField(blank=True, null=True, default='')
+    og_image = models.ForeignKey('camomilla.Media', blank=True, null=True, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related")
 
     @classmethod
     def with_seo(model, request, identifier, lang=''):

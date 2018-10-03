@@ -204,6 +204,7 @@ class MediaFolderSerializer(TranslatableModelSerializer):
 class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
 
     highlight_image_exp = MediaSerializer(source='highlight_image', read_only=True)
+    og_image_exp = MediaSerializer(source='og_image', read_only=True)
 
     def create(self, validated_data):
         try:
@@ -263,6 +264,7 @@ class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer
 
 
 class SitemapUrlSerializer(TranslatableModelSerializer):
+    og_image_exp = MediaSerializer(source='og_image', read_only=True)
     content_set = ContentSerializer(read_only=True, many=True)
     class Meta:
         model = SitemapUrl
