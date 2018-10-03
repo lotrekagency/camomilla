@@ -98,6 +98,7 @@ class BaseArticle(SeoMixin):
 
     identifier = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields(
+        content_title = models.CharField(max_length=200),
         content = models.TextField(),
     )
     author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
