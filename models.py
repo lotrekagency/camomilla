@@ -29,6 +29,7 @@ CONTENT_STATUS = (
     ('PUB', _('Published')),
     ('DRF', _('Draft')),
     ('TRS', _('Trash')),
+    ('PLA', _('Planned')),
 )
 
 
