@@ -233,6 +233,7 @@ class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer
     categories = serializers.SerializerMethodField('get_translated_categories')
     author = serializers.CharField(read_only=True)
     highlight_image_exp = MediaSerializer(source='highlight_image', read_only=True)
+    og_image_exp = MediaSerializer(source='og_image', read_only=True)
 
     def create(self, validated_data):
         try:
@@ -263,12 +264,16 @@ class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer
         return CategorySerializer(categories, many=True).data
 
 
-class SitemapUrlSerializer(TranslatableModelSerializer):
+class SitemapUrlSerializer(UnderTranslateMixin, TranslatableModelSerializer):
     og_image_exp = MediaSerializer(source='og_image', read_only=True)
-    content_set = ContentSerializer(read_only=True, many=True)
+    content_set = serializers.SerializerMethodField('get_translated_content')
     class Meta:
         model = SitemapUrl
         fields = '__all__'
+
+    def get_translated_content(self, obj):
+        content = Content.objects.language(self.ulanguage).fallbacks().filter(page__pk=obj.pk)
+        return ContentSerializer(content, many=True).data
 
 
 class CompactSitemapUrlSerializer(TranslatableModelSerializer):

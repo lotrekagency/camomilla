@@ -343,6 +343,19 @@ class SitemapUrlViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
             return CompactSitemapUrlSerializer
         return SitemapUrlSerializer
 
+    def list(self, request, *args, **kwargs):
+        user_language = self._get_user_language()
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, ulanguage = user_language, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        user_language = self._get_user_language()
+
+        instance = self.get_queryset().get(pk=kwargs['pk'])
+        serializer = self.serializer_class(instance, ulanguage = user_language)
+        return Response(serializer.data)
+
     def get_queryset(self):
         user_language = self._get_user_language()
         contents = self.model.objects.language(user_language).fallbacks().all()
