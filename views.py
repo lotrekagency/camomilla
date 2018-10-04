@@ -346,7 +346,7 @@ class SitemapUrlViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         user_language = self._get_user_language()
         queryset = self.get_queryset()
-        serializer = self.serializer_class(queryset, ulanguage = user_language, many=True)
+        serializer = self.get_serializer_class()(queryset, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
