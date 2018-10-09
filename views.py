@@ -121,7 +121,6 @@ class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    lookup_field = 'permalink'
     permission_classes = (CamomillaBasePermissions,)
     model = Article
     serializers = {
@@ -169,23 +168,12 @@ class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         user_language = self._get_user_language()
         current_serializer = self.get_dynamic_serializer(request)
-        try:
-            instance = self.get_queryset().get(permalink=kwargs['permalink'])
-        except Exception as ex:
-            # In case you use a different permalink
-            instance = self.model.objects.language('all').get(
-                permalink=kwargs['permalink']
-            )
-            instance = self.get_queryset().get(master=instance.pk)
+        instance = self.get_queryset().get(pk=kwargs['pk'])
         serializer = current_serializer(
             instance, ulanguage=user_language,
             context={'request': request}
         )
         return Response(serializer.data)
-
-    def perform_create(self, serializer):
-
-        serializer.save(author=self.request.user)
 
 
 
