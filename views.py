@@ -301,8 +301,8 @@ class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(
             instance, data=request.data, partial=partial)
-        if 'PATCH' in request.method and 'file' in request.data:
-            serializer.exclude_fields(['file', 'thumbnail'])
+        # if 'PATCH' in request.method and 'file' in request.data:
+        #     serializer.exclude_fields(['file', 'thumbnail'])
         if not serializer.is_valid():
             return Response(serializer.errors)
         serializer.save()
