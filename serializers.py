@@ -1,7 +1,7 @@
 
 from rest_framework import serializers, permissions
 from rest_framework.authtoken.models import Token
-
+import json
 from .models import Article, Tag, Category, Content, Media, SitemapUrl, MediaFolder
 
 from hvad.contrib.restframework import TranslatableModelSerializer
@@ -192,6 +192,23 @@ class MediaSerializer(TranslatableModelSerializer):
         fields = '__all__'
 
 
+class MediaDetailSerializer(TranslatableModelSerializer):
+    links = serializers.SerializerMethodField('get_linked_instances')
+
+    class Meta:
+        model = Media
+        fields = '__all__'
+
+    def get_linked_instances(self, obj):
+        result = []
+        links = obj.get_foreign_fields()
+        for link in links:
+            objects = getattr(obj, link).all()
+            for item in objects:
+                if item.__class__.__name__ != 'MediaTranslation':
+                    result.append({'model': item.__class__.__name__, 'name': item.__str__(), 'id': item.pk})
+        return result
+
 
 class MediaFolderSerializer(TranslatableModelSerializer):
     icon = MediaSerializer(read_only=True)
@@ -225,8 +242,8 @@ class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
     class Meta:
         model = Article
         fields = '__all__'
+    
         
-
 class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
 
     tags = serializers.SerializerMethodField('get_translated_tags')

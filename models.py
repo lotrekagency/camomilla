@@ -16,6 +16,7 @@ from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 
 from hvad.models import TranslatableModel, TranslatedFields
+from django.db.models.fields.related import ForeignObjectRel
 
 from subprocess import Popen
 from .mixins import SeoMixin, SlugMixin
@@ -295,6 +296,9 @@ class Media(TranslatableModel):
     def optimize(self):
         if self.file:
             self._optimize()
+
+    def get_foreign_fields(self):
+        return [field.get_accessor_name() for field in self._meta.get_fields() if issubclass(type(field), ForeignObjectRel)]
 
     @property
     def json_repr(self):

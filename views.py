@@ -20,10 +20,11 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.decorators import parser_classes
 from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework import status
 
 
 from .models import Article, Tag, Category, Content, Media, SitemapUrl, MediaFolder
-from .serializers import ExpandedArticleSerializer, ArticleSerializer, MediaSerializer, MediaFolderSerializer
+from .serializers import ExpandedArticleSerializer, ArticleSerializer, MediaSerializer, MediaFolderSerializer, MediaDetailSerializer
 from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
 from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer, UserSerializer, PermissionSerializer
 from .permissions import CamomillaBasePermissions, CamomillaSuperUser
@@ -263,6 +264,17 @@ class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
     model = Media
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(MediaDetailSerializer(self.queryset.get(pk=kwargs['pk'])).data)
+
+    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
+    def bulk_delete(self, request):
+        try:
+            self.queryset.filter(pk__in=request.data).delete()
+            return Response({'detail': 'Eliminazione multipla andata a buon fine' }, status=status.HTTP_200_OK)
+        except:
+            return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
     @parser_classes((FormParser, MultiPartParser,))
