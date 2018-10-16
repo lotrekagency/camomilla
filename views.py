@@ -38,9 +38,9 @@ class GetUserLanguageMixin(object):
         )
     def get_queryset(self):
         user_language = self._get_user_language()
-        fallbacks = False
-        if len(user_language.split('-')) == 2 and user_language.split('-')[0] == 'fallbacks':
-            fallbacks = True
+        fallbacks = True
+        if len(user_language.split('-')) == 2 and user_language.split('-')[0] == 'nofallbacks':
+            fallbacks = False
             user_language = user_language.split('-')[1]
         return self.model.objects.language(user_language).fallbacks().all() if fallbacks else self.model.objects.language(user_language).all()
         
