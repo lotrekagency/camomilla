@@ -313,17 +313,10 @@ class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(
             instance, data=request.data, partial=partial)
-        if 'PATCH' in request.method and 'file' in request.data:
-            serializer.exclude_fields(['file', 'thumbnail'])
         if not serializer.is_valid():
             return Response(serializer.errors)
         serializer.save()
         return Response(serializer.data)
-
-    def _handle_upload_file(file):
-        with open('some/file/name.txt', 'wb+') as destination:
-            for chunk in f.chunks():
-                destination.write(chunk)
 
     def get_queryset(self):
         user_language = self._get_user_language()
