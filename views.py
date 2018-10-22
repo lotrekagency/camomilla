@@ -43,7 +43,15 @@ class GetUserLanguageMixin(object):
             fallbacks = False
             user_language = user_language.split('-')[1]
         return self.model.objects.language(user_language).fallbacks().all() if fallbacks else self.model.objects.language(user_language).all()
-        
+
+class BulkDeleteMixin(object):
+    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
+    def bulk_delete(self, request):
+        try:
+            self.model.objects.filter(pk__in=request.data).delete()
+            return Response({'detail': 'Eliminazione multipla andata a buon fine' }, status=status.HTTP_200_OK)
+        except:
+            return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)      
 
 
 class CamomillaObtainAuthToken(ObtainAuthToken):
@@ -118,7 +126,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         )
 
 
-class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class ArticleViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
@@ -178,7 +186,7 @@ class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
 
 
-class ContentViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class ContentViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
@@ -207,7 +215,7 @@ class ContentViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
 
 
-class TagViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class TagViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -216,7 +224,7 @@ class TagViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 
 
 
-class CategoryViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class CategoryViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -259,7 +267,7 @@ class MediaFolderViewSet(viewsets.ModelViewSet):
         return Response(self.get_mixed_response(request, *args, **kwargs))
 
 
-class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
@@ -268,13 +276,6 @@ class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         return Response(MediaDetailSerializer(self.queryset.get(pk=kwargs['pk'])).data)
 
-    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
-    def bulk_delete(self, request):
-        try:
-            self.queryset.filter(pk__in=request.data).delete()
-            return Response({'detail': 'Eliminazione multipla andata a buon fine' }, status=status.HTTP_200_OK)
-        except:
-            return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
     @parser_classes((FormParser, MultiPartParser,))
@@ -284,7 +285,7 @@ class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
                 language_code=self._get_user_language(),
                 title=request.data.get('title', ''),
                 alt_text=request.data.get('alt_text', ''),
-                name=request.data.get('file_name', ''),
+                namedelete=request.data.get('file_name', ''),
                 description=request.data.get('description', ''),
                 size=0,
             )
@@ -324,7 +325,7 @@ class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         return contents
 
 
-class SitemapUrlViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class SitemapUrlViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
     queryset = SitemapUrl.objects.all()
     serializer_class = SitemapUrlSerializer
