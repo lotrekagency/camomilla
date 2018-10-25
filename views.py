@@ -285,7 +285,7 @@ class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet)
                 language_code=self._get_user_language(),
                 title=request.data.get('title', ''),
                 alt_text=request.data.get('alt_text', ''),
-                namedelete=request.data.get('file_name', ''),
+                name=request.data.get('file_name', ''),
                 description=request.data.get('description', ''),
                 size=0,
             )

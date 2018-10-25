@@ -14,6 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.validators import UniqueTogetherValidator, ValidationError
 from rest_framework.response import Response
+from hvad.contrib.restframework import TranslationsMixin
 
 
 class CamomillaBaseTranslatableModelSerializer(TranslatableModelSerializer):
@@ -106,7 +107,7 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class TagSerializer(CamomillaBaseTranslatableModelSerializer):
+class TagSerializer(TranslationsMixin, CamomillaBaseTranslatableModelSerializer):
 
     def create(self, validated_data):
         try:
@@ -129,7 +130,7 @@ class TagSerializer(CamomillaBaseTranslatableModelSerializer):
         fields = '__all__'
 
 
-class CategorySerializer(CamomillaBaseTranslatableModelSerializer):
+class CategorySerializer(TranslationsMixin, CamomillaBaseTranslatableModelSerializer):
 
     def create(self, validated_data):
         try:
@@ -163,7 +164,7 @@ class UnderTranslateMixin(object):
         super(UnderTranslateMixin, self).__init__(*args, **kwargs)
 
 
-class ContentSerializer(CamomillaBaseTranslatableModelSerializer):
+class ContentSerializer(TranslationsMixin, CamomillaBaseTranslatableModelSerializer):
     def create(self, validated_data):
         try:
              return super(ContentSerializer, self).create(validated_data)
@@ -222,7 +223,7 @@ class MediaFolderSerializer(CamomillaBaseTranslatableModelSerializer):
 
 
 #http://stackoverflow.com/questions/29950956/drf-simple-foreign-key-assignment-with-nested-serializers
-class ArticleSerializer(UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
+class ArticleSerializer(TranslationsMixin, UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
 
     highlight_image_exp = MediaSerializer(source='highlight_image', read_only=True)
     og_image_exp = MediaSerializer(source='og_image', read_only=True)
@@ -248,7 +249,7 @@ class ArticleSerializer(UnderTranslateMixin, CamomillaBaseTranslatableModelSeria
         fields = '__all__'
     
         
-class ExpandedArticleSerializer(UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
+class ExpandedArticleSerializer(TranslationsMixin, UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
 
     tags = serializers.SerializerMethodField('get_translated_tags')
     categories = serializers.SerializerMethodField('get_translated_categories')
@@ -285,7 +286,7 @@ class ExpandedArticleSerializer(UnderTranslateMixin, CamomillaBaseTranslatableMo
         return CategorySerializer(categories, many=True).data
 
 
-class SitemapUrlSerializer(UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
+class SitemapUrlSerializer(TranslationsMixin, UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
     og_image_exp = MediaSerializer(source='og_image', read_only=True)
     content_set = serializers.SerializerMethodField('get_translated_content')
     class Meta:
@@ -297,7 +298,7 @@ class SitemapUrlSerializer(UnderTranslateMixin, CamomillaBaseTranslatableModelSe
         return ContentSerializer(content, many=True).data
 
 
-class CompactSitemapUrlSerializer(CamomillaBaseTranslatableModelSerializer):
+class CompactSitemapUrlSerializer(TranslationsMixin, CamomillaBaseTranslatableModelSerializer):
 
     class Meta:
         model = SitemapUrl
