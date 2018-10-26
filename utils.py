@@ -38,14 +38,6 @@ class MultipartJsonParser(parsers.BaseParser):
             raise ParseError('Multipart form parse error - %s' % six.text_type(exc))
 
 
-
-        data = {}
-        data = json.loads(result.data["data"])
-        for key, value in result.files.items():
-            reduce(lambda d, k: d.setdefault(k, {}),key.split('.')[:-1],data).update({key.split('.')[-1]: value})
-        return parsers.DataAndFiles(data, result.files)
-        # return data
-
 def get_host_url(request):
     if request:
         return '{0}://{1}'.format(
