@@ -54,7 +54,7 @@ def get_complete_url(request, url, language=''):
     return complete_url
 
 
-def get_page(request, identifier, lang='', model=None, attr='page'):
+def get_page(request, identifier='404', lang='', model=None, attr='page'):
     if not model:
         model = apps.get_model(app_label='camomilla', model_name='SitemapUrl')
     if not lang:
@@ -62,31 +62,36 @@ def get_page(request, identifier, lang='', model=None, attr='page'):
     try:
         kwargs = {attr: identifier}
         meta_tag, _ = model.objects.language().fallbacks().get_or_create(**kwargs)
-        if not meta_tag.og_title:
-            meta_tag.og_title = meta_tag.title
-        if not meta_tag.og_description:
-            meta_tag.og_description = meta_tag.description
-        permalink = request.path
-        if not meta_tag.permalink:
-            meta_tag.permalink = permalink
-        if not meta_tag.canonical:
-            meta_tag.canonical = get_complete_url(request, permalink, lang)
-        else:
-            meta_tag.canonical = get_complete_url(request, meta_tag.canonical, lang)
-        if not meta_tag.og_url:
-            meta_tag.og_url = meta_tag.canonical
-        else:
-            meta_tag.og_url = get_complete_url(request, meta_tag.og_url,lang)
-        return meta_tag
-
+        return compile_seo(request, meta_tag, lang)
     except model.DoesNotExist:
         return None
 
 
-def get_seo(request, identifier, lang='', model=None, attr='identifier'):
-    if not model:
-        model = apps.get_model(app_label='camomilla', model_name='SitemapUrl')
-    return get_page(request, identifier, lang, model, attr)
+def compile_seo(request, seo_obj, lang=''):
+    if not seo_obj.og_title:
+        seo_obj.og_title = seo_obj.title
+    if not seo_obj.og_description:
+        seo_obj.og_description = seo_obj.description
+    permalink = request.path
+    if not seo_obj.permalink:
+        seo_obj.permalink = permalink
+    if not seo_obj.canonical:
+        seo_obj.canonical = get_complete_url(request, permalink, lang)
+    else:
+        seo_obj.canonical = get_complete_url(request, seo_obj.canonical, lang)
+    if not seo_obj.og_url:
+        seo_obj.og_url = get_complete_url(request, permalink, lang)
+    else:
+        seo_obj.og_url = get_complete_url(request, seo_obj.og_url,lang)
+    return seo_obj
+
+
+def get_seo(request, identifier='', lang='', model=None, attr='identifier', seo_obj=None):
+    if seo_obj: return compile_seo(request, seo_obj, lang)
+    elif not identifier: 
+        raise TypeError("get_seo() missing 1 required positional argument: 'identifier'\n"+
+        "identifier is required when no seo_obj is provided")
+    else: return get_page(request, identifier, lang, model, attr)
 
 
 def get_article_with_seo(request, identifier, lang=''):
