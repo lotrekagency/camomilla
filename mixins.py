@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import get_language
 
 from .utils import get_complete_url
+from .manager import TranslationTrashManager, TrashManager
 
 class SeoMixin(TranslatableModel):
 
@@ -65,3 +66,20 @@ class SlugMixin(object):
     def save(self, *args, **kwargs):
         self.slug = slugify(getattr(self, self.slug_attr))
         super(SlugMixin, self).save(*args, **kwargs)
+
+
+class TrahMixin(object):
+    trash = models.BooleanField(default=False)
+    trashmanager = TrashManager()
+    
+    class Meta:
+        abstract = True
+
+
+class TranslationTrashMixin(TranslatableModel):
+    trash = models.BooleanField(default=False)
+    trashmanager = TranslationTrashManager()
+    translations = TranslatedFields()
+    
+    class Meta:
+        abstract = True

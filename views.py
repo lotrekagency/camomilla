@@ -51,7 +51,43 @@ class BulkDeleteMixin(object):
             self.model.objects.filter(pk__in=request.data).delete()
             return Response({'detail': 'Eliminazione multipla andata a buon fine' }, status=status.HTTP_200_OK)
         except:
-            return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)      
+            return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
+
+
+class TrashMixin(object):
+    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
+    def bulk_trash(self, request):
+        print(request.data)
+        if request.data['action'] == 'restore':
+            try:
+                for element in self.model.objects.filter(pk__in=request.data['list']):
+                    element.trash = False
+                    element.save()
+                return Response({'detail': 'Elementi correttamente rirpistinati' }, status=status.HTTP_200_OK)
+            except:
+                return Response({'detail': 'Non è stato possibile rirpistinare gli elementi' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
+        
+        elif request.data['action'] == 'trash':
+            try:
+                for element in self.model.trashmanager.filter(pk__in=request.data['list']):
+                    element.trash = True
+                    element.save()
+                return Response({'detail': 'Elementi correttamente spostati nel cestino' }, status=status.HTTP_200_OK)
+            except:
+                return Response({'detail': 'Non è stato possibile spostare gli elementi nel cestino' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
+        
+    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
+    def bulk_delete(self, request):
+        try:
+            self.model.trashmanager.trash().filter(pk__in=request.data).delete()
+            return Response({'detail': 'Eliminazione multipla andata a buon fine' }, status=status.HTTP_200_OK)
+        except:
+            return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @list_route(methods=['get'], permission_classes=(CamomillaBasePermissions,))
+    def trash(self, request): 
+        serialized = self.serializer_class(self.model.objects.trash(), many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
 
 
 class CamomillaObtainAuthToken(ObtainAuthToken):
@@ -126,7 +162,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         )
 
 
-class ArticleViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
+class ArticleViewSet(GetUserLanguageMixin, TrashMixin, viewsets.ModelViewSet):
 
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer

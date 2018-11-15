@@ -19,7 +19,7 @@ from hvad.models import TranslatableModel, TranslatedFields
 from django.db.models.fields.related import ForeignObjectRel
 
 from subprocess import Popen
-from .mixins import SeoMixin, SlugMixin
+from .mixins import SeoMixin, SlugMixin, TranslationTrashMixin
 
 
 def create_content_id():
@@ -94,7 +94,7 @@ class CamomillaBaseUser(AbstractUser):
         )
 
 
-class BaseArticle(SeoMixin):
+class BaseArticle(TranslationTrashMixin, SeoMixin):
 
     seo_attr = 'permalink'
 
