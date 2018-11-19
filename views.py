@@ -227,7 +227,6 @@ class ContentViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSe
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
     model = Content
-    lookup_field = 'identifier'
     permission_classes = (CamomillaBasePermissions,)
 
     def list(self, request, *args, **kwargs):
