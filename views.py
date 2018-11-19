@@ -86,7 +86,14 @@ class TrashMixin(object):
 
     @list_route(methods=['get'], permission_classes=(CamomillaBasePermissions,))
     def trash(self, request): 
-        serialized = self.serializer_class(self.model.objects.trash(), many=True)
+        self.serializer_class = self.get_serializer_class()
+        serialized = self.serializer_class(self.model.trashmanager.trash(), many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+
+    @list_route(methods=['get'], permission_classes=(CamomillaBasePermissions,))
+    def not_in_trash(self, request): 
+        self.serializer_class = self.get_serializer_class()
+        serialized = self.serializer_class(self.model.trashmanager.trash(False), many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
 
 
