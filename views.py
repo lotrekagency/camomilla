@@ -79,7 +79,7 @@ class TrashMixin(object):
     @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
     def bulk_delete(self, request):
         try:
-            self.model.trashmanager.trash().filter(pk__in=request.data).delete()
+            self.model.trashmanager.trash(True).filter(pk__in=request.data).delete()
             return Response({'detail': 'Eliminazione multipla andata a buon fine' }, status=status.HTTP_200_OK)
         except:
             return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

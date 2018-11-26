@@ -68,7 +68,7 @@ class SlugMixin(object):
         super(SlugMixin, self).save(*args, **kwargs)
 
 
-class TrahMixin(object):
+class TrashMixin(object):
     trash = models.BooleanField(default=False)
     trashmanager = TrashManager()
     
