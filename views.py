@@ -20,10 +20,11 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.decorators import parser_classes
 from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework import status
 
 
 from .models import Article, Tag, Category, Content, Media, SitemapUrl, MediaFolder
-from .serializers import ExpandedArticleSerializer, ArticleSerializer, MediaSerializer, MediaFolderSerializer
+from .serializers import ExpandedArticleSerializer, ArticleSerializer, MediaSerializer, MediaFolderSerializer, MediaDetailSerializer
 from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
 from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer, UserSerializer, PermissionSerializer
 from .permissions import CamomillaBasePermissions, CamomillaSuperUser
@@ -35,6 +36,65 @@ class GetUserLanguageMixin(object):
             'language', self.request.data.get(
                 'language_code', settings.LANGUAGE_CODE)
         )
+    def get_queryset(self):
+        user_language = self._get_user_language()
+        fallbacks = True
+        if len(user_language.split('-')) == 2 and user_language.split('-')[0] == 'nofallbacks':
+            fallbacks = False
+            user_language = user_language.split('-')[1]
+        return self.model.objects.language(user_language).fallbacks().all() if fallbacks else self.model.objects.language(user_language).all()
+
+class BulkDeleteMixin(object):
+    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
+    def bulk_delete(self, request):
+        try:
+            self.model.objects.filter(pk__in=request.data).delete()
+            return Response({'detail': 'Eliminazione multipla andata a buon fine' }, status=status.HTTP_200_OK)
+        except:
+            return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
+
+
+class TrashMixin(object):
+    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
+    def bulk_trash(self, request):
+        print(request.data)
+        if request.data['action'] == 'restore':
+            try:
+                for element in self.model.objects.filter(pk__in=request.data['list']):
+                    element.trash = False
+                    element.save()
+                return Response({'detail': 'Elementi correttamente rirpistinati' }, status=status.HTTP_200_OK)
+            except:
+                return Response({'detail': 'Non è stato possibile rirpistinare gli elementi' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
+        
+        elif request.data['action'] == 'trash':
+            try:
+                for element in self.model.trashmanager.filter(pk__in=request.data['list']):
+                    element.trash = True
+                    element.save()
+                return Response({'detail': 'Elementi correttamente spostati nel cestino' }, status=status.HTTP_200_OK)
+            except:
+                return Response({'detail': 'Non è stato possibile spostare gli elementi nel cestino' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
+        
+    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
+    def bulk_delete(self, request):
+        try:
+            self.model.trashmanager.trash(True).filter(pk__in=request.data).delete()
+            return Response({'detail': 'Eliminazione multipla andata a buon fine' }, status=status.HTTP_200_OK)
+        except:
+            return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @list_route(methods=['get'], permission_classes=(CamomillaBasePermissions,))
+    def trash(self, request): 
+        self.serializer_class = self.get_serializer_class()
+        serialized = self.serializer_class(self.model.trashmanager.trash(), many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+
+    @list_route(methods=['get'], permission_classes=(CamomillaBasePermissions,))
+    def not_in_trash(self, request): 
+        self.serializer_class = self.get_serializer_class()
+        serialized = self.serializer_class(self.model.trashmanager.trash(False), many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
 
 
 class CamomillaObtainAuthToken(ObtainAuthToken):
@@ -109,11 +169,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         )
 
 
-class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class ArticleViewSet(GetUserLanguageMixin, TrashMixin, viewsets.ModelViewSet):
 
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    lookup_field = 'permalink'
     permission_classes = (CamomillaBasePermissions,)
     model = Article
     serializers = {
@@ -161,36 +220,20 @@ class ArticleViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         user_language = self._get_user_language()
         current_serializer = self.get_dynamic_serializer(request)
-        try:
-            instance = self.get_queryset().get(permalink=kwargs['permalink'])
-        except Exception as ex:
-            # In case you use a different permalink
-            instance = self.model.objects.language('all').get(
-                permalink=kwargs['permalink']
-            )
-            instance = self.get_queryset().get(master=instance.pk)
+        instance = self.get_queryset().get(pk=kwargs['pk'])
         serializer = current_serializer(
             instance, ulanguage=user_language,
             context={'request': request}
         )
         return Response(serializer.data)
 
-    def perform_create(self, serializer):
-
-        serializer.save(author=self.request.user)
-
-    def get_queryset(self):
-        user_language = self._get_user_language()
-        articles = self.model.objects.language(user_language).fallbacks().all()
-        return articles
 
 
-class ContentViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class ContentViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
     model = Content
-    lookup_field = 'identifier'
     permission_classes = (CamomillaBasePermissions,)
 
     def list(self, request, *args, **kwargs):
@@ -212,34 +255,24 @@ class ContentViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
-    def get_queryset(self):
-        user_language = self._get_user_language()
-        contents = self.model.objects.language(user_language).fallbacks().all()
-        return contents
 
 
-class TagViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class TagViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (CamomillaBasePermissions,)
     model = Tag
 
-    def get_queryset(self):
-        user_language = self._get_user_language()
-        return self.model.objects.language(user_language).fallbacks().all()
 
 
-class CategoryViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class CategoryViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (CamomillaBasePermissions,)
     model = Category
 
-    def get_queryset(self):
-        user_language = self._get_user_language()
-        return self.model.objects.language(user_language).fallbacks().all()
 
 
 class MediaFolderViewSet(viewsets.ModelViewSet):
@@ -276,11 +309,15 @@ class MediaFolderViewSet(viewsets.ModelViewSet):
         return Response(self.get_mixed_response(request, *args, **kwargs))
 
 
-class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
     model = Media
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(MediaDetailSerializer(self.queryset.get(pk=kwargs['pk'])).data)
+
 
     @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
     @parser_classes((FormParser, MultiPartParser,))
@@ -319,17 +356,10 @@ class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(
             instance, data=request.data, partial=partial)
-        if 'PATCH' in request.method and 'file' in request.data:
-            serializer.exclude_fields(['file', 'thumbnail'])
         if not serializer.is_valid():
             return Response(serializer.errors)
         serializer.save()
         return Response(serializer.data)
-
-    def _handle_upload_file(file):
-        with open('some/file/name.txt', 'wb+') as destination:
-            for chunk in f.chunks():
-                destination.write(chunk)
 
     def get_queryset(self):
         user_language = self._get_user_language()
@@ -337,7 +367,7 @@ class MediaViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         return contents
 
 
-class SitemapUrlViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
+class SitemapUrlViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
     queryset = SitemapUrl.objects.all()
     serializer_class = SitemapUrlSerializer
@@ -348,6 +378,19 @@ class SitemapUrlViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
         if self.action == 'list':
             return CompactSitemapUrlSerializer
         return SitemapUrlSerializer
+
+    def list(self, request, *args, **kwargs):
+        user_language = self._get_user_language()
+        queryset = self.get_queryset()
+        serializer = self.get_serializer_class()(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        user_language = self._get_user_language()
+
+        instance = self.get_queryset().get(pk=kwargs['pk'])
+        serializer = self.serializer_class(instance, ulanguage = user_language)
+        return Response(serializer.data)
 
     def get_queryset(self):
         user_language = self._get_user_language()
@@ -362,11 +405,10 @@ class SitemapUrlViewSet(GetUserLanguageMixin, viewsets.ModelViewSet):
 class LanguageViewSet(views.APIView):
 
     def get(self, request, *args, **kwargs):
-
         languages = []
         for key, language in settings.LANGUAGES:
             languages.append({
                 'id': key,
                 'name': language
             })
-        return Response(languages)
+        return Response({'language_code': settings.LANGUAGE_CODE, 'languages': languages})

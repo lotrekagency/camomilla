@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import get_language
 
 from .utils import get_complete_url
+from .manager import TranslationTrashManager, TrashManager
 
 class SeoMixin(TranslatableModel):
 
@@ -20,7 +21,7 @@ class SeoMixin(TranslatableModel):
         og_url = models.CharField(max_length=200, blank=True, null=True, default=''),
         canonical = models.CharField(max_length=200, blank=True, null=True, default=''),
     )
-    og_image = models.ImageField(blank=True, null=True, default='')
+    og_image = models.ForeignKey('camomilla.Media', blank=True, null=True, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related")
 
     @classmethod
     def with_seo(model, request, identifier, lang=''):
@@ -65,3 +66,20 @@ class SlugMixin(object):
     def save(self, *args, **kwargs):
         self.slug = slugify(getattr(self, self.slug_attr))
         super(SlugMixin, self).save(*args, **kwargs)
+
+
+class TrashMixin(object):
+    trash = models.BooleanField(default=False)
+    trashmanager = TrashManager()
+    
+    class Meta:
+        abstract = True
+
+
+class TranslationTrashMixin(TranslatableModel):
+    trash = models.BooleanField(default=False)
+    trashmanager = TranslationTrashManager()
+    translations = TranslatedFields()
+    
+    class Meta:
+        abstract = True

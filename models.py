@@ -16,9 +16,10 @@ from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 
 from hvad.models import TranslatableModel, TranslatedFields
+from django.db.models.fields.related import ForeignObjectRel
 
 from subprocess import Popen
-from .mixins import SeoMixin, SlugMixin
+from .mixins import SeoMixin, SlugMixin, TranslationTrashMixin
 
 
 def create_content_id():
@@ -29,6 +30,7 @@ CONTENT_STATUS = (
     ('PUB', _('Published')),
     ('DRF', _('Draft')),
     ('TRS', _('Trash')),
+    ('PLA', _('Planned')),
 )
 
 
@@ -92,12 +94,13 @@ class CamomillaBaseUser(AbstractUser):
         )
 
 
-class BaseArticle(SeoMixin):
+class BaseArticle(TranslationTrashMixin, SeoMixin):
 
     seo_attr = 'permalink'
 
     identifier = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields(
+        content_title = models.CharField(max_length=200),
         content = models.TextField(),
     )
     author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
@@ -174,7 +177,9 @@ class Tag(BaseTag):
 
 class BaseCategory(TranslatableModel):
     translations = TranslatedFields(
-        title = models.CharField(max_length=200)
+        title = models.CharField(max_length=200),
+        description = models.TextField(blank=True, null=True, default=''),
+        slug = models.SlugField()
     )
 
     class Meta:
@@ -291,6 +296,9 @@ class Media(TranslatableModel):
     def optimize(self):
         if self.file:
             self._optimize()
+
+    def get_foreign_fields(self):
+        return [field.get_accessor_name() for field in self._meta.get_fields() if issubclass(type(field), ForeignObjectRel)]
 
     @property
     def json_repr(self):

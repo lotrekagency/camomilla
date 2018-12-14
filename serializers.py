@@ -1,7 +1,7 @@
 
 from rest_framework import serializers, permissions
 from rest_framework.authtoken.models import Token
-
+import json
 from .models import Article, Tag, Category, Content, Media, SitemapUrl, MediaFolder
 
 from hvad.contrib.restframework import TranslatableModelSerializer
@@ -14,20 +14,25 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.validators import UniqueTogetherValidator, ValidationError
 from rest_framework.response import Response
+from hvad.contrib.restframework import TranslationsMixin
 
 
 class CamomillaBaseTranslatableModelSerializer(TranslatableModelSerializer):
+    translated_languages = serializers.SerializerMethodField('get_available_translations', read_only=True)
 
-    def get_field_names(self, declared_fields, info):
-        expanded_fields = super(
-            CamomillaBaseTranslatableModelSerializer, self
-        ).get_field_names(declared_fields, info)
+    # def get_field_names(self, declared_fields, info):
+    #     expanded_fields = super(
+    #         CamomillaBaseTranslatableModelSerializer, self
+    #     ).get_field_names(declared_fields, info)
 
-        if getattr(self.Meta, 'extra_fields', None):
-            print (expanded_fields)
-            return expanded_fields
-        else:
-            return expanded_fields
+    #     if getattr(self.Meta, 'extra_fields', None):
+    #         print (expanded_fields)
+    #         return expanded_fields
+    #     else:
+    #         return expanded_fields
+
+    def get_available_translations(self, obj):
+        return obj.get_available_languages()
 
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -102,7 +107,7 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class TagSerializer(TranslatableModelSerializer):
+class TagSerializer(TranslationsMixin, CamomillaBaseTranslatableModelSerializer):
 
     def create(self, validated_data):
         try:
@@ -125,7 +130,7 @@ class TagSerializer(TranslatableModelSerializer):
         fields = '__all__'
 
 
-class CategorySerializer(TranslatableModelSerializer):
+class CategorySerializer(TranslationsMixin, CamomillaBaseTranslatableModelSerializer):
 
     def create(self, validated_data):
         try:
@@ -159,14 +164,29 @@ class UnderTranslateMixin(object):
         super(UnderTranslateMixin, self).__init__(*args, **kwargs)
 
 
-class ContentSerializer(TranslatableModelSerializer):
+class ContentSerializer(TranslationsMixin, CamomillaBaseTranslatableModelSerializer):
+    def create(self, validated_data):
+        try:
+             return super(ContentSerializer, self).create(validated_data)
+        except IntegrityError:
+            raise ValidationError({
+                "identifier" : ["Esiste già un contenuto con questo identifier"]
+            })
+
+    def update(self, instance, data):
+        try:
+             return super(ContentSerializer, self).update(instance, data)
+        except IntegrityError:
+            return Response({
+                'identifier' : ['Esiste già un contenuto con questo identifier']
+            })
 
     class Meta:
         model = Content
         fields = '__all__'
 
 
-class MediaSerializer(TranslatableModelSerializer):
+class MediaSerializer(CamomillaBaseTranslatableModelSerializer):
 
     def exclude_fields(self, fields_to_exclude=None):
         if isinstance(fields_to_exclude, list):
@@ -177,8 +197,25 @@ class MediaSerializer(TranslatableModelSerializer):
         fields = '__all__'
 
 
+class MediaDetailSerializer(CamomillaBaseTranslatableModelSerializer):
+    links = serializers.SerializerMethodField('get_linked_instances')
 
-class MediaFolderSerializer(TranslatableModelSerializer):
+    class Meta:
+        model = Media
+        fields = '__all__'
+
+    def get_linked_instances(self, obj):
+        result = []
+        links = obj.get_foreign_fields()
+        for link in links:
+            objects = getattr(obj, link).all()
+            for item in objects:
+                if item.__class__.__name__ != 'MediaTranslation':
+                    result.append({'model': item.__class__.__name__, 'name': item.__str__(), 'id': item.pk})
+        return result
+
+
+class MediaFolderSerializer(CamomillaBaseTranslatableModelSerializer):
     icon = MediaSerializer(read_only=True)
     class Meta:
         model = MediaFolder
@@ -186,21 +223,55 @@ class MediaFolderSerializer(TranslatableModelSerializer):
 
 
 #http://stackoverflow.com/questions/29950956/drf-simple-foreign-key-assignment-with-nested-serializers
-class ArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
+class ArticleSerializer(TranslationsMixin, UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
 
     highlight_image_exp = MediaSerializer(source='highlight_image', read_only=True)
+    og_image_exp = MediaSerializer(source='og_image', read_only=True)
+
+    def create(self, validated_data):
+        try:
+             return super(ArticleSerializer, self).create(validated_data)
+        except IntegrityError:
+            raise ValidationError({
+                "permalink" : ["Esiste già un articolo con questo permalink"]
+            })
+
+    def update(self, instance, data):
+        try:
+             return super(ArticleSerializer, self).update(instance, data)
+        except IntegrityError:
+            return Response({
+                'permalink' : ['Esiste già un articolo con questo permalink']
+            })
 
     class Meta:
         model = Article
         fields = '__all__'
+    
         
-
-class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer):
+class ExpandedArticleSerializer(TranslationsMixin, UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
 
     tags = serializers.SerializerMethodField('get_translated_tags')
     categories = serializers.SerializerMethodField('get_translated_categories')
     author = serializers.CharField(read_only=True)
     highlight_image_exp = MediaSerializer(source='highlight_image', read_only=True)
+    og_image_exp = MediaSerializer(source='og_image', read_only=True)
+
+    def create(self, validated_data):
+        try:
+             return super(ExpandedArticleSerializer, self).create(validated_data)
+        except IntegrityError:
+            raise ValidationError({
+                "permalink" : ["Esiste già un articolo con questo permalink"]
+            })
+
+    def update(self, instance, data):
+        try:
+             return super(ExpandedArticleSerializer, self).update(instance, data)
+        except IntegrityError:
+            return Response({
+                'permalink' : ['Esiste già un articolo con questo permalink']
+            })
 
     class Meta:
         model = Article
@@ -215,15 +286,20 @@ class ExpandedArticleSerializer(UnderTranslateMixin, TranslatableModelSerializer
         return CategorySerializer(categories, many=True).data
 
 
-class SitemapUrlSerializer(TranslatableModelSerializer):
-
+class SitemapUrlSerializer(TranslationsMixin, UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
+    og_image_exp = MediaSerializer(source='og_image', read_only=True)
+    content_set = serializers.SerializerMethodField('get_translated_content')
     class Meta:
         model = SitemapUrl
         fields = '__all__'
 
+    def get_translated_content(self, obj):
+        content = Content.objects.language(self.ulanguage).fallbacks().filter(page__pk=obj.pk)
+        return ContentSerializer(content, many=True).data
 
-class CompactSitemapUrlSerializer(TranslatableModelSerializer):
+
+class CompactSitemapUrlSerializer(TranslationsMixin, CamomillaBaseTranslatableModelSerializer):
 
     class Meta:
         model = SitemapUrl
-        fields = ('id', 'identifier', 'title','description', 'permalink', 'og_image')
+        fields = ('id', 'identifier', 'title','description', 'permalink', 'og_image', 'translated_languages')
