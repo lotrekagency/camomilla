@@ -1,4 +1,4 @@
-# Camomilla 4.0 (beta)
+# Camomilla 4.0
 
 ## Install
 
