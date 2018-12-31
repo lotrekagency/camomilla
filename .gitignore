@@ -28,3 +28,9 @@ error_logs.log
 
 # Sockets
 *.socket
+
+
+# Package builds
+dist/
+build/
+*.egg-info
