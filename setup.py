@@ -5,10 +5,10 @@ setup(
     version='4.0.0',
     url='https://gitlab.com/lotrekdevteam/camomilla/camomilla',
     install_requires=[
-        'django-hvad==1.8.0',
-        'djangorestframework==3.5.2',
-        'Pillow==3.4.2',
-        'django-wysiwyg-redactor==0.5.0'
+        'django-hvad @ https://github.com/kristianoellegaard/django-hvad/tarball/releases/2.0.x',
+        'djangorestframework==3.9.2',
+        'Pillow==5.4.1',
+        'django-redactor-2.0==0.3'
     ],
     description="Our internal CMS",
     long_description=open('README.md', 'r').read(),

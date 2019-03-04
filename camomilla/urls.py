@@ -22,5 +22,6 @@ router.register(r'permissions', PermissionViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
-    url(r'^languages/', LanguageViewSet.as_view(), name='get_languages')
+    url(r'^languages/', LanguageViewSet.as_view(), name='get_languages'),
+    url(r'^redactor/', include('redactor.urls'))
 ]

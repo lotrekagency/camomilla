@@ -271,7 +271,8 @@ class Media(TranslatableModel):
     name = models.CharField(max_length=200, blank=True, null=True)
     size = models.IntegerField(default=0, blank=True, null=True)
     is_image = models.BooleanField(default=False)
-    folder = models.ForeignKey(MediaFolder, null=True, blank=True, related_name="media_folder")
+    folder = models.ForeignKey(MediaFolder, null=True, blank=True, on_delete=models.SET_NULL, related_name="media_folder")
+    
     def image_preview(self):
         if self.file:
             return mark_safe('<img src="{0}" />'.format(self.file.url))
