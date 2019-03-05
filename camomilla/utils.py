@@ -100,3 +100,11 @@ def get_article_with_seo(request, identifier, lang=''):
         lang, apps.get_model(app_label='camomilla', model_name='Article'), 
         'identifier'
     )
+
+
+def get_available_languages(obj):
+    """ Get a list of all available language_code in db. """
+    qs = getattr(obj, obj._meta.translations_accessor).all()
+    if qs._result_cache is not None:
+        return [el.language_code for el in qs]
+    return qs.values_list('language_code', flat=True)

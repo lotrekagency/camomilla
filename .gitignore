@@ -9,6 +9,7 @@ venv
 .coverage
 .cache
 coverage
+.vscode
 
 # Settings
 local_settings.py

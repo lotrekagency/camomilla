@@ -15,6 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.validators import UniqueTogetherValidator, ValidationError
 from rest_framework.response import Response
 from hvad.contrib.restframework import TranslationsMixin
+from .utils import get_available_languages
 
 
 class CamomillaBaseTranslatableModelSerializer(TranslatableModelSerializer):
@@ -32,7 +33,7 @@ class CamomillaBaseTranslatableModelSerializer(TranslatableModelSerializer):
     #         return expanded_fields
 
     def get_available_translations(self, obj):
-        return obj.get_available_languages()
+        return get_available_languages(obj)
 
 
 class PermissionSerializer(serializers.ModelSerializer):
