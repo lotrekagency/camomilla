@@ -31,4 +31,9 @@ class Migration(migrations.Migration):
             name='og_image',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='camomilla_sitemapurl_related', to='camomilla.Media'),
         ),
+        migrations.AddField(
+            model_name='article',
+            name='trash',
+            field=models.BooleanField(default=False),
+        ),
     ]

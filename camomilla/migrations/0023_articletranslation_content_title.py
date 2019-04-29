@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+
         migrations.AddField(
             model_name='articletranslation',
             name='content_title',

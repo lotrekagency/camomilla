@@ -12,9 +12,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='article',
-            name='trash',
-            field=models.BooleanField(default=False),
-        ),
+
     ]
