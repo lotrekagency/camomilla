@@ -2,12 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name='camomilla',
-    version='4.0.0',
+    version='4.0.1',
     url='https://gitlab.com/lotrekdevteam/camomilla/camomilla',
     install_requires=[
         'django-hvad @ https://github.com/kristianoellegaard/django-hvad/tarball/releases/2.0.x',
         'djangorestframework==3.9.2',
-        'Pillow==5.4.1',
+        'Pillow==6.0.0',
         'django-redactor-2.0==0.3'
     ],
     description="Our internal CMS",
