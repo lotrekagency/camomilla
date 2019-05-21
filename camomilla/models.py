@@ -123,7 +123,7 @@ class BaseArticle(TranslationTrashMixin, SeoMixin):
         )
 
     def __str__(self):
-        return self.lazy_translation_getter('title', str(self.pk))
+        return self.identifier+" | "+self.get_status_display()
 
 
 class Article(BaseArticle):
