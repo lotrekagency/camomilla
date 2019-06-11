@@ -13,11 +13,19 @@ def migrate_title(apps, schema_editor):
         for language in language_list:
             for instance in Article.objects.language(language).fallbacks().all().iterator():
                 instance.content_title = instance.title
-                instance.save()     
+                instance.save()
     except Exception as ex: print(ex)
 
+
 def reverse_migrate_title(apps, schema_editor):
-    pass
+    try:
+        language_list = [lan[0] for lan in settings.LANGUAGES]
+        for language in language_list:
+            for instance in Article.objects.language(language).fallbacks().all().iterator():
+                instance.title = instance.content_title
+                instance.save()
+    except Exception as ex: print(ex)
+
 
 class Migration(migrations.Migration):
 
@@ -26,6 +34,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunSQL(
+            'ALTER TABLE camomilla_article ADD trash tinyint(1);',
+            'ALTER TABLE camomilla_article DROP trash;'),
         migrations.AddField(
             model_name='articletranslation',
             name='content_title',
@@ -33,4 +44,7 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         migrations.RunPython(migrate_title, reverse_migrate_title),
+        migrations.RunSQL(
+            'ALTER TABLE camomilla_article DROP trash;',
+            'ALTER TABLE camomilla_article ADD trash tinyint(1);')
     ]
