@@ -8,7 +8,8 @@ setup(
         'django-hvad==1.8.0',
         'djangorestframework==3.5.2',
         'Pillow==3.4.2',
-        'django-wysiwyg-redactor==0.5.0'
+        'django-wysiwyg-redactor==0.5.0',
+        'sqlparse==0.3.0'
     ],
     description="Our internal CMS",
     long_description=open('README.md', 'r').read(),
