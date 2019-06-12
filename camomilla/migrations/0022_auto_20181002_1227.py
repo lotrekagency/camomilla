@@ -4,6 +4,54 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import django.db.models.deletion
+from django.conf import settings
+from django.db import connection
+import os
+
+
+def select_image_path(self):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT og_image FROM camomilla_sitemapurl WHERE id = %s", [self.pk])
+        row = cursor.fetchone()
+    return row
+
+
+media_list = {}
+
+
+def save_images(apps, schema_editor):
+
+    SitemapUrl = apps.get_model('camomilla', 'SitemapUrl')
+
+    for instance in SitemapUrl.objects.all().iterator():
+        db_row = select_image_path(instance)
+        if len(db_row):
+            media_list[str(instance.pk)] = db_row[0]
+
+
+def reverse_save_images(apps, schema_editor):
+    pass
+
+
+def migrate_images(apps, schema_editor):
+
+    SitemapUrl = apps.get_model('camomilla', 'SitemapUrl')
+    Media = apps.get_model('camomilla', 'Media')
+
+    for pk, image_name in media_list.items():
+        image_path = os.path.join(settings.MEDIA_ROOT, image_name)
+        if not os.path.isfile(image_path):
+            continue
+        m = Media.objects.create(name=image_name)
+        with open(image_path, 'rb') as f:
+            m.file.save(image_name, f)
+            s = SitemapUrl.objects.get(pk=pk)
+            s.og_image = m
+            s.save()
+
+
+def reverse_migrate_images(apps, schema_editor):
+    pass
 
 
 class Migration(migrations.Migration):
@@ -13,6 +61,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(save_images, reverse_save_images),
         migrations.RemoveField(
             model_name='article',
             name='og_image',
@@ -31,4 +80,5 @@ class Migration(migrations.Migration):
             name='og_image',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='camomilla_sitemapurl_related', to='camomilla.Media'),
         ),
+        migrations.RunPython(migrate_images, reverse_migrate_images),
     ]
