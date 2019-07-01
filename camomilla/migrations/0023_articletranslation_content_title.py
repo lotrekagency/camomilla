@@ -34,9 +34,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            'ALTER TABLE camomilla_article ADD trash tinyint(1);',
-            'ALTER TABLE camomilla_article DROP trash;'),
+        migrations.AddField(
+            model_name='article',
+            name='trash',
+            field=models.BooleanField(default=False),
+        ),
         migrations.AddField(
             model_name='articletranslation',
             name='content_title',
@@ -44,7 +46,8 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         migrations.RunPython(migrate_title, reverse_migrate_title),
-        migrations.RunSQL(
-            'ALTER TABLE camomilla_article DROP trash;',
-            'ALTER TABLE camomilla_article ADD trash tinyint(1);')
+        migrations.RemoveField(
+            model_name='article',
+            name='trash',
+        )
     ]
