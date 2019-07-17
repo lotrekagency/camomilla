@@ -6,15 +6,14 @@ setup(
     url='https://gitlab.com/lotrekdevteam/camomilla/camomilla',
     install_requires=[
         'django-hvad==1.8.0',
-        'djangorestframework==3.5.2',
+        'djangorestframework==3.10.0',
         'Pillow==3.4.2',
-        'django-wysiwyg-redactor==0.5.0',
         'sqlparse==0.3.0'
     ],
     description="Our internal CMS",
     long_description=open('README.md', 'r').read(),
     license="Private",
-    author="Lotrek",
+    author="Lotrèk",
     author_email="dimmitutto@lotrek.it",
     packages=find_packages(),
     include_package_data=True,
