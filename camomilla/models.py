@@ -1,6 +1,5 @@
 import os
 
-import uuid
 import json
 
 from django.conf import settings
@@ -20,10 +19,6 @@ from django.db.models.fields.related import ForeignObjectRel
 
 from subprocess import Popen
 from .mixins import SeoMixin, SlugMixin, TranslationTrashMixin
-
-
-def create_content_id():
-  return str(uuid.uuid4())[0:8]
 
 
 CONTENT_STATUS = (

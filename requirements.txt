@@ -1,5 +1,4 @@
-django-hvad==1.8.0
-djangorestframework==3.5.2
-Pillow==3.4.2
-django-wysiwyg-redactor==0.5.0
+https://github.com/lotrekagency/django-hvad/archive/master.zip
+djangorestframework==3.10.0
+Pillow==5.0.0
 sqlparse==0.3.0
