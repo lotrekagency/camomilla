@@ -5,7 +5,7 @@ setup(
     version='4.0.0',
     url='https://gitlab.com/lotrekdevteam/camomilla/camomilla',
     install_requires=[
-        'django-hvad-lotrek==1.8.0',
+        'django-hvad @ https://github.com/lotrekagency/django-hvad/archive/master.zip',
         'djangorestframework==3.10.0',
         'Pillow==5.0.0',
         'sqlparse==0.3.0'
