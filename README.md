@@ -64,29 +64,6 @@ And create a super user to start managing your project
     $ python manage.py createsuperuser
 
 
-## Extend the user
-
-If you plan to customize the user, it's a good practice to extend the user before starting the project, In your app do something like this:
-
-    from camomilla.models import CamomillaBaseUser
-
-
-    class MyCustomProfile(CamomillaBaseUser):
-        pass
-
-
-And remember to put this in your local settings:
-
-    AUTH_USER_MODEL = "plugin_profileslist.MyCustomProfile"
-
-In case you want to provide a custom user in the middle of the project, consider one of these possible actions:
-
-    - Delete the entire database
-    - Make a [difficult migration](https://code.djangoproject.com/ticket/25313)
-    - Create a 1 to 1 Profile relation with CamomillaUser
-
-More about user customization [here](https://docs.djangoproject.com/en/1.10/topics/auth/customizing/#substituting-a-custom-user-model)
-
 ## Run the server
 
     $ python manage.py runserver

@@ -34,64 +34,19 @@ CONTENT_STATUS = (
 )
 
 
-PERMISSION_LEVELS = (
-    ('1', _('Guest')),
-    ('2', _('Editor')),
-    ('3', _('Admin')),
-)
+# PERMISSION_LEVELS = (
+#     ('1', _('Guest')),
+#     ('2', _('Editor')),
+#     ('3', _('Admin')),
+# )
 
 
-class CamomillaBaseUser(AbstractUser):
-    level = models.CharField(
-        max_length=3,
-        choices=PERMISSION_LEVELS,
-        default='1',
-    )
-    image = models.ImageField(null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-
-        try:
-            orig = self.__class__.objects.get(pk=self.pk)
-        except:
-            orig = None
-
-        super(CamomillaBaseUser, self).save()
-        if orig and orig.level == self.level:
-            return self
-
-        if self.level == '1':
-            permissions = Permission.objects.filter(
-                Q(content_type__app_label__contains='camomilla') |
-                Q(content_type__app_label__contains='plugin_'),
-                codename__contains='read'
-            )
-            for permission in permissions:
-                self.user_permissions.add(permission)
-
-        if self.level == '2':
-            permissions = Permission.objects.filter(
-                Q(content_type__app_label__contains='camomilla') |
-                Q(content_type__app_label__contains='plugin_')
-            )
-            for permission in permissions:
-                self.user_permissions.add(permission)
-
-        if self.level == '3':
-            permissions = Permission.objects.filter(
-                Q(content_type__app_label__contains='camomilla') |
-                Q(content_type__app_label__contains='plugin_') |
-                Q(content_type__model='token') |
-                Q(content_type__model='user')
-            )
-            for permission in permissions:
-                self.user_permissions.add(permission)
-
-    class Meta:
-        abstract = True
-        permissions = (
-            ("read_userprofile", _("Can read user profile")),
-        )
+# permissions = Permission.objects.filter(
+#     Q(content_type__app_label__contains='camomilla') |
+#     Q(content_type__app_label__contains='plugin_') |
+#     Q(content_type__model='token') |
+#     Q(content_type__model='user')
+# )
 
 
 class BaseArticle(TranslationTrashMixin, SeoMixin):
@@ -118,9 +73,7 @@ class BaseArticle(TranslationTrashMixin, SeoMixin):
     class Meta:
         abstract = True
         unique_together = [('permalink', 'language_code')]
-        permissions = (
-            ("read_article", _("Can read article")),
-        )
+
 
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
@@ -138,14 +91,11 @@ class BaseContent(TranslatableModel):
         permalink = models.CharField(max_length=200, blank=True, null=True),
         content = models.TextField()
     )
-    page = models.ForeignKey('camomilla.SitemapUrl', blank=False, null=True, on_delete=models.SET_NULL)
+    page = models.ForeignKey('camomilla.Page', blank=False, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         abstract = True
         unique_together = [('page', 'identifier')]
-        permissions = (
-            ("read_content", _("Can read content")),
-        )
 
     def __str__(self):
         return self.page.identifier + " > " + self.identifier
@@ -163,9 +113,6 @@ class BaseTag(TranslatableModel):
     class Meta:
         abstract = True
         unique_together = [('title', 'language_code')]
-        permissions = (
-            ("read_tag", _("Can read tag")),
-        )
 
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
@@ -186,9 +133,6 @@ class BaseCategory(TranslatableModel):
         abstract = True
         unique_together = [('title', 'language_code')]
         verbose_name_plural = "categories"
-        permissions = (
-            ("read_category", _("Can read category")),
-        )
 
     def __str__(self):
         return self.lazy_translation_getter('title', str(self.pk))
@@ -198,15 +142,12 @@ class Category(BaseCategory):
     translations = TranslatedFields()
 
 
-class BaseSitemapUrl(SeoMixin):
+class BasePage(SeoMixin):
     identifier = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields()
 
     class Meta:
         abstract = True
-        permissions = (
-            ("read_sitemapurl", _("Can read sitemap url")),
-        )
         verbose_name = 'Page'
         verbose_name_plural = 'Pages'
 
@@ -214,11 +155,8 @@ class BaseSitemapUrl(SeoMixin):
         return self.identifier
 
 
-class SitemapUrl(BaseSitemapUrl):
+class Page(BasePage):
     translations = TranslatedFields()
-
-
-Page = SitemapUrl
 
 
 from PIL import Image
@@ -271,7 +209,11 @@ class Media(TranslatableModel):
     name = models.CharField(max_length=200, blank=True, null=True)
     size = models.IntegerField(default=0, blank=True, null=True)
     is_image = models.BooleanField(default=False)
-    folder = models.ForeignKey(MediaFolder, null=True, blank=True, related_name="media_folder")
+    folder = models.ForeignKey(
+        MediaFolder, null=True, blank=True,
+        related_name="media_folder",
+        on_delete=models.CASCADE
+    )
     def image_preview(self):
         if self.file:
             return mark_safe('<img src="{0}" />'.format(self.file.url))
@@ -284,9 +226,6 @@ class Media(TranslatableModel):
     image_thumb_preview.short_description = _('Thumbnail')
 
     class Meta:
-        permissions = (
-            ("read_media", _("Can read media")),
-        )
         ordering = ['-pk']
 
     def regenerate_thumbnail(self):

@@ -16,17 +16,16 @@ from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework import generics, mixins, views
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.decorators import detail_route, list_route
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 from rest_framework.decorators import parser_classes
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework import status
 
 
-from .models import Article, Tag, Category, Content, Media, SitemapUrl, MediaFolder
+from .models import Article, Tag, Category, Content, Media, Page, MediaFolder
 from .serializers import ExpandedArticleSerializer, ArticleSerializer, MediaSerializer, MediaFolderSerializer, MediaDetailSerializer
 from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
-from .serializers import SitemapUrlSerializer, CompactSitemapUrlSerializer, UserSerializer, PermissionSerializer
+from .serializers import PageSerializer, CompactPageSerializer, UserSerializer, PermissionSerializer
 from .permissions import CamomillaBasePermissions, CamomillaSuperUser
 
 
@@ -44,18 +43,19 @@ class GetUserLanguageMixin(object):
             user_language = user_language.split('-')[1]
         return self.model.objects.language(user_language).fallbacks().all() if fallbacks else self.model.objects.language(user_language).all()
 
+
 class BulkDeleteMixin(object):
-    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
+    @action(detail=False, methods=['post'], permission_classes=(CamomillaBasePermissions,))
     def bulk_delete(self, request):
         try:
             self.model.objects.filter(pk__in=request.data).delete()
             return Response({'detail': 'Eliminazione multipla andata a buon fine' }, status=status.HTTP_200_OK)
         except:
-            return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
+            return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class TrashMixin(object):
-    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
+    @action(detail=False, methods=['post'], permission_classes=(CamomillaBasePermissions,))
     def bulk_trash(self, request):
         print(request.data)
         if request.data['action'] == 'restore':
@@ -65,8 +65,8 @@ class TrashMixin(object):
                     element.save()
                 return Response({'detail': 'Elementi correttamente rirpistinati' }, status=status.HTTP_200_OK)
             except:
-                return Response({'detail': 'Non è stato possibile rirpistinare gli elementi' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
-        
+                return Response({'detail': 'Non è stato possibile rirpistinare gli elementi' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         elif request.data['action'] == 'trash':
             try:
                 for element in self.model.trashmanager.filter(pk__in=request.data['list']):
@@ -74,9 +74,9 @@ class TrashMixin(object):
                     element.save()
                 return Response({'detail': 'Elementi correttamente spostati nel cestino' }, status=status.HTTP_200_OK)
             except:
-                return Response({'detail': 'Non è stato possibile spostare gli elementi nel cestino' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
-        
-    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
+                return Response({'detail': 'Non è stato possibile spostare gli elementi nel cestino' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=['post'], permission_classes=(CamomillaBasePermissions,))
     def bulk_delete(self, request):
         try:
             self.model.trashmanager.trash(True).filter(pk__in=request.data).delete()
@@ -84,14 +84,14 @@ class TrashMixin(object):
         except:
             return Response({'detail': 'Eliminazione multipla non riuscita' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @list_route(methods=['get'], permission_classes=(CamomillaBasePermissions,))
-    def trash(self, request): 
+    @action(detail=False, methods=['get'], permission_classes=(CamomillaBasePermissions,))
+    def trash(self, request):
         self.serializer_class = self.get_serializer_class()
         serialized = self.serializer_class(self.model.trashmanager.trash(), many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
 
-    @list_route(methods=['get'], permission_classes=(CamomillaBasePermissions,))
-    def not_in_trash(self, request): 
+    @action(detail=False, methods=['get'], permission_classes=(CamomillaBasePermissions,))
+    def not_in_trash(self, request):
         self.serializer_class = self.get_serializer_class()
         serialized = self.serializer_class(self.model.trashmanager.trash(False), many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
@@ -117,12 +117,12 @@ class UserViewSet(viewsets.ModelViewSet):
     model = get_user_model()
     permission_classes = (CamomillaSuperUser,)
 
-    @list_route()
+    @action(detail=False, )
     def current(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def kickout(self, request, pk=None):
         user = get_user_model().objects.get(pk=pk)
         try:
@@ -158,7 +158,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     model = get_user_model()
     http_method_names = ['get', 'put', 'options', 'head']
 
-    @list_route(methods=['get'])
+    @action(detail=False, methods=['get'])
     def me(self, request):
         personal_profile = request.user
         return Response(
@@ -319,7 +319,7 @@ class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet)
         return Response(MediaDetailSerializer(self.queryset.get(pk=kwargs['pk'])).data)
 
 
-    @list_route(methods=['post'], permission_classes=(CamomillaBasePermissions,))
+    @action(detail=False, methods=['post'], permission_classes=(CamomillaBasePermissions,))
     @parser_classes((FormParser, MultiPartParser,))
     def upload(self, request):
         if request.data and 'file' in request.data:
@@ -367,17 +367,17 @@ class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet)
         return contents
 
 
-class SitemapUrlViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
+class PageViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
 
-    queryset = SitemapUrl.objects.all()
-    serializer_class = SitemapUrlSerializer
+    queryset = Page.objects.all()
+    serializer_class = PageSerializer
     permission_classes = (CamomillaBasePermissions,)
-    model = SitemapUrl
+    model = Page
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return CompactSitemapUrlSerializer
-        return SitemapUrlSerializer
+            return CompactPageSerializer
+        return PageSerializer
 
     def list(self, request, *args, **kwargs):
         user_language = self._get_user_language()

@@ -10,7 +10,7 @@ class CamomillaBasePermissions(permissions.BasePermission):
             permission = ''
             model_name = model.__name__.lower()
             if request.method == 'GET':
-                permission = 'read'
+                permission = 'view'
             if request.method == 'DELETE':
                 permission = 'delete'
             if request.method == 'POST':
@@ -23,38 +23,25 @@ class CamomillaBasePermissions(permissions.BasePermission):
             return request.user.has_perm(perm)
 
     def has_permission(self, request, view):
-
-        if not request.user.is_authenticated():
-            return False
-
-        if request.user.level == '3':
+        if request.user.is_authenticated and request.user.is_superuser:
             return True
-        else:
-            return self._check_custom_permissions(request, view.model)
-
-        return False
+        if not request.user.is_authenticated:
+            return False
+        return self._check_custom_permissions(request, view.model)
 
     def has_object_permission(self, request, view, obj):
-
-        if not request.user.is_authenticated():
-            return False
-
-        if request.user.level == '3':
+        if request.user.is_authenticated and request.user.is_superuser:
             return True
-        else:
-            return self._check_custom_permissions(request, view.model)
-
-        return False
+        if not request.user.is_authenticated:
+            return False
+        return self._check_custom_permissions(request, view.model)
 
 
 class CamomillaSuperUser(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        if not request.user.is_authenticated():
-            return False
-        return request.user.level == '3'
+        return request.user.is_authenticated and request.user.is_superuser
 
     def has_object_permission(self, request, view, obj):
-        if not request.user.is_authenticated():
-            return False
-        return request.user.level == '3'
+        return request.user.is_authenticated and request.user.is_superuser
+

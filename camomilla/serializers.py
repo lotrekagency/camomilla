@@ -2,7 +2,7 @@
 from rest_framework import serializers, permissions
 from rest_framework.authtoken.models import Token
 import json
-from .models import Article, Tag, Category, Content, Media, SitemapUrl, MediaFolder
+from .models import Article, Tag, Category, Content, Media, Page, MediaFolder
 
 from hvad.contrib.restframework import TranslatableModelSerializer
 
@@ -247,8 +247,8 @@ class ArticleSerializer(TranslationsMixin, UnderTranslateMixin, CamomillaBaseTra
     class Meta:
         model = Article
         fields = '__all__'
-    
-        
+
+
 class ExpandedArticleSerializer(TranslationsMixin, UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
 
     tags = serializers.SerializerMethodField('get_translated_tags')
@@ -286,11 +286,11 @@ class ExpandedArticleSerializer(TranslationsMixin, UnderTranslateMixin, Camomill
         return CategorySerializer(categories, many=True).data
 
 
-class SitemapUrlSerializer(TranslationsMixin, UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
+class PageSerializer(TranslationsMixin, UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer):
     og_image_exp = MediaSerializer(source='og_image', read_only=True)
     content_set = serializers.SerializerMethodField('get_translated_content')
     class Meta:
-        model = SitemapUrl
+        model = Page
         fields = '__all__'
 
     def get_translated_content(self, obj):
@@ -298,8 +298,8 @@ class SitemapUrlSerializer(TranslationsMixin, UnderTranslateMixin, CamomillaBase
         return ContentSerializer(content, many=True).data
 
 
-class CompactSitemapUrlSerializer(TranslationsMixin, CamomillaBaseTranslatableModelSerializer):
+class CompactPageSerializer(TranslationsMixin, CamomillaBaseTranslatableModelSerializer):
 
     class Meta:
-        model = SitemapUrl
+        model = Page
         fields = ('id', 'identifier', 'title','description', 'permalink', 'og_image', 'translated_languages')
