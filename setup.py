@@ -12,7 +12,7 @@ setup(
     ],
     dependency_links=[
         'git+ssh://git@github.com/lotrekagency/django-hvad.git#egg=django-hvad',
-    ]
+    ],
     description="Our internal CMS",
     long_description=open('README.md', 'r').read(),
     license="Private",
