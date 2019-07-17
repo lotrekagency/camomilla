@@ -85,12 +85,6 @@ CAMOMILLA_THUMBNAIL_HEIGHT = 50
 
 SITE_URL = 'http://localhost:8000'
 
-REDACTOR_OPTIONS = {
-    'air' : True
-}
-
-REDACTOR_OPTIONS = {}
-REDACTOR_UPLOAD = 'uploads/'
 
 PNG_OPTIMIZATION_COMMAND = 'pngquant {0} -f --ext .png'
 JPEG_OPTIMIZATION_COMMAND = 'jpegoptim {0}'
