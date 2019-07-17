@@ -13,7 +13,7 @@ setup(
     dependency_links=[
         # Make sure to include the `#egg` portion so the `install_requires` recognizes the package
         'git+ssh://git@github.com/lotrekagency/django-hvad.git@master#egg=django-hvad-lotrek'
-    ]
+    ],
     description="Our internal CMS",
     long_description=open('README.md', 'r').read(),
     license="Private",
