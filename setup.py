@@ -5,11 +5,15 @@ setup(
     version='4.0.0',
     url='https://gitlab.com/lotrekdevteam/camomilla/camomilla',
     install_requires=[
-        'django-hvad @ git+ssh://git@github.com/lotrekagency/django-hvad.git@master#egg=django-hvad',
+        'django-hvad-lotrek',
         'djangorestframework==3.10.0',
         'Pillow==5.0.0',
         'sqlparse==0.3.0'
     ],
+    dependency_links=[
+        # Make sure to include the `#egg` portion so the `install_requires` recognizes the package
+        'git+ssh://git@github.com/lotrekagency/django-hvad.git@master#egg=django-hvad-lotrek'
+    ]
     description="Our internal CMS",
     long_description=open('README.md', 'r').read(),
     license="Private",
