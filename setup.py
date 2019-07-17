@@ -8,7 +8,8 @@ setup(
         'django-hvad @ https://github.com/lotrekagency/django-hvad/archive/master.zip',
         'djangorestframework==3.10.0',
         'Pillow==5.0.0',
-        'sqlparse==0.3.0'
+        'sqlparse==0.3.0',
+        'django-ckeditor==5.7.1'
     ],
     dependency_links=[
         # Make sure to include the `#egg` portion so the `install_requires` recognizes the package

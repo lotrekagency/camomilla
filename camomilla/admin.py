@@ -7,6 +7,7 @@ from django import forms
 from django.http import HttpResponse
 
 from .models import Article, Tag, Category, Content, Media, Page, MediaFolder
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 
 from hvad.admin import TranslatableAdmin
@@ -21,6 +22,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 
 class ArticleAdminForm(TranslatableModelForm):
+    content = forms.CharField(widget=CKEditorUploadingWidget())
     class Meta:
         model = Article
         exclude = ('slug',)
@@ -42,6 +44,7 @@ class MediaFolderAdmin(TranslatableAdmin):
     pass
 
 class ContentAdminForm(TranslatableModelForm):
+    content = forms.CharField(widget=CKEditorUploadingWidget())
     class Meta:
         model = Content
 
