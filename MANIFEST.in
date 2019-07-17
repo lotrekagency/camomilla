@@ -1,9 +1,5 @@
 include LICENSE
 include README.md
-recursive-include camomilla/mediasortedm2m/static *
-recursive-include camomilla/mediasortedm2m/templates *
-recursive-include camomilla/sortedm2m/static *
-recursive-include camomilla/sortedm2m/templates *
 recursive-include camomilla/theme/static *
 recursive-include camomilla/theme/templates *
 recursive-include camomilla/templates *
