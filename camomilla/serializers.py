@@ -68,7 +68,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'password', 'repassword', 'level', 'user_permissions', 'has_token', 'image')
+        fields = (
+            'id', 'username', 'first_name', 'last_name', 'email',
+            'password', 'repassword', 'level', 'user_permissions',
+            'has_token'
+        )
 
     def validate(self, data):
         new_password = data.get('password', '')
