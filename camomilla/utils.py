@@ -1,6 +1,6 @@
 from django.conf import settings
 import urllib.parse
-from django.utils.translation import get_language
+from django.utils.translation import activate, get_language
 
 from django.apps import apps
 from django.http import QueryDict
@@ -11,6 +11,11 @@ from django.http.multipartparser import MultiPartParser as DjangoMultiPartParser
 from django.http.multipartparser import MultiPartParserError
 from rest_framework.exceptions import ParseError
 from django.utils import six
+from django.http import Http404
+from django.urls import resolve, reverse, is_valid_path
+
+
+from .exceptions import NeedARedirect
 
 
 class MultipartJsonParser(parsers.BaseParser):
@@ -56,7 +61,7 @@ def get_complete_url(request, url, language=''):
 
 def get_page(request, identifier='404', lang='', model=None, attr='page'):
     if not model:
-        model = apps.get_model(app_label='camomilla', model_name='SitemapUrl')
+        model = apps.get_model(app_label='camomilla', model_name='Page')
     if not lang:
         lang = get_language()
     try:
@@ -88,7 +93,7 @@ def compile_seo(request, seo_obj, lang=''):
 
 def get_seo(request, identifier='', lang='', model=None, attr='identifier', seo_obj=None):
     if seo_obj: return compile_seo(request, seo_obj, lang)
-    elif not identifier: 
+    elif not identifier:
         raise TypeError("get_seo() missing 1 required positional argument: 'identifier'\n"+
         "identifier is required when no seo_obj is provided")
     else: return get_page(request, identifier, lang, model, attr)
@@ -96,7 +101,32 @@ def get_seo(request, identifier='', lang='', model=None, attr='identifier', seo_
 
 def get_article_with_seo(request, identifier, lang=''):
     return get_seo(
-        request, identifier, 
-        lang, apps.get_model(app_label='camomilla', model_name='Article'), 
+        request, identifier,
+        lang, apps.get_model(app_label='camomilla', model_name='Article'),
         'identifier'
     )
+
+
+def find_content_or_redirect(request, obj_class, **kwargs):
+    try:
+        obj = obj_class.objects.language().get(**kwargs)
+        return obj
+    except obj_class.DoesNotExist:
+        cur_language = get_language()
+        for language in settings.LANGUAGES:
+            try:
+                activate(language[0])
+                obj = obj_class.objects.language().get(**kwargs)
+                activate(cur_language)
+                obj = obj_class.objects.language().get(pk=obj.pk)
+                args = []
+                for kwarg_key, kwarg_val in kwargs.items():
+                    args.append(getattr(obj, kwarg_key))
+
+                url_name = resolve(request.path_info).url_name
+                language_path = reverse(url_name, args=args)
+                raise NeedARedirect(language_path)
+            except obj_class.DoesNotExist as ex:
+                pass
+        activate(cur_language)
+        raise Http404()
