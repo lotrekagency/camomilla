@@ -4,19 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-LANGUAGE_CODE = 'it'
-
-LANGUAGES = (
-    ('it', _('Italian')),
-    ('en', _('English')),
-)
-
-USER_PROFILE_MODEL = 'camomilla.UserProfile'
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 
@@ -53,16 +42,13 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     )
 }
 
-from django.utils.translation import ugettext_lazy as _
-
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'it'
 
 LANGUAGES = (
-    ('en', _("English")),
     ('it', _('Italian')),
 )
 
@@ -88,3 +74,4 @@ SITE_URL = 'http://localhost:8000'
 PNG_OPTIMIZATION_COMMAND = 'pngquant {0} -f --ext .png'
 JPEG_OPTIMIZATION_COMMAND = 'jpegoptim {0}'
 
+LANG_ON_PREFERENCE_DISABLED_VIEWS = ['sitemap', 'sitemap_xml']
