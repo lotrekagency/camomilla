@@ -19,6 +19,7 @@ from django.db.models.fields.related import ForeignObjectRel
 
 from subprocess import Popen
 from .mixins import SeoMixin, SlugMixin, TranslationTrashMixin
+from .utils import get_page
 
 
 CONTENT_STATUS = (
@@ -50,7 +51,6 @@ class BaseArticle(TranslationTrashMixin, SeoMixin):
 
     identifier = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields(
-        content_title = models.CharField(max_length=200),
         content = models.TextField(),
     )
     author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
@@ -86,7 +86,7 @@ class BaseContent(TranslatableModel):
         permalink = models.CharField(max_length=200, blank=True, null=True),
         content = models.TextField()
     )
-    page = models.ForeignKey('camomilla.Page', blank=False, null=True, on_delete=models.SET_NULL)
+    page = models.ForeignKey('camomilla.Page', blank=False, null=True, on_delete=models.SET_NULL, related_name='contents')
 
     class Meta:
         abstract = True
@@ -145,6 +145,14 @@ class BasePage(SeoMixin):
         abstract = True
         verbose_name = 'Page'
         verbose_name_plural = 'Pages'
+
+    @classmethod
+    def get(model, request, **kwargs):
+        return get_page(request, **kwargs)
+
+    def alternate_urls(self, request):
+        from djlotrek.context_processors import alternate_seo_url
+        return alternate_seo_url(request)
 
     def __str__(self):
         return self.identifier

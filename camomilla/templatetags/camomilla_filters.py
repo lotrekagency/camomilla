@@ -12,5 +12,17 @@ def filter_object(objects, args):
 
 
 @register.filter(name='filter_content')
-def filter_content(objects, args):
-    return filter_object(objects, args + ',identifier')
+def filter_content(page, args):
+    try:
+        content = page.contents.get(identifier=args)
+    except page.contents.model.DoesNotExist:
+        content = page.contents.create(identifier=args, title='')
+    return content
+
+
+@register.filter(name='alternate_urls')
+def alternate_urls(page, request):
+    alternates = page.alternate_urls(request)
+    if not alternates or len(alternates.keys()) == 1:
+        alternates = {}
+    return alternates.get('alternate_urls', alternates).items()

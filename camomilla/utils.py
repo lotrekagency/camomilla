@@ -14,7 +14,6 @@ from django.utils import six
 from django.http import Http404
 from django.urls import resolve, reverse, is_valid_path
 
-
 from .exceptions import NeedARedirect
 
 
@@ -59,17 +58,46 @@ def get_complete_url(request, url, language=''):
     return complete_url
 
 
-def get_page(request, identifier='404', lang='', model=None, attr='page'):
-    if not model:
-        model = apps.get_model(app_label='camomilla', model_name='Page')
+# def get_page(request, identifier='404', lang='', model=None, attr='identifier'):
+#     if not model:
+#         model = apps.get_model(app_label='camomilla', model_name='Page')
+#     if not lang:
+#         lang = get_language()
+#     try:
+#         kwargs = {attr: identifier}
+#         page, _ = model.objects.language().fallbacks().get_or_create(**kwargs)
+#         return compile_seo(request, page, lang)
+#     except model.DoesNotExist:
+#         return None
+
+
+def get_page(request, identifier='404', lang='', model_page=None, attr_page='identifier', model_content=None):
+    if not model_content:
+        model_content = apps.get_model(app_label='camomilla', model_name='Content')
+    if not model_page:
+        model_page = apps.get_model(app_label='camomilla', model_name='Page')
     if not lang:
         lang = get_language()
     try:
-        kwargs = {attr: identifier}
-        meta_tag, _ = model.objects.language().fallbacks().get_or_create(**kwargs)
-        return compile_seo(request, meta_tag, lang)
-    except model.DoesNotExist:
+        kwargs = {attr_page: identifier}
+        page, _ = model_page.objects.language().fallbacks().get_or_create(**kwargs)
+        page = compile_seo(request, page, lang)
+        #page.set_fetched_contents(model_content.objects.language().fallbacks().filter(page=page))
+        return page
+    except model_page.DoesNotExist:
         return None
+
+
+def get_article(request, slug, lang='', model=None,):
+    if not model:
+        model = apps.get_model(app_label='camomilla', model_name='Article')
+    article = find_or_redirect(request, model, permalink=slug)
+    return compile_seo(request, article, lang)
+
+
+def get_seo_model(request, model, **params):
+    seo_obj = find_or_redirect(request, model, **params)
+    return compile_seo(request, seo_obj, get_language())
 
 
 def compile_seo(request, seo_obj, lang=''):
@@ -96,7 +124,8 @@ def get_seo(request, identifier='', lang='', model=None, attr='identifier', seo_
     elif not identifier:
         raise TypeError("get_seo() missing 1 required positional argument: 'identifier'\n"+
         "identifier is required when no seo_obj is provided")
-    else: return get_page(request, identifier, lang, model, attr)
+    else:
+        return get_page(request, identifier, lang, model, attr)
 
 
 def get_article_with_seo(request, identifier, lang=''):
@@ -107,7 +136,7 @@ def get_article_with_seo(request, identifier, lang=''):
     )
 
 
-def find_content_or_redirect(request, obj_class, **kwargs):
+def find_or_redirect(request, obj_class, **kwargs):
     try:
         obj = obj_class.objects.language().get(**kwargs)
         return obj
@@ -122,7 +151,6 @@ def find_content_or_redirect(request, obj_class, **kwargs):
                 args = []
                 for kwarg_key, kwarg_val in kwargs.items():
                     args.append(getattr(obj, kwarg_key))
-
                 url_name = resolve(request.path_info).url_name
                 language_path = reverse(url_name, args=args)
                 raise NeedARedirect(language_path)

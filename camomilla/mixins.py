@@ -4,8 +4,11 @@ from hvad.models import TranslatableModel, TranslatedFields
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import get_language
 
-from .utils import get_complete_url
+from .utils import get_complete_url, get_seo_model
 from .manager import TranslationTrashManager, TrashManager
+
+from djlotrek.utils import alternate_seo_url_with_object
+
 
 class SeoMixin(TranslatableModel):
 
@@ -24,31 +27,11 @@ class SeoMixin(TranslatableModel):
     og_image = models.ForeignKey('camomilla.Media', blank=True, null=True, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related")
 
     @classmethod
-    def with_seo(model, request, identifier, lang=''):
-        if not lang:
-            lang = get_language()
-        try:
-            kwargs = {model.seo_attr: identifier}
-            meta_tag, _ = model.objects.language().get_or_create(**kwargs)
-            if not meta_tag.og_title:
-                meta_tag.og_title = meta_tag.title
-            if not meta_tag.og_description:
-                meta_tag.og_description = meta_tag.description
-            permalink = request.path
-            if not meta_tag.permalink:
-                meta_tag.permalink = permalink
-            if not meta_tag.canonical:
-                meta_tag.canonical = get_complete_url(request, permalink, lang)
-            else:
-                meta_tag.canonical = get_complete_url(request, meta_tag.canonical, lang)
-            if not meta_tag.og_url:
-                meta_tag.og_url = meta_tag.canonical
-            else:
-                meta_tag.og_url = get_complete_url(request, meta_tag.og_url,lang)
-            return meta_tag
+    def get(model, request, **kwargs):
+        return get_seo_model(request, model, **kwargs)
 
-        except model.DoesNotExist:
-            return None
+    def alternate_urls(self, request):
+        return alternate_seo_url_with_object(request, self.__class__, permalink=self.permalink)
 
     class Meta:
         abstract = True
@@ -71,7 +54,7 @@ class SlugMixin(object):
 class TrashMixin(object):
     trash = models.BooleanField(default=False)
     trashmanager = TrashManager()
-    
+
     class Meta:
         abstract = True
 
@@ -80,6 +63,6 @@ class TranslationTrashMixin(TranslatableModel):
     trash = models.BooleanField(default=False)
     trashmanager = TranslationTrashManager()
     translations = TranslatedFields()
-    
+
     class Meta:
         abstract = True

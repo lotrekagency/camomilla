@@ -44,6 +44,7 @@ class MediaFolderAdmin(TranslatableAdmin):
     pass
 
 class ContentAdminForm(TranslatableModelForm):
+    exclude = ('permalink',)
     content = forms.CharField(widget=CKEditorUploadingWidget())
     class Meta:
         model = Content
@@ -70,23 +71,8 @@ class MediaAdmin(TranslatableAdmin):
 
 
 class PageAdmin(TranslatableAdmin):
-    pass
-    # def __init__(self, *args, **kwargs):
-    #     super(PageAdmin, self).__init__(*args, **kwargs)
-    #     self.fieldsets = (
-    #         ('SEO', {
-    #             'fields': (
-    #                 'title', 'description', 'permalink',
-    #                 'og_image', 'og_description',
-    #                 'og_title', 'og_type', 'og_url',
-    #                 'canonical',
-    #             ),
-    #         }),
-    #     )
+    exclude = ('permalink',)
 
-
-class PageAdmin(TranslatableAdmin):
-    pass
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Category, CategoryAdmin)
