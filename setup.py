@@ -12,8 +12,7 @@ setup(
         'django-ckeditor==5.7.1'
     ],
     dependency_links=[
-        # Make sure to include the `#egg` portion so the `install_requires` recognizes the package
-        'git+ssh://git@github.com/lotrekagency/django-hvad.git@master#egg=django-hvad-lotrek-1.8.0'
+        'git+ssh://git@github.com/lotrekagency/django-hvad.git@master#egg=django-hvad-lotrek-2.0.0'
     ],
     description="Our internal CMS",
     long_description=open('README.md', 'r').read(),

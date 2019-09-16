@@ -93,7 +93,7 @@ class BaseContent(TranslatableModel):
         unique_together = [('page', 'identifier')]
 
     def __str__(self):
-        return self.page.identifier + " > " + self.identifier
+        return self.identifier
 
 
 class Content(BaseContent):

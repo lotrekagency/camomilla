@@ -80,7 +80,7 @@ def get_page(request, identifier='404', lang='', model_page=None, attr_page='ide
         lang = get_language()
     try:
         kwargs = {attr_page: identifier}
-        page, _ = model_page.objects.language().fallbacks().get_or_create(**kwargs)
+        page, _ = model_page.objects.language().fallbacks().prefetch_related('contents').get_or_create(**kwargs)
         page = compile_seo(request, page, lang)
         #page.set_fetched_contents(model_content.objects.language().fallbacks().filter(page=page))
         return page

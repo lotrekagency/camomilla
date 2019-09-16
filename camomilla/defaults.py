@@ -75,3 +75,7 @@ PNG_OPTIMIZATION_COMMAND = 'pngquant {0} -f --ext .png'
 JPEG_OPTIMIZATION_COMMAND = 'jpegoptim {0}'
 
 LANG_ON_PREFERENCE_DISABLED_VIEWS = ['sitemap', 'sitemap_xml']
+
+HVAD = {
+    'AUTOLOAD_TRANSLATIONS' : True
+}
