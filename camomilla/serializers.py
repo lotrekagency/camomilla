@@ -18,7 +18,8 @@ from hvad.contrib.restframework import TranslationsMixin
 
 
 class CamomillaBaseTranslatableModelSerializer(TranslatableModelSerializer):
-    translated_languages = serializers.SerializerMethodField('get_available_translations', read_only=True)
+    pass
+    #translated_languages = serializers.SerializerMethodField('get_available_translations', read_only=True)
 
     # def get_field_names(self, declared_fields, info):
     #     expanded_fields = super(
@@ -31,8 +32,8 @@ class CamomillaBaseTranslatableModelSerializer(TranslatableModelSerializer):
     #     else:
     #         return expanded_fields
 
-    def get_available_translations(self, obj):
-        return obj.get_available_languages()
+    # def get_available_translations(self, obj):
+    #     return obj.get_available_languages()
 
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -306,4 +307,4 @@ class CompactPageSerializer(TranslationsMixin, CamomillaBaseTranslatableModelSer
 
     class Meta:
         model = Page
-        fields = ('id', 'identifier', 'title','description', 'permalink', 'og_image', 'translated_languages')
+        fields = ('id', 'identifier', 'title','description', 'permalink', 'og_image')

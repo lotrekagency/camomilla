@@ -2,7 +2,8 @@ from .views import ArticleViewSet, CategoryViewSet, MediaFolderViewSet
 from .views import TagViewSet, ContentViewSet, MediaViewSet, PermissionViewSet
 from .views import PageViewSet, LanguageViewSet, UserProfileViewSet, UserViewSet
 
-from django.conf.urls import url, include
+from django.urls import include, path, re_path
+
 from rest_framework import routers
 
 
@@ -22,6 +23,6 @@ router.register(r'permissions', PermissionViewSet)
 
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
-    url(r'^languages/', LanguageViewSet.as_view(), name='get_languages')
+    path('', include(router.urls)),
+    path('languages/', LanguageViewSet.as_view(), name='get_languages')
 ]

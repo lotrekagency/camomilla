@@ -6,14 +6,15 @@ setup(
     url='https://gitlab.com/lotrekdevteam/camomilla/camomilla',
     install_requires=[
         'django-hvad @ https://github.com/lotrekagency/django-hvad/archive/master.zip',
+        'djsuperadmin @ git+https://git@github.com/lotrekagency/djsuperadmin.git@master#egg=djsuperadmin',
         'djangorestframework==3.10.0',
         'Pillow==5.0.0',
         'sqlparse==0.3.0',
         'django-ckeditor==5.7.1'
     ],
-    dependency_links=[
-        'git+ssh://git@github.com/lotrekagency/django-hvad.git@master#egg=django-hvad-lotrek-2.0.0'
-    ],
+    # dependency_links=[
+    #     'git+ssh://git@github.com/lotrekagency/django-hvad.git@master#egg=django-hvad-lotrek-2.0.0'
+    # ],
     description="Our internal CMS",
     long_description=open('README.md', 'r').read(),
     license="Private",

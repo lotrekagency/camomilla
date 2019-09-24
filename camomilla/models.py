@@ -13,9 +13,12 @@ from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
+from django.urls import reverse
 
 from hvad.models import TranslatableModel, TranslatedFields
 from django.db.models.fields.related import ForeignObjectRel
+
+from djsuperadmin.mixins import DjSuperAdminMixin
 
 from subprocess import Popen
 from .mixins import SeoMixin, SlugMixin, TranslationTrashMixin
@@ -71,14 +74,14 @@ class BaseArticle(TranslationTrashMixin, SeoMixin):
 
 
     def __str__(self):
-        return self.lazy_translation_getter('title', str(self.pk))
+        return self.title
 
 
 class Article(BaseArticle):
     translations = TranslatedFields()
 
 
-class BaseContent(TranslatableModel):
+class BaseContent(DjSuperAdminMixin, TranslatableModel):
     identifier = models.CharField(max_length=200)
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
@@ -87,6 +90,14 @@ class BaseContent(TranslatableModel):
         content = models.TextField()
     )
     page = models.ForeignKey('camomilla.Page', blank=False, null=True, on_delete=models.SET_NULL, related_name='contents')
+
+    @property
+    def superadmin_get_url(self):
+        return reverse('content-djsuperadmin', kwargs={'pk': self.pk})
+
+    @property
+    def superadmin_patch_url(self):
+        return reverse('content-djsuperadmin', kwargs={'pk': self.pk})
 
     class Meta:
         abstract = True
@@ -110,7 +121,7 @@ class BaseTag(TranslatableModel):
         unique_together = [('title', 'language_code')]
 
     def __str__(self):
-        return self.lazy_translation_getter('title', str(self.pk))
+        return self.title
 
 
 class Tag(BaseTag):
@@ -130,7 +141,7 @@ class BaseCategory(TranslatableModel):
         verbose_name_plural = "categories"
 
     def __str__(self):
-        return self.lazy_translation_getter('title', str(self.pk))
+        return self.title
 
 
 class Category(BaseCategory):

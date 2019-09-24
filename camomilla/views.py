@@ -6,7 +6,7 @@ from django.contrib.auth.models import Permission
 
 from django.db.models import Q
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from django.shortcuts import redirect
 
 
@@ -31,10 +31,8 @@ from .permissions import CamomillaBasePermissions, CamomillaSuperUser
 
 class GetUserLanguageMixin(object):
     def _get_user_language(self):
-        return self.request.GET.get(
-            'language', self.request.data.get(
-                'language_code', settings.LANGUAGE_CODE)
-        )
+        return self.request.GET.get('language', self.request.data.get('language_code', settings.LANGUAGE_CODE))
+
     def get_queryset(self):
         user_language = self._get_user_language()
         fallbacks = True
@@ -255,6 +253,18 @@ class ContentViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSe
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['get', 'patch'])
+    def djsuperadmin(self, request, pk):
+        content = Content.objects.language().get(pk=pk)
+        if request.method == 'GET':
+            return JsonResponse({'content' : content.content})
+        if request.method == 'PATCH':
+            data = json.loads(request.body)
+            content_data = data['content']
+            content.content = content_data
+            content.save()
+            return JsonResponse({'content' : content_data})
+
 
 
 class TagViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
@@ -412,3 +422,4 @@ class LanguageViewSet(views.APIView):
                 'name': language
             })
         return Response({'language_code': settings.LANGUAGE_CODE, 'languages': languages})
+
