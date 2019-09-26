@@ -80,3 +80,9 @@ LANG_ON_PREFERENCE_DISABLED_VIEWS = ['sitemap', 'sitemap_xml']
 HVAD = {
     'AUTOLOAD_TRANSLATIONS' : True
 }
+
+import datetime
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=300)
+}
