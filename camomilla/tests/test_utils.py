@@ -1,14 +1,16 @@
 import os
 import mock
 
+from camomilla.utils import get_host_url, get_complete_url, get_page
+from camomilla.exceptions import NeedARedirect
+from camomilla.models import Page, Article
+
+from django.http import Http404
 from django.test import TestCase
-from requests import RequestException
-
 from django.test import RequestFactory
+from django.utils.translation import activate, get_language
 
-
-from camomilla.utils import get_article_with_seo, get_host_url, get_complete_url, get_seo
-from camomilla.models import SitemapUrl, Article
+from requests import RequestException
 
 
 class UtilsTestCase(TestCase):
@@ -23,6 +25,8 @@ class UtilsTestCase(TestCase):
         request.META['HTTP_HOST'] = 'localhost'
         host_url = get_host_url(request)
         self.assertEqual(host_url, 'http://localhost')
+        host_url = get_host_url(None)
+        self.assertEqual(host_url, None)
 
     def test_get_complete_url(self):
         """Our beloved get_complete_url utility"""
@@ -36,70 +40,35 @@ class UtilsTestCase(TestCase):
         complete_url = get_complete_url(request, 'path', 'fr')
         self.assertEqual(complete_url, 'http://localhost/fr/path')
 
-    def test_get_seo_clean(self):
+    def test_get_page_with_default_seo(self):
         """Our beloved get_seo utility with auto attributes"""
-        SitemapUrl.objects.language().create(page='path')
-
         request_factory = RequestFactory()
         request = request_factory.get('/path')
         request.META['HTTP_HOST'] = 'localhost'
-        seo_obj = get_seo(request, 'path')
-        self.assertEqual(seo_obj.og_url, 'http://localhost/path')
-        self.assertEqual(seo_obj.canonical, 'http://localhost/path')
+        page = Page.get(request, identifier='home')
+        self.assertEqual(page.og_url, 'http://localhost/path')
+        self.assertEqual(page.canonical, 'http://localhost/path')
 
-        self.assertEqual(get_seo(request, 'notexist'), None)
-
-    def test_get_seo_permalink(self):
+    def test_get_article_with_default_seo(self):
         """Our beloved get_seo utility with auto attributes"""
-        SitemapUrl.objects.language().create(
-            page='path', permalink='perma/link'
-        )
-
         request_factory = RequestFactory()
         request = request_factory.get('/path')
         request.META['HTTP_HOST'] = 'localhost'
-        seo_obj = get_seo(request, 'path')
-        self.assertEqual(seo_obj.og_url, 'http://localhost/perma/link')
-        self.assertEqual(seo_obj.canonical, 'http://localhost/perma/link')
+        Article.objects.create(permalink='main')
+        article = Article.get(request, permalink='main')
+        self.assertEqual(article.og_url, 'http://localhost/path')
+        self.assertEqual(article.canonical, 'http://localhost/path')
 
-    def test_get_seo_og_url(self):
+    def test_get_article_with_redirect(self):
         """Our beloved get_seo utility with auto attributes"""
-        SitemapUrl.objects.language().create(
-            page='path', canonical='canonical'
-        )
-
         request_factory = RequestFactory()
-        request = request_factory.get('/path')
+        request = request_factory.get('/articles/articolo-1')
         request.META['HTTP_HOST'] = 'localhost'
-        seo_obj = get_seo(request, 'path')
-        self.assertEqual(seo_obj.og_url, 'http://localhost/canonical')
-        self.assertEqual(seo_obj.canonical, 'http://localhost/canonical')
 
-    def test_get_seo_combo_url(self):
-        """Our beloved get_seo utility with auto attributes"""
-        SitemapUrl.objects.language().create(
-            page='path', permalink='perma/link',
-            canonical='canonical', og_url='og_url'
-        )
-
-        request_factory = RequestFactory()
-        request = request_factory.get('/path')
-        request.META['HTTP_HOST'] = 'localhost'
-        seo_obj = get_seo(request, 'path')
-        self.assertEqual(seo_obj.og_url, 'http://localhost/og_url')
-        self.assertEqual(seo_obj.canonical, 'http://localhost/canonical')
-
-
-    def test_get_article_with_seo(self):
-        """Our beloved get_seo utility with auto attributes"""
-        Article.objects.language().create(
-            identifier='art1', permalink='perma/link',
-            canonical='canonical', og_url='og_url'
-        )
-
-        request_factory = RequestFactory()
-        request = request_factory.get('/path')
-        request.META['HTTP_HOST'] = 'localhost'
-        article = get_article_with_seo(request, 'art1')
-        self.assertEqual(article.og_url, 'http://localhost/og_url')
-        self.assertEqual(article.canonical, 'http://localhost/canonical')
+        article = Article.objects.create(permalink='article-1', language_code='en')
+        article.translate('it')
+        article.permalink = 'articolo-1'
+        article.save()
+        self.assertRaises(NeedARedirect, Article.get, request, permalink='article-1')
+        activate('de')
+        self.assertRaises(Http404, Article.get, request, permalink='article-1')

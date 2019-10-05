@@ -27,14 +27,8 @@ Remember to add all the required applications in your project
 
 ## Run tests
 
-Put Camomilla in a real Django project, then run
-
-    $ coverage run --source='camomilla' manage.py test camomilla.tests
-
-To see the coverage use
-
-    $ coverage report
-
+    pip install -r requirements-dev.txt
+    make test
 
 ## Don't fear the hvader
 

@@ -33,21 +33,6 @@ CONTENT_STATUS = (
 )
 
 
-# PERMISSION_LEVELS = (
-#     ('1', _('Guest')),
-#     ('2', _('Editor')),
-#     ('3', _('Admin')),
-# )
-
-
-# permissions = Permission.objects.filter(
-#     Q(content_type__app_label__contains='camomilla') |
-#     Q(content_type__app_label__contains='plugin_') |
-#     Q(content_type__model='token') |
-#     Q(content_type__model='user')
-# )
-
-
 class BaseArticle(TranslationTrashMixin, SeoMixin):
 
     seo_attr = 'permalink'
