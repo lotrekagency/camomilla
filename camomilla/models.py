@@ -158,6 +158,8 @@ class Page(BasePage):
     translations = TranslatedFields()
 
 
+## MEDIA PART ##
+
 from PIL import Image
 import os
 from django.core.files.base import ContentFile

@@ -433,5 +433,8 @@ class LanguageViewSet(views.APIView):
                 'id': key,
                 'name': language
             })
-        return Response({'language_code': settings.LANGUAGE_CODE, 'languages': languages})
+        return Response({
+            'language_code': settings.LANGUAGE_CODE,
+            'languages': languages
+        })
 

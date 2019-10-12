@@ -6,3 +6,4 @@ djangorestframework==3.10.0
 Pillow==5.0.0
 sqlparse==0.3.0
 django-ckeditor==5.7.1
+djangorestframework-jwt
