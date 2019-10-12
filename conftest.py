@@ -14,7 +14,7 @@ settings.configure(
         'django.contrib.auth',
         'camomilla',
     ],
-    ROOT_URLCONF='camomilla.tests.urls',
+    ROOT_URLCONF='tests.urls',
     LANGUAGE_CODE = 'it',
     LANGUAGES = (
         ('it', 'Italian'),
