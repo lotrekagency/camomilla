@@ -1,4 +1,5 @@
 from django import template
+from django.utils.translation import activate, get_language
 
 register = template.Library()
 
@@ -16,7 +17,9 @@ def filter_content(page, args):
     try:
         content = page.contents.get(identifier=args)
     except page.contents.model.DoesNotExist:
-        content = page.contents.create(identifier=args, title='')
+        content, _ = page.contents.get_or_create(identifier=args)
+        content.translate(get_language())
+        content.save()
     return content
 
 

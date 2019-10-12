@@ -231,10 +231,6 @@ class Media(TranslatableModel):
         if self.file:
             self._make_thumbnail()
 
-    def optimize(self):
-        if self.file:
-            self._optimize()
-
     def get_foreign_fields(self):
         return [field.get_accessor_name() for field in self._meta.get_fields() if issubclass(type(field), ForeignObjectRel)]
 
@@ -285,42 +281,6 @@ class Media(TranslatableModel):
 
         return True
 
-    def _optimize_command(self):
-
-        try:
-            fh = storage.open(self.file.name, 'rb')
-        except FileNotFoundError as ex:
-            return ''
-        try:
-            my_image = Image.open(fh)
-        except Exception as ex:
-            print (ex)
-            return ''
-
-        if my_image.format == 'JPEG':
-            opt_command = settings.JPEG_OPTIMIZATION_COMMAND.format(
-                os.path.join(settings.MEDIA_ROOT, self.file.name)
-            )
-            return opt_command
-        elif my_image.format == 'PNG':
-            opt_command = settings.PNG_OPTIMIZATION_COMMAND.format(
-                os.path.join(settings.MEDIA_ROOT, self.file.name)
-            )
-            return opt_command
-        else:
-            return ''
-
-    def _optimize(self):
-        opt_command = self._optimize_command()
-        os.system(opt_command)
-
-    def _optimize_async(self):
-        opt_command = self._optimize_command()
-        try:
-            p = Popen(opt_command, shell=True)
-        except FileNotFoundError as ex:
-            print (ex)
-
     def _remove_file(self):
         if self.file:
             file_to_remove = os.path.join(settings.MEDIA_ROOT, self.file.name)
@@ -356,7 +316,6 @@ def update_media(sender, instance, **kwargs):
         thumbnail=instance.thumbnail,
         is_image=instance.is_image
     )
-    instance._optimize_async()
 
 
 @receiver(pre_delete, sender=Media, dispatch_uid="make thumbnails")

@@ -33,7 +33,14 @@ def get_page(request, identifier='404', lang='', model_page=None, attr_page='ide
     if not lang:
         lang = get_language()
     kwargs = {attr_page: identifier}
-    page, _ = model_page.objects.language().fallbacks().prefetch_related('contents').get_or_create(**kwargs)
+    try:
+        page = model_page.objects.language(
+            get_language()
+        ).prefetch_related('contents').get(**kwargs)
+    except model_page.DoesNotExist:
+        page, _ = model_page.objects.get_or_create(**kwargs)
+        page.translate(get_language())
+        page.save()
     page = compile_seo(request, page, lang)
     return page
 

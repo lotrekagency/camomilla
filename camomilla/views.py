@@ -5,9 +5,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import HttpResponse, JsonResponse, QueryDict
-from django.shortcuts import redirect
+from django.utils.translation import activate, get_language
 
 
 from rest_framework.authtoken.models import Token
@@ -31,7 +31,11 @@ from .permissions import CamomillaBasePermissions, CamomillaSuperUser
 
 class GetUserLanguageMixin(object):
     def _get_user_language(self):
-        return self.request.GET.get('language', self.request.data.get('language_code', settings.LANGUAGE_CODE))
+        return self.request.GET.get(
+            'language', self.request.data.get(
+                'language_code', settings.LANGUAGE_CODE
+            )
+        )
 
     def get_queryset(self):
         user_language = self._get_user_language()
@@ -255,7 +259,15 @@ class ContentViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSe
 
     @action(detail=True, methods=['get', 'patch'])
     def djsuperadmin(self, request, pk):
-        content = Content.objects.language().get(pk=pk)
+        # content, _ = Content.objects.get_or_create(pk=pk)
+        # content.translate(get_language())
+        try:
+            content = Content.objects.language(
+                get_language()
+            ).get(pk=pk)
+        except Content.DoesNotExist:
+            content, _ = Content.objects.get_or_create(pk=pk)
+            content.translate(get_language())
         if request.method == 'GET':
             return JsonResponse({'content' : content.content})
         if request.method == 'PATCH':
