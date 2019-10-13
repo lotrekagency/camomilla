@@ -18,6 +18,7 @@ def filter_content(page, args):
         content = page.contents.get(identifier=args)
     except page.contents.model.DoesNotExist:
         content, _ = page.contents.get_or_create(identifier=args)
+    if get_language() not in content.get_available_languages():
         content.translate(get_language())
         content.save()
     return content

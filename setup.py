@@ -5,7 +5,7 @@ setup(
     version='4.0.0',
     url='https://gitlab.com/lotrekdevteam/camomilla/camomilla',
     install_requires=[
-        'django-hvad @ https://github.com/lotrekagency/django-hvad/archive/master.zip',
+        'django-hvad @ git+https://git@github.com/lotrekagency/django-hvad.git@master#egg=django-hvad',
         'djsuperadmin @ git+https://git@github.com/lotrekagency/djsuperadmin.git@master#egg=djsuperadmin',
         'djangorestframework==3.10.0',
         'djlotrek @ git+https://git@github.com/lotrekagency/djlotrek.git@master#egg=djlotrek',
