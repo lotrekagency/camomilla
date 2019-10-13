@@ -8,9 +8,11 @@ setup(
         'django-hvad @ https://github.com/lotrekagency/django-hvad/archive/master.zip',
         'djsuperadmin @ git+https://git@github.com/lotrekagency/djsuperadmin.git@master#egg=djsuperadmin',
         'djangorestframework==3.10.0',
+        'djlotrek @ git+https://git@github.com/lotrekagency/djlotrek.git@master#egg=djlotrek',
         'Pillow==5.0.0',
         'sqlparse==0.3.0',
-        'django-ckeditor==5.7.1'
+        'django-ckeditor==5.7.1',
+        'djangorestframework-jwt'
     ],
     # dependency_links=[
     #     'git+ssh://git@github.com/lotrekagency/django-hvad.git@master#egg=django-hvad-lotrek-2.0.0'
