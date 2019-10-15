@@ -9,7 +9,7 @@ setup(
         'djsuperadmin @ git+https://git@github.com/lotrekagency/djsuperadmin.git@master#egg=djsuperadmin',
         'djangorestframework==3.10.0',
         'djlotrek @ git+https://git@github.com/lotrekagency/djlotrek.git@master#egg=djlotrek',
-        'Pillow==5.0.0',
+        'Pillow==6.2.0',
         'sqlparse==0.3.0',
         'django-ckeditor==5.7.1',
         'djangorestframework-jwt'
