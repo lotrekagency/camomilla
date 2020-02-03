@@ -59,6 +59,20 @@ class UtilsTestCase(TestCase):
         self.assertEqual(article.og_url, 'http://localhost/path')
         self.assertEqual(article.canonical, 'http://localhost/path')
 
+
+    def test_compile_seo_overwrite(self):
+        """Our beloved get_seo utility with auto attributes"""
+        request_factory = RequestFactory()
+        request = request_factory.get('/path')
+        request.META['HTTP_HOST'] = 'localhost'
+        article = Article.objects.create(permalink='main')
+        article.canonical = '/myarticle'
+        article.og_url = '/myarticle'
+        article.save()
+        article = Article.get(request, permalink='main')
+        self.assertEqual(article.og_url, 'http://localhost/myarticle')
+        self.assertEqual(article.canonical, 'http://localhost/myarticle')
+
     def test_get_article_with_redirect(self):
         """Our beloved get_seo utility with auto attributes"""
         request_factory = RequestFactory()
