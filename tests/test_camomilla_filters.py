@@ -53,11 +53,3 @@ class CamomillaFiltersTestCase(TestCase):
         self.assertEqual(alt_urls['en'], 'http://localhost/en/about')
         self.assertEqual(alt_urls['de'], 'http://localhost/de/about')
 
-
-    # def test_filter_objects(self):
-    #     articles = [
-    #         Article.objects.create(identifier='1', permalink='article-1'),
-    #         Article.objects.create(identifier='2', permalink='article-2'),
-    #     ]
-    #     self.assertEqual(filter_objects(articles, 'permalink'), articles[0])
-

@@ -58,6 +58,12 @@ class BaseArticle(TranslationTrashMixin, SeoMixin):
         unique_together = [('permalink', 'language_code')]
 
 
+    def save(self, *args, **kwargs):
+        import uuid
+        if not self.identifier:
+            self.identifier = '{0}'.format(str(uuid.uuid4()))
+        super(BaseArticle, self).save(*args, **kwargs)
+
     def __str__(self):
         return self.title
 
@@ -186,7 +192,7 @@ class BaseMediaFolder(TranslatableModel):
     def __str__(self):
         to_string = self.slug
         if self.title:
-            to_string+=" - "+self.title
+            to_string += " - " + self.title
         return to_string
 
 
