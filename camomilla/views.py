@@ -59,7 +59,6 @@ class BulkDeleteMixin(object):
 class TrashMixin(object):
     @action(detail=False, methods=['post'], permission_classes=(CamomillaBasePermissions,))
     def bulk_trash(self, request):
-        print(request.data)
         if request.data['action'] == 'restore':
             try:
                 for element in self.model.objects.filter(pk__in=request.data['list']):
@@ -371,7 +370,6 @@ class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet)
         return redirect('media-detail', pk=new_media.pk)
 
     def update(self, request, *args, **kwargs):
-        print(request.data)
         partial = False
         if 'PATCH' in request.method:
             partial = True
