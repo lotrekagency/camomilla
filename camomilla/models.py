@@ -39,7 +39,8 @@ class BaseArticle(TranslationTrashMixin, SeoMixin):
 
     identifier = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields(
-        content = models.TextField(),
+        content = models.TextField(default=''),
+        permalink = models.CharField(max_length=200, blank=False),
     )
     author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
     status = models.CharField(
@@ -77,8 +78,8 @@ class BaseContent(DjSuperAdminMixin, TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(max_length=200),
         subtitle = models.CharField(max_length=200, blank=True, null=True, default=''),
-        permalink = models.CharField(max_length=200, blank=True, null=True),
-        content = models.TextField()
+        permalink = models.CharField(max_length=200, blank=False, null=True),
+        content = models.TextField(default='')
     )
     page = models.ForeignKey('camomilla.Page', blank=False, null=True, on_delete=models.SET_NULL, related_name='contents')
 
