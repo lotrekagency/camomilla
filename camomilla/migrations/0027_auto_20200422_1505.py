@@ -12,90 +12,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='Page',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('identifier', models.CharField(max_length=200, unique=True)),
-            ],
-            options={
-                'verbose_name': 'Page',
-                'verbose_name_plural': 'Pages',
-                'abstract': False,
-            },
-            managers=[
-                ('objects', django.db.models.manager.Manager()),
-                ('_plain_manager', django.db.models.manager.Manager()),
-            ],
-        ),
-        migrations.AlterModelOptions(
-            name='article',
-            options={},
-        ),
-        migrations.AlterModelOptions(
-            name='category',
-            options={'verbose_name_plural': 'categories'},
-        ),
-        migrations.AlterModelOptions(
-            name='content',
-            options={},
-        ),
-        migrations.AlterModelOptions(
-            name='media',
-            options={'ordering': ['-pk']},
-        ),
-        migrations.AlterModelOptions(
-            name='tag',
-            options={},
-        ),
-        migrations.RemoveField(
-            model_name='articletranslation',
-            name='content_title',
-        ),
-        migrations.AlterField(
-            model_name='articletranslation',
-            name='content',
-            field=models.TextField(default=''),
-        ),
-        migrations.AlterField(
-            model_name='articletranslation',
-            name='permalink',
-            field=models.CharField(max_length=200),
-        ),
-        migrations.AlterField(
-            model_name='content',
-            name='page',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='contents', to='camomilla.Page'),
-        ),
-        migrations.AlterField(
-            model_name='contenttranslation',
-            name='content',
-            field=models.TextField(default=''),
-        ),
-        migrations.AlterField(
-            model_name='contenttranslation',
-            name='permalink',
-            field=models.CharField(max_length=200, null=True),
-        ),
-        migrations.AlterField(
-            model_name='pagetranslation',
-            name='master',
-            field=models.ForeignKey(editable=False, on_delete=django.db.models.deletion.CASCADE, related_name='translations', to='camomilla.Page'),
-        ),
-        migrations.AlterModelTable(
-            name='pagetranslation',
-            table='camomilla_page_translation',
+        migrations.RenameModel(
+            old_name='SitemapUrl',
+            new_name='Page',
         ),
         migrations.RenameModel(
             old_name='SitemapUrlTranslation',
             new_name='PageTranslation',
-        ),
-        migrations.DeleteModel(
-            name='SitemapUrl',
-        ),
-        migrations.AddField(
-            model_name='page',
-            name='og_image',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='camomilla_page_related', to='camomilla.Media'),
         ),
     ]
