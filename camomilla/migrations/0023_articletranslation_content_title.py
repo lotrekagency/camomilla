@@ -45,7 +45,9 @@ class Migration(migrations.Migration):
             field=models.CharField(default='', max_length=200),
             preserve_default=False,
         ),
+        migrations.RunSQL('SET CONSTRAINTS ALL IMMEDIATE;'),
         migrations.RunPython(migrate_title, reverse_migrate_title),
+        migrations.RunSQL('SET CONSTRAINTS ALL DEFERRED;'),
         migrations.RemoveField(
             model_name='article',
             name='trash',
