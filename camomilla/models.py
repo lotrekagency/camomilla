@@ -268,25 +268,28 @@ class Media(TranslatableModel):
             print (ex)
             return False
 
-        image.thumbnail(
-            (settings.CAMOMILLA_THUMBNAIL_WIDTH, settings.CAMOMILLA_THUMBNAIL_HEIGHT),
-            Image.ANTIALIAS
-        )
-        fh.close()
+        try:
+            image.thumbnail(
+                (settings.CAMOMILLA_THUMBNAIL_WIDTH, settings.CAMOMILLA_THUMBNAIL_HEIGHT),
+                Image.ANTIALIAS
+            )
+            fh.close()
 
-        # Path to save to, name, and extension
-        thumb_name, thumb_extension = os.path.splitext(self.file.name)
-        thumb_extension = thumb_extension.lower()
+            # Path to save to, name, and extension
+            thumb_name, thumb_extension = os.path.splitext(self.file.name)
+            thumb_extension = thumb_extension.lower()
 
-        thumb_filename = thumb_name + '_thumb' + thumb_extension
+            thumb_filename = thumb_name + '_thumb' + thumb_extension
 
-        temp_thumb = BytesIO()
-        image.save(temp_thumb, 'PNG', optimize=True)
-        temp_thumb.seek(0)
+            temp_thumb = BytesIO()
+            image.save(temp_thumb, 'PNG', optimize=True)
+            temp_thumb.seek(0)
 
-        # Load a ContentFile into the thumbnail field so it gets saved
-        self.thumbnail.save(thumb_filename, ContentFile(temp_thumb.read()), save=False)
-        temp_thumb.close()
+            # Load a ContentFile into the thumbnail field so it gets saved
+            self.thumbnail.save(thumb_filename, ContentFile(temp_thumb.read()), save=False)
+            temp_thumb.close()
+        except Exception:
+            return False
 
         return True
 
