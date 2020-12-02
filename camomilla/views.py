@@ -337,7 +337,7 @@ class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet)
     model = Media
 
     def retrieve(self, request, *args, **kwargs):
-        return Response(MediaDetailSerializer(self.queryset.get(pk=kwargs['pk'])).data)
+        return Response(MediaDetailSerializer(self.queryset.get(pk=kwargs['pk']), context={'request' : request}).data)
 
 
     @action(detail=False, methods=['post'], permission_classes=(CamomillaBasePermissions,))
