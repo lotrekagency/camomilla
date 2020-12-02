@@ -319,7 +319,7 @@ class MediaFolderViewSet(viewsets.ModelViewSet):
             folder_queryset, many=True,
         )
         media_serializer = MediaSerializer(
-            media_queryset, many=True,
+            media_queryset, many=True, context={'request' : request}
         )
         return {'folders': folder_serializer.data, "media": media_serializer.data, "parent_folder": parent_folder}
 
