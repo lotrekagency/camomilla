@@ -59,6 +59,7 @@ class UserSerializer(serializers.ModelSerializer):
     repassword = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
     level = serializers.CharField(required=False)
     has_token = serializers.SerializerMethodField('get_token', read_only=True)
+    user_permissions = PermissionSerializer(read_only=True, many=True)
 
     def get_token(self, obj):
         try:
