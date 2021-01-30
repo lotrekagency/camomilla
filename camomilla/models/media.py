@@ -3,6 +3,7 @@ import os
 from io import BytesIO
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage as storage
 from django.db import models
@@ -30,10 +31,33 @@ class BaseMediaFolder(TranslatableModel):
         blank=True,
         verbose_name=_("Image cover"),
     )
-    updir = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
+    path = models.TextField(blank=True, null=True)
+    updir = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        related_name="child_folders",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         abstract = True
+
+    def update_childs(self):
+        for folder in self.child_folders.all():
+            folder.save()
+
+    def save(self, *args, **kwargs):
+        if self.updir:
+            if self.updir.id == self.id:
+                raise ValidationError({"updir": "Unvalid parent"})
+            self.path = "{0}/{1}".format(self.updir.path, self.slug)
+
+        else:
+            self.path = "/{0}".format(self.slug)
+
+        super(BaseMediaFolder, self).save(*args, **kwargs)
+        self.update_childs()
 
     def __str__(self):
         to_string = self.slug
@@ -67,6 +91,10 @@ class Media(TranslatableModel):
         related_name="media_folder",
         on_delete=models.CASCADE,
     )
+
+    @property
+    def path(self):
+        return "%s/%s" % (self.folder.path, self.name)
 
     def image_preview(self):
         if self.file:

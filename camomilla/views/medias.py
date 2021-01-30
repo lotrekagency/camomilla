@@ -1,3 +1,4 @@
+from ..views.mixins.pagination import PaginateStackMixin
 from .mixins import BulkDeleteMixin, GetUserLanguageMixin
 from ..parsers import MultipartJsonParser
 from django.shortcuts import redirect
@@ -12,7 +13,7 @@ from ..serializers import MediaSerializer, MediaFolderSerializer, MediaDetailSer
 from ..permissions import CamomillaBasePermissions
 
 
-class MediaFolderViewSet(viewsets.ModelViewSet):
+class MediaFolderViewSet(PaginateStackMixin, viewsets.ModelViewSet):
     model = MediaFolder
     serializer_class = MediaFolderSerializer
 
@@ -25,23 +26,21 @@ class MediaFolderViewSet(viewsets.ModelViewSet):
 
         if "pk" in kwargs:
             updir = kwargs["pk"]
-            parent_folder = MediaFolderSerializer(
-                self.model.objects.get(pk=updir).updir
-            ).data
-
+            parent_folder = MediaFolderSerializer(self.model.objects.get(pk=updir)).data
         folder_queryset = self.model.objects.filter(updir__pk=updir)
         media_queryset = Media.objects.filter(folder__pk=updir)
 
-        folder_serializer = MediaFolderSerializer(
-            folder_queryset,
-            many=True,
+        folder_serializer = self.format_output(
+            *self.handle_pagination_stack(folder_queryset),
+            SerializerClass=MediaFolderSerializer
         )
-        media_serializer = MediaSerializer(
-            media_queryset, many=True, context={"request": request}
+        media_serializer = self.format_output(
+            *self.handle_pagination_stack(media_queryset),
+            SerializerClass=MediaSerializer
         )
         return {
-            "folders": folder_serializer.data,
-            "media": media_serializer.data,
+            "folders": folder_serializer,
+            "media": media_serializer,
             "parent_folder": parent_folder,
         }
 
@@ -77,6 +76,9 @@ class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet)
                 alt_text=request.data.get("alt_text", ""),
                 name=request.data.get("file_name", ""),
                 description=request.data.get("description", ""),
+                folder=MediaFolder.objects.filter(
+                    id=request.data.get("folder", "")
+                ).first(),
                 size=0,
             )
             upload = request.data["file"]
