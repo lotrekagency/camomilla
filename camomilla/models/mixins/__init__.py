@@ -2,11 +2,10 @@ from django.db import models
 from hvad.models import TranslatableModel, TranslatedFields
 
 from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import get_language
 from django.utils.text import slugify
 
-from .utils import get_complete_url, get_seo_model
-from .manager import TranslationTrashManager, TrashManager
+from ...utils import get_seo_model
+from ..managers import TranslationTrashManager, TrashManager
 
 from djlotrek.utils import alternate_seo_url_with_object
 
