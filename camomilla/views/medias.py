@@ -16,6 +16,7 @@ from ..permissions import CamomillaBasePermissions
 class MediaFolderViewSet(PaginateStackMixin, viewsets.ModelViewSet):
     model = MediaFolder
     serializer_class = MediaFolderSerializer
+    items_per_page = 18
 
     def get_queryset(self):
         return self.model.objects.all()
@@ -30,10 +31,9 @@ class MediaFolderViewSet(PaginateStackMixin, viewsets.ModelViewSet):
         folder_queryset = self.model.objects.filter(updir__pk=updir)
         media_queryset = Media.objects.filter(folder__pk=updir)
 
-        folder_serializer = self.format_output(
-            *self.handle_pagination_stack(folder_queryset),
-            SerializerClass=MediaFolderSerializer
-        )
+        folder_serializer = MediaFolderSerializer(
+            folder_queryset, many=True, context={"request": request}
+        ).data
         media_serializer = self.format_output(
             *self.handle_pagination_stack(media_queryset),
             SerializerClass=MediaSerializer
@@ -71,7 +71,7 @@ class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet)
     def upload(self, request):
         if request.data and "file" in request.data:
             new_media = Media(
-                language_code=self._get_user_language(),
+                # language_code=self._get_user_language(),
                 title=request.data.get("title", ""),
                 alt_text=request.data.get("alt_text", ""),
                 name=request.data.get("file_name", ""),
