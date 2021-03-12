@@ -27,7 +27,7 @@ from .serializers import ExpandedArticleSerializer, ArticleSerializer, MediaSeri
 from .serializers import TagSerializer, CategorySerializer, ContentSerializer, UserProfileSerializer
 from .serializers import PageSerializer, CompactPageSerializer, UserSerializer, PermissionSerializer
 from .permissions import CamomillaBasePermissions, CamomillaSuperUser
-
+from .parsers import MultipartJsonParser
 
 class GetUserLanguageMixin(object):
     def _get_user_language(self):
@@ -335,13 +335,13 @@ class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet)
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
     model = Media
+    parser_classes = (MultipartJsonParser,)
 
     def retrieve(self, request, *args, **kwargs):
         return Response(MediaDetailSerializer(self.queryset.get(pk=kwargs['pk']), context={'request' : request}).data)
 
 
-    @action(detail=False, methods=['post'], permission_classes=(CamomillaBasePermissions,))
-    @parser_classes((FormParser, MultiPartParser,))
+    @action(detail=False, methods=['post'], permission_classes=(CamomillaBasePermissions,), parser_classes=(FormParser, MultiPartParser,))
     def upload(self, request):
         if request.data and 'file' in request.data:
             new_media = Media(

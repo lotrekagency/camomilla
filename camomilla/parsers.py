@@ -6,7 +6,7 @@ from django.http.multipartparser import MultiPartParserError
 from functools import reduce
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
-
+from django.conf import settings
 
 class MultipartJsonParser(parsers.BaseParser):
 
