@@ -12,25 +12,56 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.validators import ValidationError
 from rest_framework.response import Response
 from hvad.contrib.restframework import TranslationsMixin
+from django.conf import settings
+
+
+class RelatedField(serializers.PrimaryKeyRelatedField):
+    def __init__(self, **kwargs):
+        self.serializer = kwargs.pop("serializer", None)
+        self.lookup = kwargs.pop("lookup", "id")
+        if self.serializer is not None:
+            assert issubclass(
+                self.serializer, serializers.Serializer
+            ), '"serializer" is not a valid serializer class'
+            assert hasattr(
+                self.serializer.Meta, "model"
+            ), 'Class {serializer_class} missing "Meta.model" attribute'.format(
+                serializer_class=self.serializer.__class__.__name__
+            )
+            kwargs["queryset"] = kwargs.get("queryset", self.serializer.Meta.model.objects.all()) 
+            # kwargs["allow_null"] = kwargs.get("allow_null", self.serializer.Meta.model._meta.get_field(self.source).null)
+        super().__init__(**kwargs)
+
+    def use_pk_only_optimization(self):
+        return False if self.serializer else True
+
+    def to_representation(self, instance):
+        if self.serializer:
+            return self.serializer(instance, context=self.context).data
+        return super().to_representation(instance)
+    
+    def to_internal_value(self, data):
+        if isinstance(data, dict):
+            return self.get_queryset().get(**{self.lookup: data.get(self.lookup, None)})
+        return super().to_internal_value(data)
 
 
 class CamomillaBaseTranslatableModelSerializer(TranslatableModelSerializer):
-    pass
-    # translated_languages = serializers.SerializerMethodField('get_available_translations', read_only=True)
+    translated_languages = serializers.SerializerMethodField(
+        "get_available_translations", read_only=True
+    )
+    active_languages = serializers.SerializerMethodField(
+        "get_active_languages", read_only=True
+    )
 
-    # def get_field_names(self, declared_fields, info):
-    #     expanded_fields = super(
-    #         CamomillaBaseTranslatableModelSerializer, self
-    #     ).get_field_names(declared_fields, info)
+    def get_available_translations(self, obj):
+        return obj.get_available_languages()
 
-    #     if getattr(self.Meta, 'extra_fields', None):
-    #         print (expanded_fields)
-    #         return expanded_fields
-    #     else:
-    #         return expanded_fields
-
-    # def get_available_translations(self, obj):
-    #     return obj.get_available_languages()
+    def get_active_languages(self, request, *args, **kwargs):
+        languages = []
+        for key, language in settings.LANGUAGES:
+            languages.append({"id": key, "name": language})
+        return {"active": settings.LANGUAGE_CODE, "languages": languages}
 
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -236,13 +267,13 @@ class MediaFolderSerializer(CamomillaBaseTranslatableModelSerializer):
         fields = "__all__"
 
 
-# http://stackoverflow.com/questions/29950956/drf-simple-foreign-key-assignment-with-nested-serializers
 class ArticleSerializer(
     TranslationsMixin, UnderTranslateMixin, CamomillaBaseTranslatableModelSerializer
 ):
 
-    highlight_image_exp = MediaSerializer(source="highlight_image", read_only=True)
-    og_image_exp = MediaSerializer(source="og_image", read_only=True)
+    highlight_image = RelatedField(serializer=MediaSerializer, allow_null=True)
+    tags = RelatedField(serializer=TagSerializer, many=True, allow_null=True)
+    og_image = RelatedField(serializer=MediaSerializer, allow_null=True)
 
     def create(self, validated_data):
         try:
