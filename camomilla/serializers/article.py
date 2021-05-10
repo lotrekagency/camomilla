@@ -29,31 +29,3 @@ class ArticleSerializer(TranslationsMixin, CamomillaBaseTranslatableModelSeriali
         model = Article
         fields = "__all__"
 
-
-class ExpandedArticleSerializer(
-    TranslationsMixin, CamomillaBaseTranslatableModelSerializer
-):
-
-    tags = serializers.SerializerMethodField("get_translated_tags")
-    categories = serializers.SerializerMethodField("get_translated_categories")
-    author = serializers.CharField(read_only=True)
-    highlight_image_exp = MediaSerializer(source="highlight_image", read_only=True)
-    og_image_exp = MediaSerializer(source="og_image", read_only=True)
-
-    class Meta:
-        model = Article
-        fields = "__all__"
-
-    def get_translated_tags(self, obj):
-        tags = (
-            Tag.objects.language(self.ulanguage).fallbacks().filter(article__pk=obj.pk)
-        )
-        return TagSerializer(tags, many=True).data
-
-    def get_translated_categories(self, obj):
-        categories = (
-            Category.objects.language(self.ulanguage)
-            .fallbacks()
-            .filter(article__pk=obj.pk)
-        )
-        return CategorySerializer(categories, many=True).data
