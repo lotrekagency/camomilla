@@ -15,6 +15,7 @@ from ..serializers import (
     PermissionSerializer,
 )
 from ..permissions import CamomillaSuperUser
+from .mixins import PaginateStackMixin
 
 
 class CamomillaObtainAuthToken(ObtainAuthToken):
@@ -29,7 +30,7 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
             return Response({"token": token.key})
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(PaginateStackMixin, viewsets.ModelViewSet):
 
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
@@ -72,7 +73,7 @@ class PermissionViewSet(viewsets.ModelViewSet):
         return permissions
 
 
-class UserProfileViewSet(viewsets.ModelViewSet):
+class UserProfileViewSet(PaginateStackMixin, viewsets.ModelViewSet):
 
     queryset = get_user_model().objects.all()
     serializer_class = UserProfileSerializer

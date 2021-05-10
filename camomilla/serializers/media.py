@@ -5,17 +5,6 @@ from .mixins import CamomillaBaseTranslatableModelSerializer
 
 
 class MediaSerializer(CamomillaBaseTranslatableModelSerializer):
-    def exclude_fields(self, fields_to_exclude=None):
-        if isinstance(fields_to_exclude, list):
-            for f in fields_to_exclude:
-                f in self.fields.fields and self.fields.fields.pop(f) or next()
-
-    class Meta:
-        model = Media
-        fields = "__all__"
-
-
-class MediaDetailSerializer(CamomillaBaseTranslatableModelSerializer):
     links = serializers.SerializerMethodField("get_linked_instances")
 
     class Meta:
@@ -26,8 +15,10 @@ class MediaDetailSerializer(CamomillaBaseTranslatableModelSerializer):
         result = []
         links = obj.get_foreign_fields()
         for link in links:
-            objects = getattr(obj, link).all()
-            for item in objects:
+            manager = getattr(obj, link)
+            if hasattr(manager, "language"):
+                manager = manager.language()
+            for item in manager.all():
                 if item.__class__.__name__ != "MediaTranslation":
                     result.append(
                         {

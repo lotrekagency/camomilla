@@ -1,5 +1,4 @@
-from ..views.mixins.pagination import PaginateStackMixin
-from .mixins import BulkDeleteMixin, GetUserLanguageMixin
+from .mixins import BulkDeleteMixin, GetUserLanguageMixin, PaginateStackMixin
 from ..parsers import MultipartJsonParser
 from django.shortcuts import redirect
 
@@ -9,11 +8,13 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 
 from ..models import Media, MediaFolder
-from ..serializers import MediaSerializer, MediaFolderSerializer, MediaDetailSerializer
+from ..serializers import MediaSerializer, MediaFolderSerializer
 from ..permissions import CamomillaBasePermissions
 
 
-class MediaFolderViewSet(PaginateStackMixin, viewsets.ModelViewSet):
+class MediaFolderViewSet(
+    PaginateStackMixin, GetUserLanguageMixin, viewsets.ModelViewSet
+):
     model = MediaFolder
     serializer_class = MediaFolderSerializer
     items_per_page = 18
@@ -21,26 +22,26 @@ class MediaFolderViewSet(PaginateStackMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         return self.model.objects.all()
 
-    def get_mixed_response(self, request, *args, **kwargs):
-        updir = None
-        parent_folder = None
+    def get_serializer_context(self):
+        return {**super().get_serializer_context(), "action": "list"}
 
-        if "pk" in kwargs:
-            updir = kwargs["pk"]
-            parent_folder = MediaFolderSerializer(self.model.objects.get(pk=updir)).data
+    def get_mixed_response(self, request, *args, **kwargs):
+        updir = kwargs.get('pk', None)
+
+        parent_folder = MediaFolderSerializer(self.model.objects.filter(pk=updir).first()).data
         folder_queryset = self.model.objects.filter(updir__pk=updir)
         media_queryset = Media.objects.filter(folder__pk=updir)
 
-        folder_serializer = MediaFolderSerializer(
+        folder_data = MediaFolderSerializer(
             folder_queryset, many=True, context={"request": request}
         ).data
-        media_serializer = self.format_output(
+        media_data = self.format_output(
             *self.handle_pagination_stack(media_queryset),
             SerializerClass=MediaSerializer
         )
         return {
-            "folders": folder_serializer,
-            "media": media_serializer,
+            "folders": folder_data,
+            "media": media_data,
             "parent_folder": parent_folder,
         }
 
@@ -57,13 +58,6 @@ class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet)
     serializer_class = MediaSerializer
     model = Media
     parser_classes = [MultipartJsonParser]
-
-    def retrieve(self, request, *args, **kwargs):
-        return Response(
-            MediaDetailSerializer(
-                self.queryset.get(pk=kwargs["pk"]), context={"request": request}
-            ).data
-        )
 
     @action(
         detail=False, methods=["post"], permission_classes=(CamomillaBasePermissions,)
@@ -108,8 +102,3 @@ class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet)
             return Response(serializer.errors)
         serializer.save()
         return Response(serializer.data)
-
-    def get_queryset(self):
-        user_language = self._get_user_language()
-        contents = self.model.objects.language(user_language).fallbacks().all()
-        return contents
