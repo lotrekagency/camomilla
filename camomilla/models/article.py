@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from hvad.models import TranslatedFields
 
-from .mixins import SeoMixin, TranslationTrashMixin
+from .mixins import SeoMixin
 
 
 CONTENT_STATUS = (
@@ -16,7 +16,7 @@ CONTENT_STATUS = (
 )
 
 
-class BaseArticle(TranslationTrashMixin, SeoMixin):
+class BaseArticle(SeoMixin):
 
     seo_attr = "permalink"
 
