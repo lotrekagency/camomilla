@@ -42,7 +42,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
         'rest_framework.authentication.SessionAuthentication'
     )
 }
@@ -81,8 +81,3 @@ HVAD = {
     'AUTOLOAD_TRANSLATIONS' : True
 }
 
-import datetime
-
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=300)
-}

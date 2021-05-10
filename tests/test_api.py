@@ -9,7 +9,7 @@ client = APIClient()
 
 def login_superuser():
     my_admin = User.objects.create_superuser('admin', 'myemail@test.com', 'adminadmin')
-    response = client.post('/api/api-token-auth/', {
+    response = client.post('/api/camomilla/token-auth/', {
         'username': 'admin', 'password' : 'adminadmin'
     })
     return response.json()['token']
@@ -27,7 +27,7 @@ def test_create_tag_no_access():
 def test_crud_tag():
     ## Create
     token = login_superuser()
-    client.credentials(HTTP_AUTHORIZATION='JWT ' + token)
+    client.credentials(HTTP_AUTHORIZATION='Token ' + token)
     response = client.post('/api/camomilla/tags/', {
         'title': 'Primo tag'
     })
