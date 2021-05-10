@@ -1,4 +1,3 @@
-from django.conf import settings
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -11,7 +10,7 @@ class GetUserLanguageMixin(object):
     def _get_user_language(self, request):
         self.active_language = request.GET.get(
             "language",
-            request.data.get(
+            request.GET.get(
                 "language_code", translation.get_language_from_request(request)
             ),
         )
