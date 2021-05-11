@@ -1,4 +1,4 @@
-from .views import ArticleViewSet, CategoryViewSet, MediaFolderViewSet
+from .views import ArticleViewSet, CamomillaObtainAuthToken, CategoryViewSet, MediaFolderViewSet
 from .views import TagViewSet, ContentViewSet, MediaViewSet, PermissionViewSet
 from .views import PageViewSet, LanguageViewSet, UserProfileViewSet, UserViewSet
 
@@ -23,5 +23,6 @@ router.register(r'permissions', PermissionViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path("token-auth/", CamomillaObtainAuthToken.as_view(), name='api_token'),
     path('languages/', LanguageViewSet.as_view(), name='get_languages')
 ]

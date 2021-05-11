@@ -12,7 +12,6 @@ setup(
         'Pillow==6.2.0',
         'sqlparse==0.3.0',
         'django-ckeditor==5.7.1',
-        'djangorestframework-jwt'
     ],
     # dependency_links=[
     #     'git+ssh://git@github.com/lotrekagency/django-hvad.git@master#egg=django-hvad-lotrek-2.0.0'
