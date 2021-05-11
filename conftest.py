@@ -23,8 +23,6 @@ settings.configure(
     ),
     USE_I18N = True,
     USE_L10N = True,
-    THUMB_ROOT = os.path.join('', 'media', 'thumbnails'),
-    THUMB_URL = '/media/thumbnails/',
     THUMB_FOLDER = 'thumbnails',
     REST_FRAMEWORK = {
         'DEFAULT_PARSER_CLASSES': (
@@ -33,8 +31,8 @@ settings.configure(
             'rest_framework.parsers.MultiPartParser',
         ),
         'DEFAULT_AUTHENTICATION_CLASSES': (
-            'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-            'rest_framework.authentication.SessionAuthentication'
+            'rest_framework.authentication.SessionAuthentication',
+            'rest_framework.authentication.TokenAuthentication'
         )
     }
 )

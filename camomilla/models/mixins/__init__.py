@@ -2,11 +2,9 @@ from django.db import models
 from hvad.models import TranslatableModel, TranslatedFields
 
 from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import get_language
 from django.utils.text import slugify
 
-from .utils import get_complete_url, get_seo_model
-from .manager import TranslationTrashManager, TrashManager
+from ...utils import get_seo_model
 
 from djlotrek.utils import alternate_seo_url_with_object
 
@@ -51,19 +49,3 @@ class SlugMixin(object):
         self.slug = slugify(getattr(self, self.slug_attr))
         super(SlugMixin, self).save(*args, **kwargs)
 
-
-class TrashMixin(object):
-    trash = models.BooleanField(default=False)
-    trashmanager = TrashManager()
-
-    class Meta:
-        abstract = True
-
-
-class TranslationTrashMixin(TranslatableModel):
-    trash = models.BooleanField(default=False)
-    trashmanager = TranslationTrashManager()
-    translations = TranslatedFields()
-
-    class Meta:
-        abstract = True

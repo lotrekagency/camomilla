@@ -4,22 +4,6 @@ from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Internationalization
-# https://docs.djangoproject.com/en/1.10/topics/i18n/
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.10/howto/static-files/
-
-STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATICFILES_DIRS = []
@@ -31,8 +15,6 @@ if os.path.exists(os.path.join(BASE_DIR, 'public')):
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-THUMB_ROOT = os.path.join(BASE_DIR, 'media', 'thumbnails')
-THUMB_URL = '/media/thumbnails/'
 THUMB_FOLDER = 'thumbnails'
 
 REST_FRAMEWORK = {
@@ -42,34 +24,16 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
         'rest_framework.authentication.SessionAuthentication'
     )
 }
 
-LANGUAGE_CODE = 'it'
-
-LANGUAGES = (
-    ('it', _('Italian')),
-)
-
 ADMIN_SITE_HEADER = _("Camomilla advanced panel")
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-        'TIMEOUT': 480,
-        'OPTIONS': {
-            'MAX_ENTRIES': 1000
-        }
-    }
-}
 
 CAMOMILLA_THUMBNAIL_WIDTH = 50
 CAMOMILLA_THUMBNAIL_HEIGHT = 50
 
-SITE_URL = 'http://localhost:8000'
 
 
 PNG_OPTIMIZATION_COMMAND = 'pngquant {0} -f --ext .png'
@@ -81,8 +45,3 @@ HVAD = {
     'AUTOLOAD_TRANSLATIONS' : True
 }
 
-import datetime
-
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=300)
-}
