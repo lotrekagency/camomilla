@@ -4,10 +4,8 @@ import six
 from django.http.multipartparser import MultiPartParser as DjangoMultiPartParser
 from django.http.multipartparser import MultiPartParserError
 from django.conf import settings
-from functools import reduce
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
-from django.conf import settings
 
 
 def set_key(data, key, val):
@@ -38,7 +36,7 @@ def compile_payload(data, path, value):
 
 
 
-class MultiPartJSONParser(parsers.BaseParser):
+class MultipartJsonParser(parsers.BaseParser):
 
     media_type = 'multipart/form-data'
 
