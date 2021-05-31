@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from ..models import Media, MediaFolder
-from ..serializers import MediaSerializer, MediaFolderSerializer
+from ..serializers import MediaSerializer, MediaFolderSerializer, MediaListSerializer
 from ..permissions import CamomillaBasePermissions
 
 
@@ -37,7 +37,7 @@ class MediaFolderViewSet(
         ).data
         media_data = self.format_output(
             *self.handle_pagination_stack(media_queryset),
-            SerializerClass=MediaSerializer
+            SerializerClass=MediaListSerializer
         )
         return {
             "folders": folder_data,

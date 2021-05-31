@@ -4,6 +4,12 @@ from ..models import Media, MediaFolder
 from .base import BaseTranslatableModelSerializer
 
 
+class MediaListSerializer(BaseTranslatableModelSerializer):
+    class Meta:
+        model = Media
+        fields = "__all__"
+
+
 class MediaSerializer(BaseTranslatableModelSerializer):
     links = serializers.SerializerMethodField("get_linked_instances")
 
