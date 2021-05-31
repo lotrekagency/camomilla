@@ -4,9 +4,36 @@ import six
 from django.http.multipartparser import MultiPartParser as DjangoMultiPartParser
 from django.http.multipartparser import MultiPartParserError
 from django.conf import settings
-from functools import reduce
 from rest_framework import parsers
 from rest_framework.exceptions import ParseError
+
+
+def set_key(data, key, val):
+    if isinstance(data, list):
+        key = int(key)
+        if key < len(data):
+            data[key] = val
+        else:
+            data.append(val)
+        return data
+    data[key] = val
+    return data
+
+def get_key(data, key, default):
+    if isinstance(data, list):
+        try:
+            return data[int(key)]
+        except IndexError:
+            return default
+    return data.get(key, default)
+
+def compile_payload(data, path, value):
+    key = path.pop(0)
+    if not len(path):
+        return set_key(data, key, value)
+    default = [] if path[0].isdigit() else {}
+    return set_key(data, key, compile_payload(get_key(data, key, default), path, value))
+
 
 
 class MultipartJsonParser(parsers.BaseParser):
@@ -28,8 +55,7 @@ class MultipartJsonParser(parsers.BaseParser):
             data = {}
             data = json.loads(result.data["data"])
             for key, value in result.files.items():
-                reduce(lambda d, k: d.setdefault(k, {}),key.split('.')[:-1],data).update({key.split('.')[-1]: value})
+                data = compile_payload(data, key.split("."), value)
             return data
         except MultiPartParserError as exc:
             raise ParseError('Multipart form parse error - %s' % six.text_type(exc))
-
