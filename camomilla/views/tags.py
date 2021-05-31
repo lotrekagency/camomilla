@@ -1,11 +1,11 @@
-from .mixins import GetUserLanguageMixin, BulkDeleteMixin, PaginateStackMixin
+from .base import BaseModelViewset
+from .mixins import GetUserLanguageMixin, BulkDeleteMixin
 from ..models import Tag
 from ..serializers import TagSerializer
 from ..permissions import CamomillaBasePermissions
-from rest_framework import viewsets
 
 
-class TagViewSet(PaginateStackMixin, GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
+class TagViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer

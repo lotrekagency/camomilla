@@ -1,5 +1,5 @@
 from django.conf import settings
-from hvad.contrib.restframework import TranslatableModelSerializer, TranslationsMixin
+from hvad.contrib.restframework import TranslationsMixin
 from rest_framework import serializers
 from django.utils import translation
 
@@ -39,7 +39,7 @@ class TranslationSetMixin(TranslationsMixin):
         return field_names
 
 
-class CamomillaBaseTranslatableModelSerializer(
-    LangInfoMixin, TranslationSetMixin, TranslatableModelSerializer
-):
-    pass
+class SetupEagerLoadingMixin:
+    @staticmethod
+    def setup_eager_loading(queryset):
+        return queryset

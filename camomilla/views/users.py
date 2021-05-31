@@ -1,3 +1,4 @@
+from .base import BaseModelViewset
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 
@@ -5,7 +6,6 @@ from django.db.models import Q
 
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from rest_framework import viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 
@@ -15,7 +15,6 @@ from ..serializers import (
     PermissionSerializer,
 )
 from ..permissions import CamomillaSuperUser
-from .mixins import PaginateStackMixin
 
 
 class CamomillaObtainAuthToken(ObtainAuthToken):
@@ -30,7 +29,7 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
             return Response({"token": token.key})
 
 
-class UserViewSet(PaginateStackMixin, viewsets.ModelViewSet):
+class UserViewSet(BaseModelViewset):
 
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
@@ -55,7 +54,7 @@ class UserViewSet(PaginateStackMixin, viewsets.ModelViewSet):
         return Response({})
 
 
-class PermissionViewSet(viewsets.ModelViewSet):
+class PermissionViewSet(BaseModelViewset):
 
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer
@@ -73,7 +72,7 @@ class PermissionViewSet(viewsets.ModelViewSet):
         return permissions
 
 
-class UserProfileViewSet(PaginateStackMixin, viewsets.ModelViewSet):
+class UserProfileViewSet(BaseModelViewset):
 
     queryset = get_user_model().objects.all()
     serializer_class = UserProfileSerializer

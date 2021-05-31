@@ -1,10 +1,16 @@
 from rest_framework import serializers
 
 from ..models import Media, MediaFolder
-from .mixins import CamomillaBaseTranslatableModelSerializer
+from .base import BaseTranslatableModelSerializer
 
 
-class MediaSerializer(CamomillaBaseTranslatableModelSerializer):
+class MediaListSerializer(BaseTranslatableModelSerializer):
+    class Meta:
+        model = Media
+        fields = "__all__"
+
+
+class MediaSerializer(BaseTranslatableModelSerializer):
     links = serializers.SerializerMethodField("get_linked_instances")
 
     class Meta:
@@ -30,7 +36,7 @@ class MediaSerializer(CamomillaBaseTranslatableModelSerializer):
         return result
 
 
-class MediaFolderSerializer(CamomillaBaseTranslatableModelSerializer):
+class MediaFolderSerializer(BaseTranslatableModelSerializer):
     icon = MediaSerializer(read_only=True)
 
     class Meta:

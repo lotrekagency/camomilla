@@ -1,28 +1,9 @@
-from rest_framework import viewsets
 from rest_framework.response import Response
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.contrib.postgres.search import SearchVector, SearchQuery
 
 
-class BaseModelViewSet(viewsets.ModelViewSet):
-    def get_serializer_class(self):
-        if hasattr(self, "action_serializers"):
-            if self.action in self.action_serializers:
-                return self.action_serializers[self.action]
-        return super(BaseModelViewSet, self).get_serializer_class()
-
-    def get_serializer_context(self):
-        return {"request": self.request, "action": self.action}
-
-    def get_queryset(self):
-        queryset = super(BaseModelViewSet, self).get_queryset()
-        serializer = self.get_serializer_class()
-        if hasattr(serializer, "setup_eager_loading"):
-            queryset = self.get_serializer_class().setup_eager_loading(queryset)
-        return queryset
-
-
-class PaginateStackMixin(BaseModelViewSet):
+class PaginateStackMixin:
     def parse_qs_value(self, string: str):
         if string and string.startswith("[") and string.endswith("]"):
             string = [self.parse_qs_value(substr) for substr in string[1:-1].split(",")]

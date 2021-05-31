@@ -1,12 +1,12 @@
-from .mixins import GetUserLanguageMixin, BulkDeleteMixin, PaginateStackMixin
-from rest_framework import viewsets
+from .base import BaseModelViewset
+from .mixins import GetUserLanguageMixin, BulkDeleteMixin
 
 from ..models import Article
 from ..serializers import  ArticleSerializer
 from ..permissions import CamomillaBasePermissions
 
 
-class ArticleViewSet(PaginateStackMixin, GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
+class ArticleViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
 
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer

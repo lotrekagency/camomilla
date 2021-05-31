@@ -36,6 +36,25 @@ class GetUserLanguageMixin(object):
         )
 
 
+class OptimViewMixin:
+    def get_serializer_class(self):
+        if hasattr(self, "action_serializers"):
+            if self.action in self.action_serializers:
+                return self.action_serializers[self.action]
+        return super().get_serializer_class()
+
+    def get_serializer_context(self):
+        return {"request": self.request, "action": self.action}
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        serializer = self.get_serializer_class()
+        if hasattr(serializer, "setup_eager_loading"):
+            queryset = self.get_serializer_class().setup_eager_loading(queryset)
+        return queryset
+
+
+
 class BulkDeleteMixin(object):
     @action(detail=False, methods=['post'], permission_classes=(CamomillaBasePermissions,))
     def bulk_delete(self, request):
