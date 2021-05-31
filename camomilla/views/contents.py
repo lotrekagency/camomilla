@@ -1,17 +1,17 @@
+from .base import BaseModelViewset
 import json
 
 from django.http import JsonResponse
 from django.utils.translation import get_language
-from rest_framework import viewsets
 from rest_framework.decorators import action
 
 from ..models import Content
 from ..permissions import CamomillaBasePermissions
 from ..serializers import ContentSerializer
-from .mixins import BulkDeleteMixin, GetUserLanguageMixin, PaginateStackMixin
+from .mixins import BulkDeleteMixin, GetUserLanguageMixin
 
 
-class ContentViewSet(PaginateStackMixin, GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
+class ContentViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
 
     queryset = Content.objects.all()
     serializer_class = ContentSerializer

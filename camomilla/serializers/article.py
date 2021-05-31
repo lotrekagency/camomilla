@@ -1,22 +1,22 @@
 from ..models import Article, Category, Tag
 from .fields import RelatedField
 from .media import MediaSerializer
-from .mixins import CamomillaBaseTranslatableModelSerializer
+from .base import BaseTranslatableModelSerializer
 
 
-class TagSerializer(CamomillaBaseTranslatableModelSerializer):
+class TagSerializer(BaseTranslatableModelSerializer):
     class Meta:
         model = Tag
         fields = "__all__"
 
 
-class CategorySerializer(CamomillaBaseTranslatableModelSerializer):
+class CategorySerializer(BaseTranslatableModelSerializer):
     class Meta:
         model = Category
         fields = "__all__"
 
 
-class ArticleSerializer(CamomillaBaseTranslatableModelSerializer):
+class ArticleSerializer(BaseTranslatableModelSerializer):
 
     highlight_image = RelatedField(serializer=MediaSerializer, allow_null=True)
     tags = RelatedField(serializer=TagSerializer, many=True, allow_null=True)

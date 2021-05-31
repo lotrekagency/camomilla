@@ -1,11 +1,11 @@
-from .mixins import GetUserLanguageMixin, BulkDeleteMixin, PaginateStackMixin
+from .base import BaseModelViewset
+from .mixins import GetUserLanguageMixin, BulkDeleteMixin
 from ..models import Category
 from ..serializers import CategorySerializer
 from ..permissions import CamomillaBasePermissions
-from rest_framework import viewsets
 
 
-class CategoryViewSet(PaginateStackMixin, GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
+class CategoryViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer

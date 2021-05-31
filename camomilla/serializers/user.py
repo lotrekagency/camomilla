@@ -1,16 +1,17 @@
+from .base import BaseModelSerializer
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 
-class PermissionSerializer(serializers.ModelSerializer):
+class PermissionSerializer(BaseModelSerializer):
     class Meta:
         model = Permission
         fields = "__all__"
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class UserProfileSerializer(BaseModelSerializer):
 
     user_permissions = PermissionSerializer(read_only=True, many=True)
 
@@ -19,7 +20,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(BaseModelSerializer):
 
     id = serializers.IntegerField(read_only=True)
     password = serializers.CharField(

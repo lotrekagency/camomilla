@@ -1,10 +1,10 @@
-from .mixins import BulkDeleteMixin, GetUserLanguageMixin, PaginateStackMixin
+from .base import BaseModelViewset
+from .mixins import BulkDeleteMixin, GetUserLanguageMixin
 from ..parsers import MultipartJsonParser
 from django.shortcuts import redirect
 
 
 from rest_framework.response import Response
-from rest_framework import viewsets
 from rest_framework.decorators import action
 
 from ..models import Media, MediaFolder
@@ -13,7 +13,7 @@ from ..permissions import CamomillaBasePermissions
 
 
 class MediaFolderViewSet(
-    PaginateStackMixin, GetUserLanguageMixin, viewsets.ModelViewSet
+    GetUserLanguageMixin, BaseModelViewset
 ):
     model = MediaFolder
     serializer_class = MediaFolderSerializer
@@ -52,7 +52,7 @@ class MediaFolderViewSet(
         return Response(self.get_mixed_response(request, *args, **kwargs))
 
 
-class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, viewsets.ModelViewSet):
+class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
