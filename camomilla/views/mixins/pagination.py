@@ -88,7 +88,7 @@ class PaginateStackMixin:
                 "page": elements.number,
                 "has_next": elements.has_next(),
                 "has_previous": elements.has_previous(),
-                "page_range": list(paginator.page_range),
+                "pages": paginator.num_pages,
                 "page_size": paginator.per_page,
             },
         }
