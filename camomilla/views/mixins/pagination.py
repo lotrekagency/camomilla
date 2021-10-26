@@ -61,7 +61,7 @@ class PaginateStackMixin:
         if search_string:
             return list_handler.annotate(
                 search=SearchVector(
-                    search_fields or getattr(self, "search_fields", [])
+                    *(search_fields or getattr(self, "search_fields", []))
                 ),
             ).filter(search=SearchQuery(search_string))
 
@@ -88,7 +88,7 @@ class PaginateStackMixin:
                 "page": elements.number,
                 "has_next": elements.has_next(),
                 "has_previous": elements.has_previous(),
-                "page_range": list(paginator.page_range),
+                "pages": paginator.num_pages,
                 "page_size": paginator.per_page,
             },
         }
