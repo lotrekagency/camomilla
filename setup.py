@@ -1,5 +1,4 @@
 from setuptools import setup
-
-__version__ = "5.0.1"
+from camomilla import __version__
 
 setup(version=__version__)
