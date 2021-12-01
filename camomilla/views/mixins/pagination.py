@@ -19,9 +19,9 @@ class PaginateStackMixin:
 
     def handle_pagination(self, list_handler=None, items_per_page=None):
         list_handler = list_handler if list_handler is not None else self.get_queryset()
-        items_per_page = items_per_page or self.request.GET.get("items") or getattr(self, "items_per_page", 30)
-        paginator = Paginator(list_handler, items_per_page)
-        page = self.request.GET.get("page")
+        items_per_page = int(items_per_page or self.request.GET.get("items") or getattr(self, "items_per_page", 30))
+        paginator = Paginator(list_handler, items_per_page if items_per_page != -1 else list_handler.count())
+        page = self.request.GET.get("page", 1) if items_per_page != -1 else 1
 
         try:
             elements = paginator.page(page)
