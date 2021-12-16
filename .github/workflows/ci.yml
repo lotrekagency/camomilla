@@ -41,7 +41,7 @@ jobs:
           - python-version: 3.9
             django-version: Django==3.1
 
-    name: Test on Python ${{ matrix.python-version }}
+    name: Test on Python ${{ matrix.python-version }} ${{ matrix.django-version }}
 
     steps:
     - uses: actions/checkout@v2
