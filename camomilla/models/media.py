@@ -8,6 +8,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage as storage
 from django.db import models
 from django.db.models.fields.related import ForeignObjectRel
+from django.contrib.postgres.fields import JSONField
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.safestring import mark_safe
@@ -84,6 +85,7 @@ class Media(TranslatableModel):
     name = models.CharField(max_length=200, blank=True, null=True)
     size = models.IntegerField(default=0, blank=True, null=True)
     is_image = models.BooleanField(default=False)
+    image_props = JSONField(default=dict, blank=True)
     folder = models.ForeignKey(
         MediaFolder,
         null=True,
@@ -137,11 +139,19 @@ class Media(TranslatableModel):
         except FileNotFoundError as ex:
             print(ex)
             self.is_image = False
+            self.image_props = {}
             return False
         try:
             orig_image = Image.open(fh)
             image = orig_image.copy()
             self.is_image = True
+            self.image_props = {
+                'width': orig_image.width,
+                'height': orig_image.height,
+                'format': orig_image.format,
+                'mime': Image.MIME[orig_image.format],
+                'mode': orig_image.mode
+            }
         except Exception as ex:
             print(ex)
             return False
@@ -210,6 +220,7 @@ def update_media(sender, instance, **kwargs):
         size=instance._get_file_size(),
         thumbnail=instance.thumbnail,
         is_image=instance.is_image,
+        image_props=instance.image_props,
     )
 
 

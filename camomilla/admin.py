@@ -55,7 +55,7 @@ class ContentAdmin(TranslatableAdmin):
 
 
 class MediaAdmin(TranslatableAdmin):
-    exclude = ('thumbnail', 'size', 'is_image')
+    exclude = ('thumbnail', 'size', 'is_image', 'image_props',)
     readonly_fields = ('image_preview', 'image_thumb_preview')
     list_display = ('__str__', 'name', 'image_thumb_preview',)
 
