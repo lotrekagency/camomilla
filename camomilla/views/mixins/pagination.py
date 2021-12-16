@@ -58,11 +58,10 @@ class PaginateStackMixin:
     def handle_search(self, list_handler=None, search_fields=None):
         list_handler = list_handler if list_handler is not None else self.get_queryset()
         search_string = self.request.GET.get("search", None)
-        if search_string:
+        search_fields = search_fields or getattr(self, "search_fields", [])
+        if search_string and len(search_fields) > 0:
             return list_handler.annotate(
-                search=SearchVector(
-                    *(search_fields or getattr(self, "search_fields", []))
-                ),
+                search=SearchVector(*search_fields),
             ).filter(search=SearchQuery(search_string))
 
         return list_handler
