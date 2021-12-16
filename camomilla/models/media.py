@@ -8,7 +8,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage as storage
 from django.db import models
 from django.db.models.fields.related import ForeignObjectRel
-from django.contrib.postgres.fields import JSONField
+from ..fields import JSONField
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.safestring import mark_safe
