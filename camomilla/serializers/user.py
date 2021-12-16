@@ -34,11 +34,7 @@ class UserSerializer(BaseModelSerializer):
     user_permissions = PermissionSerializer(read_only=True, many=True)
 
     def get_token(self, obj):
-        try:
-            obj.auth_token
-            return True
-        except:
-            return False
+        return hasattr(obj, "auth_token")
 
     class Meta:
         model = get_user_model()

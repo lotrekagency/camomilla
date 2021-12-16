@@ -7,18 +7,24 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camomilla', '0002_auto_20200214_1127'),
+        ("camomilla", "0002_auto_20200214_1127"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='mediafolder',
-            name='path',
+            model_name="mediafolder",
+            name="path",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='mediafolder',
-            name='updir',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='child_folders', to='camomilla.MediaFolder'),
+            model_name="mediafolder",
+            name="updir",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="child_folders",
+                to="camomilla.MediaFolder",
+            ),
         ),
     ]

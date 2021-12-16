@@ -2,7 +2,7 @@ from .base import BaseModelViewset
 from .mixins import GetUserLanguageMixin, BulkDeleteMixin
 
 from ..models import Article
-from ..serializers import  ArticleSerializer
+from ..serializers import ArticleSerializer
 from ..permissions import CamomillaBasePermissions
 
 

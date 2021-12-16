@@ -7,13 +7,15 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camomilla', '0004_auto_20210511_0937'),
+        ("camomilla", "0004_auto_20210511_0937"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='media',
-            name='image_props',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default=dict, blank=True),
+            model_name="media",
+            name="image_props",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                default=dict, blank=True
+            ),
         ),
     ]

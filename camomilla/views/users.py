@@ -23,10 +23,7 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, _ = Token.objects.get_or_create(user=user)
-        try:
-            return Response({"token": token.key})
-        except:
-            return Response({"token": token.key})
+        return Response({"token": token.key})
 
 
 class UserViewSet(BaseModelViewset):
@@ -48,7 +45,7 @@ class UserViewSet(BaseModelViewset):
         user = get_user_model().objects.get(pk=pk)
         try:
             user.auth_token.delete()
-        except:
+        except Exception:
             pass
 
         return Response({})

@@ -4,39 +4,46 @@ from django.apps import apps
 from django.conf import settings
 from django.http import Http404
 from django.utils.translation import activate, get_language
-from django.urls import resolve, reverse, is_valid_path
+from django.urls import resolve, reverse
 
 from .exceptions import NeedARedirect
 
 
 def get_host_url(request):
     if request:
-        return '{0}://{1}'.format(
-            request.scheme, request.META['HTTP_HOST']
-        )
+        return "{0}://{1}".format(request.scheme, request.META["HTTP_HOST"])
 
 
-def get_complete_url(request, url, language=''):
-    prefix = getattr(settings, 'PREFIX_DEFAULT_LANGUAGE', False)
+def get_complete_url(request, url, language=""):
+    prefix = getattr(settings, "PREFIX_DEFAULT_LANGUAGE", False)
     if language == settings.LANGUAGE_CODE and not prefix:
-        language = ''
-    i18n_url = urllib.parse.urljoin(language + '/', url)
+        language = ""
+    i18n_url = urllib.parse.urljoin(language + "/", url)
     complete_url = urllib.parse.urljoin(get_host_url(request), i18n_url)
     return complete_url
 
 
-def get_page(request, identifier='404', lang='', model_page=None, attr_page='identifier', model_content=None):
+def get_page(
+    request,
+    identifier="404",
+    lang="",
+    model_page=None,
+    attr_page="identifier",
+    model_content=None,
+):
     if not model_content:
-        model_content = apps.get_model(app_label='camomilla', model_name='Content')
+        model_content = apps.get_model(app_label="camomilla", model_name="Content")
     if not model_page:
-        model_page = apps.get_model(app_label='camomilla', model_name='Page')
+        model_page = apps.get_model(app_label="camomilla", model_name="Page")
     if not lang:
         lang = get_language()
     kwargs = {attr_page: identifier}
     try:
-        page = model_page.objects.language(
-            get_language()
-        ).prefetch_related('contents').get(**kwargs)
+        page = (
+            model_page.objects.language(get_language())
+            .prefetch_related("contents")
+            .get(**kwargs)
+        )
     except model_page.DoesNotExist:
         page, _ = model_page.objects.get_or_create(**kwargs)
         page.translate(get_language())
@@ -50,7 +57,7 @@ def get_seo_model(request, model, **params):
     return compile_seo(request, seo_obj, get_language())
 
 
-def compile_seo(request, seo_obj, lang=''):
+def compile_seo(request, seo_obj, lang=""):
     if not seo_obj.og_title:
         seo_obj.og_title = seo_obj.title
     if not seo_obj.og_description:
@@ -65,7 +72,7 @@ def compile_seo(request, seo_obj, lang=''):
     if not seo_obj.og_url:
         seo_obj.og_url = get_complete_url(request, permalink, lang)
     else:
-        seo_obj.og_url = get_complete_url(request, seo_obj.og_url,lang)
+        seo_obj.og_url = get_complete_url(request, seo_obj.og_url, lang)
     return seo_obj
 
 
@@ -87,7 +94,7 @@ def find_or_redirect(request, obj_class, **kwargs):
                 url_name = resolve(request.path_info).url_name
                 language_path = reverse(url_name, args=args)
                 raise NeedARedirect(language_path)
-            except obj_class.DoesNotExist as ex:
+            except obj_class.DoesNotExist:
                 pass
         activate(cur_language)
         raise Http404()

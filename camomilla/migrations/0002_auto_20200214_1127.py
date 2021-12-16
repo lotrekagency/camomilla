@@ -6,28 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camomilla', '0001_initial'),
+        ("camomilla", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='articletranslation',
-            name='content',
-            field=models.TextField(default=''),
+            model_name="articletranslation",
+            name="content",
+            field=models.TextField(default=""),
         ),
         migrations.AlterField(
-            model_name='articletranslation',
-            name='permalink',
+            model_name="articletranslation",
+            name="permalink",
             field=models.CharField(max_length=200),
         ),
         migrations.AlterField(
-            model_name='contenttranslation',
-            name='content',
-            field=models.TextField(default=''),
+            model_name="contenttranslation",
+            name="content",
+            field=models.TextField(default=""),
         ),
         migrations.AlterField(
-            model_name='contenttranslation',
-            name='permalink',
+            model_name="contenttranslation",
+            name="permalink",
             field=models.CharField(max_length=200, null=True),
         ),
     ]

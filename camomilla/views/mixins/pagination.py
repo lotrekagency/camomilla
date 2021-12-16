@@ -19,8 +19,15 @@ class PaginateStackMixin:
 
     def handle_pagination(self, list_handler=None, items_per_page=None):
         list_handler = list_handler if list_handler is not None else self.get_queryset()
-        items_per_page = int(items_per_page or self.request.GET.get("items") or getattr(self, "items_per_page", 30))
-        paginator = Paginator(list_handler, items_per_page if items_per_page != -1 else list_handler.count())
+        items_per_page = int(
+            items_per_page
+            or self.request.GET.get("items")
+            or getattr(self, "items_per_page", 30)
+        )
+        paginator = Paginator(
+            list_handler,
+            items_per_page if items_per_page != -1 else list_handler.count(),
+        )
         page = self.request.GET.get("page", 1) if items_per_page != -1 else 1
 
         try:
@@ -51,7 +58,7 @@ class PaginateStackMixin:
             try:
                 filter_name, value = self.parse_filter(filter)
                 list_handler = list_handler.filter(**{filter_name: value})
-            except:
+            except Exception:
                 pass
         return list_handler
 
@@ -93,7 +100,13 @@ class PaginateStackMixin:
         }
 
     def list(self, *args, **kwargs):
-        active = getattr(self, "force_active", False) or (self.request.GET.get("items", -1) != -1)
-        return Response(
-            self.format_output(*self.handle_pagination_stack(self.get_queryset()))
-        ) if active else super().list(*args, **kwargs)
+        active = getattr(self, "force_active", False) or (
+            self.request.GET.get("items", -1) != -1
+        )
+        return (
+            Response(
+                self.format_output(*self.handle_pagination_stack(self.get_queryset()))
+            )
+            if active
+            else super().list(*args, **kwargs)
+        )

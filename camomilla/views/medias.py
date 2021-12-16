@@ -12,9 +12,7 @@ from ..serializers import MediaSerializer, MediaFolderSerializer, MediaListSeria
 from ..permissions import CamomillaBasePermissions
 
 
-class MediaFolderViewSet(
-    GetUserLanguageMixin, BaseModelViewset
-):
+class MediaFolderViewSet(GetUserLanguageMixin, BaseModelViewset):
     model = MediaFolder
     serializer_class = MediaFolderSerializer
     items_per_page = 18
@@ -26,9 +24,11 @@ class MediaFolderViewSet(
         return {**super().get_serializer_context(), "action": "list"}
 
     def get_mixed_response(self, request, *args, **kwargs):
-        updir = kwargs.get('pk', None)
+        updir = kwargs.get("pk", None)
 
-        parent_folder = MediaFolderSerializer(self.model.objects.filter(pk=updir).first()).data
+        parent_folder = MediaFolderSerializer(
+            self.model.objects.filter(pk=updir).first()
+        ).data
         folder_queryset = self.model.objects.filter(updir__pk=updir)
         media_queryset = Media.objects.filter(folder__pk=updir)
 

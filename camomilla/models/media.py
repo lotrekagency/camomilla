@@ -79,7 +79,10 @@ class Media(TranslatableModel):
     )
     file = models.FileField()
     thumbnail = models.ImageField(
-        upload_to=getattr(settings, 'THUMB_FOLDER', 'thumbnails'), max_length=500, null=True, blank=True
+        upload_to=getattr(settings, "THUMB_FOLDER", "thumbnails"),
+        max_length=500,
+        null=True,
+        blank=True,
     )
     created = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200, blank=True, null=True)
@@ -146,11 +149,11 @@ class Media(TranslatableModel):
             image = orig_image.copy()
             self.is_image = True
             self.image_props = {
-                'width': orig_image.width,
-                'height': orig_image.height,
-                'format': orig_image.format,
-                'mime': Image.MIME[orig_image.format],
-                'mode': orig_image.mode
+                "width": orig_image.width,
+                "height": orig_image.height,
+                "format": orig_image.format,
+                "mime": Image.MIME[orig_image.format],
+                "mode": orig_image.mode,
             }
         except Exception as ex:
             print(ex)
@@ -159,8 +162,8 @@ class Media(TranslatableModel):
         try:
             image.thumbnail(
                 (
-                    getattr(settings, 'CAMOMILLA_THUMBNAIL_WIDTH', 50),
-                    getattr(settings, 'CAMOMILLA_THUMBNAIL_HEIGHT', 50)
+                    getattr(settings, "CAMOMILLA_THUMBNAIL_WIDTH", 50),
+                    getattr(settings, "CAMOMILLA_THUMBNAIL_HEIGHT", 50),
                 ),
                 Image.ANTIALIAS,
             )

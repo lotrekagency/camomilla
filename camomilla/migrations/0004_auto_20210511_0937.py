@@ -7,19 +7,19 @@ import django.db.models.manager
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camomilla', '0003_auto_20210130_1610'),
+        ("camomilla", "0003_auto_20210130_1610"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='article',
+            name="article",
             managers=[
-                ('objects', django.db.models.manager.Manager()),
-                ('_plain_manager', django.db.models.manager.Manager()),
+                ("objects", django.db.models.manager.Manager()),
+                ("_plain_manager", django.db.models.manager.Manager()),
             ],
         ),
         migrations.RemoveField(
-            model_name='article',
-            name='trash',
+            model_name="article",
+            name="trash",
         ),
     ]

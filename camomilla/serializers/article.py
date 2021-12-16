@@ -18,10 +18,14 @@ class CategorySerializer(BaseTranslatableModelSerializer):
 
 class ArticleSerializer(BaseTranslatableModelSerializer):
 
-    highlight_image = RelatedField(serializer=MediaSerializer, required=False, allow_null=True)
-    tags = RelatedField(serializer=TagSerializer, many=True, required=False, allow_null=True)
+    highlight_image = RelatedField(
+        serializer=MediaSerializer, required=False, allow_null=True
+    )
+    tags = RelatedField(
+        serializer=TagSerializer, many=True, required=False, allow_null=True
+    )
     og_image = RelatedField(serializer=MediaSerializer, required=False, allow_null=True)
-    
+
     class Meta:
         model = Article
         fields = "__all__"
