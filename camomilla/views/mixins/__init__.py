@@ -65,7 +65,7 @@ class BulkDeleteMixin(object):
                 {"detail": "Eliminazione multipla andata a buon fine"},
                 status=status.HTTP_200_OK,
             )
-        except:
+        except Exception:
             return Response(
                 {"detail": "Eliminazione multipla non riuscita"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
