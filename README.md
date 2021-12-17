@@ -1,4 +1,4 @@
-# camomilla cms ![PyPI](https://img.shields.io/pypi/v/django-camomilla-cms?style=flat-square) ![Codecov](https://img.shields.io/codecov/c/github/lotrekagency/camomilla?style=flat-square) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lotrekagency/camomilla/Test,%20Coverage%20and%20Release?style=flat-square) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/lotrekagency/django-camomilla-cms/blob/master/LICENSE)
+# camomilla cms [![PyPI](https://img.shields.io/pypi/v/django-camomilla-cms?style=flat-square)](https://pypi.org/project/django-camomilla-cms) ![Codecov](https://img.shields.io/codecov/c/github/lotrekagency/camomilla?style=flat-square) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lotrekagency/camomilla/Test,%20Coverage%20and%20Release?style=flat-square) [![GitHub](https://img.shields.io/github/license/lotrekagency/camomilla?style=flat-square)](./LICENSE)
 
 ## Install
 
