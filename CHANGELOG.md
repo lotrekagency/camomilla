@@ -2,6 +2,9 @@
 
 <!--next-version-placeholder-->
 
+## v5.2.0 (2021-12-17)
+
+
 ## v5.1.0 (2021-12-17)
 ### Feature
 * Added image properties into media model ([`09cb481`](https://github.com/lotrekagency/camomilla/commit/09cb4818b2e3207eab7a12361f5e273b17edd1d0))
