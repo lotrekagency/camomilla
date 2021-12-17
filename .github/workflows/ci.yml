@@ -1,4 +1,4 @@
-name: Test and Coverage
+name: Test, Coverage and Release
 
 on:
   push:
@@ -61,6 +61,7 @@ jobs:
     needs: [test]
     runs-on: ubuntu-latest
     concurrency: release
+    name: Release to PYPI 🚀
 
     steps:
     - uses: actions/checkout@v2
