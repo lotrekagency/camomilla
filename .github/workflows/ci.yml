@@ -11,35 +11,26 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      max-parallel: 4
+      max-parallel: 3
       matrix:
         include:
           - python-version: 3.6
-            django-version: Django==1.11
+            django-version: Django<=2.3
 
           - python-version: 3.6
-            django-version: Django==2.0
-
-          - python-version: 3.6
-            django-version: Django==2.1
-
-          - python-version: 3.6
-            django-version: Django==2.2
-
-          - python-version: 3.6
-            django-version: Django==3.0
+            django-version: Django<=3.3
 
           - python-version: 3.7
-            django-version: Django==2.2
+            django-version: Django<=2.3
 
           - python-version: 3.7
-            django-version: Django==3.0
+            django-version: Django<=3.3
 
           - python-version: 3.8
-            django-version: Django==3.1
+            django-version: Django<=2.3
 
           - python-version: 3.9
-            django-version: Django==3.1
+            django-version: Django<=3.3
 
     name: Test on Python ${{ matrix.python-version }} ${{ matrix.django-version }}
 
