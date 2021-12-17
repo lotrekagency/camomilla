@@ -43,12 +43,12 @@ class PaginateStackMixin:
 
     def handle_ordering(self, list_handler=None):
         list_handler = list_handler if list_handler is not None else self.get_queryset()
-        sort = self.request.GET.get("sort", None)
+        sort = [p for p in self.request.GET.get("sort", "").split(",") if p]
         order = self.request.GET.get("order", "asc")
         if sort:
-            return list_handler.order_by(f"{'-' if order == 'desc' else ''}{sort}")
-        elif order == "desc":
-            return list_handler.reverse()
+            list_handler.order_by(*sort)
+        if order == "desc":
+            list_handler.reverse()
         return list_handler
 
     def handle_filters(self, list_handler=None):
