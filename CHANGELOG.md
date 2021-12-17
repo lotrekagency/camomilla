@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v5.3.0 (2021-12-17)
+### Feature
+* **api:** Handle multisort on PaginateStackMixin ([`40080f4`](https://github.com/lotrekagency/camomilla/commit/40080f4542c8e0dd4c8b36bb5cf5de6e078c3314))
+
 ## v5.2.0 (2021-12-17)
 
 
