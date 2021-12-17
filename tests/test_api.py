@@ -8,7 +8,7 @@ client = APIClient()
 
 
 def login_superuser():
-    my_admin = User.objects.create_superuser("admin", "myemail@test.com", "adminadmin")
+    User.objects.create_superuser("admin", "myemail@test.com", "adminadmin")
     response = client.post(
         "/api/camomilla/token-auth/", {"username": "admin", "password": "adminadmin"}
     )
@@ -19,7 +19,7 @@ def login_superuser():
 def test_create_tag_no_access():
     response = client.post("/api/camomilla/tags/", {"title": "First tag"})
     assert response.json()["detail"] == "Authentication credentials were not provided."
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
