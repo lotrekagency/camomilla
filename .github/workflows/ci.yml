@@ -1,4 +1,4 @@
-name: Test, Coverage and Release
+name: Test and Coverage
 
 on:
   push:
@@ -56,21 +56,3 @@ jobs:
       uses: codecov/codecov-action@v2
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  release:
-    needs: [test]
-    runs-on: ubuntu-latest
-    concurrency: release
-    name: Release to PYPI 🚀
-
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-
-    - name: Python Semantic Release
-      uses: relekang/python-semantic-release@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        repository_username: __token__
-        repository_password: ${{ secrets.PYPI_TOKEN }}
