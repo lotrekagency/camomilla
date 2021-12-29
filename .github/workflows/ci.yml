@@ -2,9 +2,9 @@ name: Test and Coverage
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, release ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, release ]
 
 jobs:
   test:
@@ -54,5 +54,3 @@ jobs:
         make test
     - name: Upload coverage
       uses: codecov/codecov-action@v2
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

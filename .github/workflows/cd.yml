@@ -3,7 +3,7 @@ name: Release
 on:
   workflow_run:
     workflows: [ "Test and Coverage" ]
-    branches: [ master ]
+    branches: [ release ]
     types:
       - completed
 
