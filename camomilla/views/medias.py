@@ -13,6 +13,7 @@ class MediaFolderViewSet(GetUserLanguageMixin, BaseModelViewset):
     model = MediaFolder
     serializer_class = MediaFolderSerializer
     items_per_page = 18
+    search_fields = ["name", "title", "alt_text"]
 
     def get_queryset(self):
         return self.model.objects.all()
@@ -27,7 +28,11 @@ class MediaFolderViewSet(GetUserLanguageMixin, BaseModelViewset):
             self.model.objects.filter(pk=updir).first()
         ).data
         folder_queryset = self.model.objects.filter(updir__pk=updir)
-        media_queryset = Media.objects.filter(folder__pk=updir)
+        media_queryset = (
+            Media.objects.language(self.active_language)
+            if request.GET.get("search", None)
+            else Media.objects.all()
+        ).filter(folder__pk=updir)
 
         folder_data = MediaFolderSerializer(
             folder_queryset, many=True, context={"request": request}
