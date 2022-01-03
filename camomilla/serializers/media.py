@@ -35,7 +35,7 @@ class MediaSerializer(BaseTranslatableModelSerializer):
                         }
                     )
         return result
-    
+
     def update(self, instance, data):
         same_url = self.initial_data.get("same_url", False)
         if same_url:

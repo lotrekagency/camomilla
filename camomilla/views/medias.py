@@ -1,15 +1,12 @@
 from .base import BaseModelViewset
 from .mixins import BulkDeleteMixin, GetUserLanguageMixin
 from ..parsers import MultipartJsonParser
-from django.shortcuts import redirect
 
 
 from rest_framework.response import Response
-from rest_framework.decorators import action
 
 from ..models import Media, MediaFolder
 from ..serializers import MediaSerializer, MediaFolderSerializer, MediaListSerializer
-from ..permissions import CamomillaBasePermissions
 
 
 class MediaFolderViewSet(GetUserLanguageMixin, BaseModelViewset):
