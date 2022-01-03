@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from ..models import Media, MediaFolder
+from ..storages import OverwriteStorage
 from .base import BaseTranslatableModelSerializer
 
 
@@ -34,6 +35,17 @@ class MediaSerializer(BaseTranslatableModelSerializer):
                         }
                     )
         return result
+    
+    def update(self, instance, data):
+        same_url = self.initial_data.get("same_url", False)
+        if same_url:
+            new_file = data.pop("file", None)
+            if new_file:
+                instance = super().update(instance, data)
+                instance.file.storage = OverwriteStorage()
+                instance.file.save(instance.file.name, new_file, save=True)
+                return instance
+        return super().update(instance, data)
 
 
 class MediaFolderSerializer(BaseTranslatableModelSerializer):
