@@ -9,7 +9,18 @@ from ..models import Media, MediaFolder
 from ..serializers import MediaSerializer, MediaFolderSerializer, MediaListSerializer
 
 
-class MediaFolderViewSet(GetUserLanguageMixin, BaseModelViewset):
+class ParseMimeMixin(object):
+    def parse_filter(self, filter):
+        filter_name, value = filter.split("=")
+        if filter_name == "mime_type":
+            if value == "*/*":
+                return "mime_type__isnull", False
+            elif value.endswith("/*"):
+                return "mime_type__startswith", value.split("/")[0]
+        return filter_name, super().parse_qs_value(value)
+
+
+class MediaFolderViewSet(GetUserLanguageMixin, ParseMimeMixin, BaseModelViewset):
     model = MediaFolder
     serializer_class = MediaFolderSerializer
     items_per_page = 18
@@ -54,7 +65,9 @@ class MediaFolderViewSet(GetUserLanguageMixin, BaseModelViewset):
         return Response(self.get_mixed_response(request, *args, **kwargs))
 
 
-class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
+class MediaViewSet(
+    GetUserLanguageMixin, BulkDeleteMixin, ParseMimeMixin, BaseModelViewset
+):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
