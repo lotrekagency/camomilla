@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v5.4.0 (2022-01-13)
+### Feature
+* **media:** Added mime_type column to media model ([`4771068`](https://github.com/lotrekagency/camomilla/commit/4771068d2e54779a3d6e38ee9b447fb04c73539c))
+* **api:** Added search to medias ([`905661d`](https://github.com/lotrekagency/camomilla/commit/905661d874b5ff2e22ea8b508c46d1ccfc70c0e7))
+* **media:** Added option to override Media file on update from api to maintain same url ([`8d6371f`](https://github.com/lotrekagency/camomilla/commit/8d6371ff94e460f2e84efde45882d7d192b7cce6))
+
+### Fix
+* **media:** Added opetation to db  migration to recalc old media with the new mime_type feature ([`a7afd2d`](https://github.com/lotrekagency/camomilla/commit/a7afd2d53ba2b2f27d0d06fb6dba131368fdcc6e))
+* **media:** Mime filter parsing works also in folder viewset ([`4149e92`](https://github.com/lotrekagency/camomilla/commit/4149e92e6c67e5f96219f02859a3aaa3f748553d))
+
 ## v5.3.0 (2021-12-17)
 ### Feature
 * **api:** Handle multisort on PaginateStackMixin ([`40080f4`](https://github.com/lotrekagency/camomilla/commit/40080f4542c8e0dd4c8b36bb5cf5de6e078c3314))
