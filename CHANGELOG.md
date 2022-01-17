@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v5.4.1 (2022-01-17)
+### Fix
+* Loosen the range of requirements package versions ([`96d491b`](https://github.com/lotrekagency/camomilla/commit/96d491b4ff0aba269624eb7a27b1f3cd55946721))
+
 ## v5.4.0 (2022-01-13)
 ### Feature
 * **media:** Added mime_type column to media model ([`4771068`](https://github.com/lotrekagency/camomilla/commit/4771068d2e54779a3d6e38ee9b447fb04c73539c))
