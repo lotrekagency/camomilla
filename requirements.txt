@@ -1,8 +1,7 @@
-lotrek-django-hvad==1.8.1
-djsuperadmin==0.9.1
-djlotrek==0.0.7
-djangorestframework==3.10.0
-Pillow==6.2.0
-sqlparse==0.3.0
-django-ckeditor==5.7.1
-python-magic==0.4.24
+lotrek-django-hvad<1.9
+djsuperadmin<1.0.0
+djangorestframework<4.0.0
+djlotrek<1.0.0
+Pillow<7.0.0
+django-ckeditor<6.0.0
+python-magic<0.5
