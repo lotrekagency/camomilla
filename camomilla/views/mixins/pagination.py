@@ -1,6 +1,28 @@
 from rest_framework.response import Response
+from django.db.models import Q
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.contrib.postgres.search import SearchVector, SearchQuery
+from django.contrib.postgres.search import SearchVector, SearchQuery, TrigramSimilarity
+
+
+class TrigramSearchMixin:
+    def handle_search(self, list_handler=None, search_fields=None):
+        list_handler = list_handler if list_handler is not None else self.get_queryset()
+        search_string = self.request.GET.get("search", None)
+        search_fields = search_fields or getattr(self, "search_fields", [])
+        if search_string and len(search_fields) > 0:
+            filters = Q()
+            for field in search_fields:
+                filters |= Q(
+                    **{f"search_{field}__gte": getattr(self, "trigram_threshold", 0.3)}
+                )
+            return list_handler.annotate(
+                **{
+                    f"search_{field}": TrigramSimilarity(field, search_string)
+                    for field in search_fields
+                },
+            ).filter(filters)
+
+        return list_handler
 
 
 class PaginateStackMixin:
