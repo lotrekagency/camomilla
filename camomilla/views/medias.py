@@ -20,7 +20,9 @@ class ParseMimeMixin(object):
         return filter_name, super().parse_qs_value(value)
 
 
-class MediaFolderViewSet(GetUserLanguageMixin, ParseMimeMixin, TrigramSearchMixin, BaseModelViewset):
+class MediaFolderViewSet(
+    GetUserLanguageMixin, ParseMimeMixin, TrigramSearchMixin, BaseModelViewset
+):
     model = MediaFolder
     serializer_class = MediaFolderSerializer
     items_per_page = 18
@@ -66,7 +68,11 @@ class MediaFolderViewSet(GetUserLanguageMixin, ParseMimeMixin, TrigramSearchMixi
 
 
 class MediaViewSet(
-    GetUserLanguageMixin, BulkDeleteMixin, ParseMimeMixin, TrigramSearchMixin, BaseModelViewset
+    GetUserLanguageMixin,
+    BulkDeleteMixin,
+    ParseMimeMixin,
+    TrigramSearchMixin,
+    BaseModelViewset,
 ):
 
     queryset = Media.objects.all()

@@ -16,13 +16,17 @@ class PermissionSerializer(BaseModelSerializer):
 class UserProfileSerializer(BaseModelSerializer):
 
     user_permissions = PermissionSerializer(read_only=True, many=True)
-    password = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
-    repassword = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
+    password = serializers.CharField(
+        write_only=True, required=False, allow_null=True, allow_blank=True
+    )
+    repassword = serializers.CharField(
+        write_only=True, required=False, allow_null=True, allow_blank=True
+    )
 
     class Meta:
         model = get_user_model()
         fields = "__all__"
-        
+
     def validate_password(self, value):
         password_validation.validate_password(value)
         return value
@@ -37,18 +41,23 @@ class UserProfileSerializer(BaseModelSerializer):
 
     def update(self, instance, validated_data):
         user = super(UserSerializer, self).update(instance, validated_data)
-        if 'password' in validated_data:
-            user.set_password(validated_data['password'])
+        if "password" in validated_data:
+            user.set_password(validated_data["password"])
             user.save()
         return user
+
 
 class UserSerializer(BaseModelSerializer):
 
     id = serializers.IntegerField(read_only=True)
-    password = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
+    password = serializers.CharField(
+        write_only=True, required=False, allow_null=True, allow_blank=True
+    )
     level = serializers.CharField(required=False)
     has_token = serializers.SerializerMethodField("get_token", read_only=True)
-    user_permissions = RelatedField(serializer=PermissionSerializer, many=True, required=False, allow_null=True)
+    user_permissions = RelatedField(
+        serializer=PermissionSerializer, many=True, required=False, allow_null=True
+    )
 
     def get_token(self, obj):
         return hasattr(obj, "auth_token")
@@ -74,13 +83,13 @@ class UserSerializer(BaseModelSerializer):
 
     def create(self, validated_data):
         user = super(UserSerializer, self).create(validated_data)
-        user.set_password(validated_data['password'])
+        user.set_password(validated_data["password"])
         user.save()
         return user
 
     def update(self, instance, validated_data):
         user = super(UserSerializer, self).update(instance, validated_data)
-        if 'password' in validated_data:
-            user.set_password(validated_data['password'])
+        if "password" in validated_data:
+            user.set_password(validated_data["password"])
             user.save()
         return user

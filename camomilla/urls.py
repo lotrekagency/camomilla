@@ -28,7 +28,9 @@ router.register(r"permissions", PermissionViewSet, "camomilla-permissions")
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("profiles/me/", lambda _ : redirect("../../users/current/") , name="profiles-me"),
+    path(
+        "profiles/me/", lambda _: redirect("../../users/current/"), name="profiles-me"
+    ),
     path("token-auth/", CamomillaObtainAuthToken.as_view(), name="api_token"),
     path("languages/", LanguageViewSet.as_view(), name="get_languages"),
 ]

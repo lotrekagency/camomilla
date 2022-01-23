@@ -14,8 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="media",
             name="image_props",
-            field=JSONField(
-                default=dict, blank=True
-            ),
+            field=JSONField(default=dict, blank=True),
         ),
     ]
