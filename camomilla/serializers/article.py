@@ -24,6 +24,9 @@ class ArticleSerializer(BaseTranslatableModelSerializer):
     tags = RelatedField(
         serializer=TagSerializer, many=True, required=False, allow_null=True
     )
+    categories = RelatedField(
+        serializer=CategorySerializer, many=True, required=False, allow_null=True
+    )
     og_image = RelatedField(serializer=MediaSerializer, required=False, allow_null=True)
 
     class Meta:
