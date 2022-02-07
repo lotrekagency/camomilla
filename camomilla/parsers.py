@@ -19,6 +19,7 @@ def set_key(data, key, val):
     data[key] = val
     return data
 
+
 def get_key(data, key, default):
     if isinstance(data, list):
         try:
@@ -26,6 +27,7 @@ def get_key(data, key, default):
         except IndexError:
             return default
     return data.get(key, default)
+
 
 def compile_payload(data, path, value):
     key = path.pop(0)
@@ -35,17 +37,16 @@ def compile_payload(data, path, value):
     return set_key(data, key, compile_payload(get_key(data, key, default), path, value))
 
 
-
 class MultipartJsonParser(parsers.BaseParser):
 
-    media_type = 'multipart/form-data'
+    media_type = "multipart/form-data"
 
     def parse(self, stream, media_type=None, parser_context=None):
         parser_context = parser_context or {}
-        request = parser_context['request']
-        encoding = parser_context.get('encoding', settings.DEFAULT_CHARSET)
+        request = parser_context["request"]
+        encoding = parser_context.get("encoding", settings.DEFAULT_CHARSET)
         meta = request.META.copy()
-        meta['CONTENT_TYPE'] = media_type
+        meta["CONTENT_TYPE"] = media_type
         upload_handlers = request.upload_handlers
 
         try:
@@ -58,4 +59,4 @@ class MultipartJsonParser(parsers.BaseParser):
                 data = compile_payload(data, key.split("."), value)
             return data
         except MultiPartParserError as exc:
-            raise ParseError('Multipart form parse error - %s' % six.text_type(exc))
+            raise ParseError("Multipart form parse error - %s" % six.text_type(exc))

@@ -1,5 +1,6 @@
 import json
 import os
+import magic
 from io import BytesIO
 
 from django.conf import settings
@@ -8,6 +9,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage as storage
 from django.db import models
 from django.db.models.fields.related import ForeignObjectRel
+from ..fields import JSONField
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.safestring import mark_safe
@@ -78,12 +80,16 @@ class Media(TranslatableModel):
     )
     file = models.FileField()
     thumbnail = models.ImageField(
-        upload_to=getattr(settings, 'THUMB_FOLDER', 'thumbnails'), max_length=500, null=True, blank=True
+        upload_to=getattr(settings, "THUMB_FOLDER", "thumbnails"),
+        max_length=500,
+        null=True,
+        blank=True,
     )
     created = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200, blank=True, null=True)
     size = models.IntegerField(default=0, blank=True, null=True)
-    is_image = models.BooleanField(default=False)
+    mime_type = models.CharField(max_length=128, blank=True, null=True)
+    image_props = JSONField(default=dict, blank=True)
     folder = models.ForeignKey(
         MediaFolder,
         null=True,
@@ -95,6 +101,10 @@ class Media(TranslatableModel):
     @property
     def path(self):
         return "%s/%s" % (self.folder.path, self.name)
+
+    @property
+    def is_image(self):
+        return self.mime_type and self.mime_type.startswith("image")
 
     def image_preview(self):
         if self.file:
@@ -131,17 +141,23 @@ class Media(TranslatableModel):
         return json.dumps(json_r)
 
     def _make_thumbnail(self):
-
         try:
             fh = storage.open(self.file.name, "rb")
+            self.mime_type = magic.from_buffer(fh.read(2048), mime=True)
         except FileNotFoundError as ex:
             print(ex)
-            self.is_image = False
+            self.image_props = {}
+            self.mime_type = ""
             return False
         try:
             orig_image = Image.open(fh)
             image = orig_image.copy()
-            self.is_image = True
+            self.image_props = {
+                "width": orig_image.width,
+                "height": orig_image.height,
+                "format": orig_image.format,
+                "mode": orig_image.mode,
+            }
         except Exception as ex:
             print(ex)
             return False
@@ -149,8 +165,8 @@ class Media(TranslatableModel):
         try:
             image.thumbnail(
                 (
-                    getattr(settings, 'CAMOMILLA_THUMBNAIL_WIDTH', 50),
-                    getattr(settings, 'CAMOMILLA_THUMBNAIL_HEIGHT', 50)
+                    getattr(settings, "CAMOMILLA_THUMBNAIL_WIDTH", 50),
+                    getattr(settings, "CAMOMILLA_THUMBNAIL_HEIGHT", 50),
                 ),
                 Image.ANTIALIAS,
             )
@@ -209,7 +225,8 @@ def update_media(sender, instance, **kwargs):
     Media.objects.filter(pk=instance.pk).update(
         size=instance._get_file_size(),
         thumbnail=instance.thumbnail,
-        is_image=instance.is_image,
+        mime_type=instance.mime_type,
+        image_props=instance.image_props,
     )
 
 

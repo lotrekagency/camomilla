@@ -13,12 +13,10 @@ from requests import RequestException
 
 
 class CamomillaFiltersTestCase(TestCase):
-
     def setUp(self):
         pass
 
-
     def test_create_articles_with_auto_identifier(self):
-        article1 = Article.objects.create(permalink='article-1')
-        article2 = Article.objects.create(permalink='article-2')
+        article1 = Article.objects.create(permalink="article-1")
+        article2 = Article.objects.create(permalink="article-2")
         self.assertNotEqual(article1.identifier, article2.identifier)

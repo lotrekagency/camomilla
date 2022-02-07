@@ -11,8 +11,10 @@ class ContentSerializer(BaseTranslatableModelSerializer):
 
 
 class PageSerializer(BaseTranslatableModelSerializer):
-    og_image = RelatedField(serializer=MediaSerializer, allow_null=True)
-    contents = RelatedField(serializer=ContentSerializer, many=True, allow_null=True)
+    og_image = RelatedField(serializer=MediaSerializer, required=False, allow_null=True)
+    contents = RelatedField(
+        serializer=ContentSerializer, many=True, required=False, allow_null=True
+    )
 
     class Meta:
         model = Page

@@ -1,23 +1,32 @@
 from .base import BaseModelViewset
-from .mixins import BulkDeleteMixin, GetUserLanguageMixin
+from .mixins import BulkDeleteMixin, GetUserLanguageMixin, TrigramSearchMixin
 from ..parsers import MultipartJsonParser
-from django.shortcuts import redirect
 
 
 from rest_framework.response import Response
-from rest_framework.decorators import action
 
 from ..models import Media, MediaFolder
 from ..serializers import MediaSerializer, MediaFolderSerializer, MediaListSerializer
-from ..permissions import CamomillaBasePermissions
+
+
+class ParseMimeMixin(object):
+    def parse_filter(self, filter):
+        filter_name, value = filter.split("=")
+        if filter_name == "mime_type":
+            if value == "*/*":
+                return "mime_type__isnull", False
+            elif value.endswith("/*"):
+                return "mime_type__startswith", value.split("/")[0]
+        return filter_name, super().parse_qs_value(value)
 
 
 class MediaFolderViewSet(
-    GetUserLanguageMixin, BaseModelViewset
+    GetUserLanguageMixin, ParseMimeMixin, TrigramSearchMixin, BaseModelViewset
 ):
     model = MediaFolder
     serializer_class = MediaFolderSerializer
     items_per_page = 18
+    search_fields = ["name", "title", "alt_text"]
 
     def get_queryset(self):
         return self.model.objects.all()
@@ -26,11 +35,17 @@ class MediaFolderViewSet(
         return {**super().get_serializer_context(), "action": "list"}
 
     def get_mixed_response(self, request, *args, **kwargs):
-        updir = kwargs.get('pk', None)
+        updir = kwargs.get("pk", None)
 
-        parent_folder = MediaFolderSerializer(self.model.objects.filter(pk=updir).first()).data
+        parent_folder = MediaFolderSerializer(
+            self.model.objects.filter(pk=updir).first()
+        ).data
         folder_queryset = self.model.objects.filter(updir__pk=updir)
-        media_queryset = Media.objects.filter(folder__pk=updir)
+        media_queryset = (
+            Media.objects.language(self.active_language)
+            if request.GET.get("search", None)
+            else Media.objects.all()
+        ).filter(folder__pk=updir)
 
         folder_data = MediaFolderSerializer(
             folder_queryset, many=True, context={"request": request}
@@ -52,53 +67,15 @@ class MediaFolderViewSet(
         return Response(self.get_mixed_response(request, *args, **kwargs))
 
 
-class MediaViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
+class MediaViewSet(
+    GetUserLanguageMixin,
+    BulkDeleteMixin,
+    ParseMimeMixin,
+    TrigramSearchMixin,
+    BaseModelViewset,
+):
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
     model = Media
     parser_classes = [MultipartJsonParser]
-
-    @action(
-        detail=False, methods=["post"], permission_classes=(CamomillaBasePermissions,)
-    )
-    def upload(self, request):
-        if request.data and "file" in request.data:
-            new_media = Media(
-                # language_code=self._get_user_language(),
-                title=request.data.get("title", ""),
-                alt_text=request.data.get("alt_text", ""),
-                name=request.data.get("file_name", ""),
-                description=request.data.get("description", ""),
-                folder=MediaFolder.objects.filter(
-                    id=request.data.get("folder", "")
-                ).first(),
-                size=0,
-            )
-            upload = request.data["file"]
-
-            new_media.file.save(upload.name, upload)
-            new_media.save()
-            serializer = MediaSerializer(new_media)
-            return Response(serializer.data)
-        else:
-            new_media = Media.objects.language(self._get_user_language()).create(
-                title=request.POST["title"],
-                alt_text=request.POST["alt_text"],
-                file=request.FILES["file_contents"],
-                name=request.POST["file_name"],
-                size=0,
-            )
-
-        return redirect("media-detail", pk=new_media.pk)
-
-    def update(self, request, *args, **kwargs):
-        partial = False
-        if "PATCH" in request.method:
-            partial = True
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        if not serializer.is_valid():
-            return Response(serializer.errors)
-        serializer.save()
-        return Response(serializer.data)

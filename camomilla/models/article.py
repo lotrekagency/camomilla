@@ -23,7 +23,7 @@ class BaseArticle(SeoMixin):
     identifier = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields(
         content=models.TextField(default=""),
-        permalink=models.CharField(max_length=200, blank=False),
+        permalink=models.SlugField(max_length=200, blank=False),
     )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL

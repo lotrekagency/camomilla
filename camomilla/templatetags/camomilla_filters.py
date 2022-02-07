@@ -1,11 +1,11 @@
 from django import template
-from django.utils.translation import activate, get_language
+from django.utils.translation import get_language
 
 
 register = template.Library()
 
 
-@register.filter(name='filter_content')
+@register.filter(name="filter_content")
 def filter_content(page, args):
     try:
         content = page.contents.get(identifier=args)
@@ -17,7 +17,7 @@ def filter_content(page, args):
     return content
 
 
-@register.filter(name='alternate_urls')
+@register.filter(name="alternate_urls")
 def alternate_urls(page, request):
     alternates = page.alternate_urls(request)
-    return alternates.get('alternate_urls', alternates).items()
+    return alternates.get("alternate_urls", alternates).items()

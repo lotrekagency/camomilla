@@ -1,28 +1,36 @@
-from .views import ArticleViewSet, CamomillaObtainAuthToken, CategoryViewSet, MediaFolderViewSet
+from .views import (
+    ArticleViewSet,
+    CamomillaObtainAuthToken,
+    CategoryViewSet,
+    MediaFolderViewSet,
+)
 from .views import TagViewSet, ContentViewSet, MediaViewSet, PermissionViewSet
-from .views import PageViewSet, LanguageViewSet, UserProfileViewSet, UserViewSet
+from .views import PageViewSet, LanguageViewSet, UserViewSet
 
-from django.urls import include, path, re_path
+from django.urls import include, path
+from django.shortcuts import redirect
 
 from rest_framework import routers
 
 router = routers.DefaultRouter()
 
-router.register(r'tags', TagViewSet)
-router.register(r'categories', CategoryViewSet)
-router.register(r'articles', ArticleViewSet)
-router.register(r'contents', ContentViewSet)
-router.register(r'media', MediaViewSet, 'media')
-router.register(r'media-folders', MediaFolderViewSet, 'media_folders')
-router.register(r'pages', PageViewSet)
-router.register(r'sitemap', PageViewSet)
-router.register(r'profiles', UserProfileViewSet)
-router.register(r'users', UserViewSet)
-router.register(r'permissions', PermissionViewSet)
+router.register(r"tags", TagViewSet, "camomilla-tags")
+router.register(r"categories", CategoryViewSet, "camomilla-categories")
+router.register(r"articles", ArticleViewSet, "camomilla-articles")
+router.register(r"contents", ContentViewSet, "camomilla-content")
+router.register(r"media", MediaViewSet, "camomilla-media")
+router.register(r"media-folders", MediaFolderViewSet, "camomilla-media_folders")
+router.register(r"pages", PageViewSet, "camomilla-pages")
+router.register(r"sitemap", PageViewSet, "camomilla-sitemap")
+router.register(r"users", UserViewSet, "camomilla-users")
+router.register(r"permissions", PermissionViewSet, "camomilla-permissions")
 
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path("token-auth/", CamomillaObtainAuthToken.as_view(), name='api_token'),
-    path('languages/', LanguageViewSet.as_view(), name='get_languages')
+    path("", include(router.urls)),
+    path(
+        "profiles/me/", lambda _: redirect("../../users/current/"), name="profiles-me"
+    ),
+    path("token-auth/", CamomillaObtainAuthToken.as_view(), name="api_token"),
+    path("languages/", LanguageViewSet.as_view(), name="get_languages"),
 ]

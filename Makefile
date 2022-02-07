@@ -4,4 +4,8 @@ clean:
 	@find . -name "__pycache__" -type d | xargs rm -rf
 
 test: clean
-	@pytest --cov=camomilla -s --cov-report term-missing
+	@flake8 camomilla
+	@pytest --cov=camomilla -s --cov-report=xml --cov-report=term-missing
+
+docs: clean
+	@sphinx-build -b html ./docs camomilla_docs

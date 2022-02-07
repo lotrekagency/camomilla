@@ -1,8 +1,5 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
-from django.contrib.auth.admin import UserAdmin
 
-from django.contrib.admin.sites import AlreadyRegistered
 from django import forms
 from django.http import HttpResponse
 
@@ -23,13 +20,14 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 class ArticleAdminForm(TranslatableModelForm):
     content = forms.CharField(widget=CKEditorUploadingWidget())
+
     class Meta:
         model = Article
-        exclude = ('slug',)
+        exclude = ("slug",)
 
 
 class ArticleAdmin(TranslatableAdmin):
-    filter_horizontal = ('tags', 'categories')
+    filter_horizontal = ("tags", "categories")
     form = ArticleAdminForm
 
 
@@ -40,12 +38,15 @@ class TagAdmin(TranslatableAdmin):
 class CategoryAdmin(TranslatableAdmin):
     pass
 
+
 class MediaFolderAdmin(TranslatableAdmin):
     pass
 
+
 class ContentAdminForm(TranslatableModelForm):
-    exclude = ('permalink',)
+    exclude = ("permalink",)
     content = forms.CharField(widget=CKEditorUploadingWidget())
+
     class Meta:
         model = Content
 
@@ -55,23 +56,33 @@ class ContentAdmin(TranslatableAdmin):
 
 
 class MediaAdmin(TranslatableAdmin):
-    exclude = ('thumbnail', 'size', 'is_image')
-    readonly_fields = ('image_preview', 'image_thumb_preview')
-    list_display = ('__str__', 'name', 'image_thumb_preview',)
+    exclude = (
+        "thumbnail",
+        "size",
+        "image_props",
+    )
+    readonly_fields = ("image_preview", "image_thumb_preview")
+    list_display = (
+        "__str__",
+        "name",
+        "image_thumb_preview",
+    )
 
     def response_add(self, request, obj):
-        if request.GET.get('_popup', ''):
-            return HttpResponse('''
+        if request.GET.get("_popup", ""):
+            return HttpResponse(
+                """
                <script type="text/javascript">
                   opener.dismissAddRelatedObjectPopup(window, %s, '%s');
-               </script>''' % (obj.id, obj.json_repr)
+               </script>"""
+                % (obj.id, obj.json_repr)
             )
         else:
             return super(MediaAdmin, self).response_add(request, obj)
 
 
 class PageAdmin(TranslatableAdmin):
-    exclude = ('permalink',)
+    exclude = ("permalink",)
 
 
 admin.site.register(Article, ArticleAdmin)
@@ -82,7 +93,6 @@ admin.site.register(Content, ContentAdmin)
 admin.site.register(Media, MediaAdmin)
 admin.site.register(Page, PageAdmin)
 
-admin.site.index_title = '{0} {1}'.format(
-    _('Administration panel for'),
-    getattr(settings, 'PROJECT_TITLE', 'Camomilla')
+admin.site.index_title = "{0} {1}".format(
+    _("Administration panel for"), getattr(settings, "PROJECT_TITLE", "Camomilla")
 )

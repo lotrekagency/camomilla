@@ -18,7 +18,6 @@ class ContentViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
     model = Content
     permission_classes = (CamomillaBasePermissions,)
 
-
     @action(detail=True, methods=["get", "patch"])
     def djsuperadmin(self, request, pk):
         # content, _ = Content.objects.get_or_create(pk=pk)

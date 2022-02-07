@@ -1,5 +1,7 @@
+from django.forms import ValidationError
+from .fields.related import RelatedField
 from .base import BaseModelSerializer
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.models import Permission
 from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
@@ -14,10 +16,35 @@ class PermissionSerializer(BaseModelSerializer):
 class UserProfileSerializer(BaseModelSerializer):
 
     user_permissions = PermissionSerializer(read_only=True, many=True)
+    password = serializers.CharField(
+        write_only=True, required=False, allow_null=True, allow_blank=True
+    )
+    repassword = serializers.CharField(
+        write_only=True, required=False, allow_null=True, allow_blank=True
+    )
 
     class Meta:
         model = get_user_model()
         fields = "__all__"
+
+    def validate_password(self, value):
+        password_validation.validate_password(value)
+        return value
+
+    def validate_repassword(self, value):
+        if "password" in self.initial_data:
+            if not value:
+                raise ValidationError(_("This field is required"))
+            if self.initial_data["password"] != value:
+                raise ValidationError(_("Passwords do not match."))
+        return value
+
+    def update(self, instance, validated_data):
+        user = super(UserSerializer, self).update(instance, validated_data)
+        if "password" in validated_data:
+            user.set_password(validated_data["password"])
+            user.save()
+        return user
 
 
 class UserSerializer(BaseModelSerializer):
@@ -26,19 +53,14 @@ class UserSerializer(BaseModelSerializer):
     password = serializers.CharField(
         write_only=True, required=False, allow_null=True, allow_blank=True
     )
-    repassword = serializers.CharField(
-        write_only=True, required=False, allow_null=True, allow_blank=True
-    )
     level = serializers.CharField(required=False)
     has_token = serializers.SerializerMethodField("get_token", read_only=True)
-    user_permissions = PermissionSerializer(read_only=True, many=True)
+    user_permissions = RelatedField(
+        serializer=PermissionSerializer, many=True, required=False, allow_null=True
+    )
 
     def get_token(self, obj):
-        try:
-            obj.auth_token
-            return True
-        except:
-            return False
+        return hasattr(obj, "auth_token")
 
     class Meta:
         model = get_user_model()
@@ -49,45 +71,25 @@ class UserSerializer(BaseModelSerializer):
             "last_name",
             "email",
             "password",
-            "repassword",
             "level",
             "user_permissions",
             "has_token",
             "is_superuser",
         )
 
-    def validate(self, data):
-        new_password = data.get("password", "")
-        if new_password and len(new_password) < 8:
-            raise serializers.ValidationError(_("Passwords too short"))
-        if new_password != data.get("repassword", ""):
-            raise serializers.ValidationError(_("Passwords should match"))
-        return data
+    def validate_password(self, value):
+        password_validation.validate_password(value)
+        return value
 
     def create(self, validated_data):
-        user = get_user_model()(
-            email=validated_data["email"],
-            username=validated_data["username"],
-            first_name=validated_data["first_name"],
-            last_name=validated_data["last_name"],
-            level=validated_data["level"],
-        )
-        if validated_data.get("password", ""):
-            user.set_password(validated_data["password"])
+        user = super(UserSerializer, self).create(validated_data)
+        user.set_password(validated_data["password"])
         user.save()
         return user
 
     def update(self, instance, validated_data):
-        instance.email = validated_data.get("email", instance.email)
-        instance.username = validated_data.get("username", instance.username)
-        instance.first_name = validated_data.get("first_name", instance.first_name)
-        instance.last_name = validated_data.get("last_name", instance.last_name)
-        instance.level = validated_data.get("level", instance.level)
-        if validated_data.get("password", ""):
-            instance.set_password(validated_data["password"])
-        permissions = validated_data.get("user_permissions", [])
-        instance.user_permissions.clear()
-        for permission in permissions:
-            instance.user_permissions.add(permission)
-        instance.save()
-        return instance
+        user = super(UserSerializer, self).update(instance, validated_data)
+        if "password" in validated_data:
+            user.set_password(validated_data["password"])
+            user.save()
+        return user
