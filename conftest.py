@@ -15,7 +15,7 @@ settings.configure(
         "django.contrib.contenttypes",
         "django.contrib.auth",
         "camomilla",
-        "rest_framework.authtoken"
+        "rest_framework.authtoken",
     ],
     ROOT_URLCONF="tests.urls",
     LANGUAGE_CODE="it",

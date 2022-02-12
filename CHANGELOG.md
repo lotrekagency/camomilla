@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v5.4.2 (2022-01-18)
+### Fix
+* Fix versioning ([`39b5226`](https://github.com/lotrekagency/camomilla/commit/39b522637ff79c7ff05237d1ad85e1cae26d2a94))
+* Added min max range to requirements ([`6841054`](https://github.com/lotrekagency/camomilla/commit/6841054d71c0704919b446eb8ed542d3fb08a873))
+
 ## v5.4.1 (2022-01-17)
 ### Fix
 * Loosen the range of requirements package versions ([`96d491b`](https://github.com/lotrekagency/camomilla/commit/96d491b4ff0aba269624eb7a27b1f3cd55946721))

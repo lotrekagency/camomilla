@@ -8,13 +8,14 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
 from ..serializers import (
     UserProfileSerializer,
     UserSerializer,
     PermissionSerializer,
 )
-from ..permissions import CamomillaSuperUser
+from ..permissions import CamomillaSuperUser, CamomillaBasePermissions, ReadOnly
 
 
 class CamomillaObtainAuthToken(ObtainAuthToken):
@@ -31,23 +32,26 @@ class UserViewSet(BaseModelViewset):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     model = get_user_model()
-    permission_classes = (CamomillaSuperUser,)
+    permission_classes = (CamomillaSuperUser | CamomillaBasePermissions,)
 
-    @action(
-        detail=False,
-    )
+    @action(detail=False, methods=["get", "put"], permission_classes=(IsAuthenticated,))
     def current(self, request):
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
+        user = request.user
+        if request.method == "PUT":
+            serialized_user = UserProfileSerializer(
+                user, data=request.data, partial=True
+            )
+            if serialized_user.is_valid(raise_exception=True):
+                user = serialized_user.save()
+        return Response(UserProfileSerializer(user, context={"request": request}).data)
 
     @action(detail=True, methods=["post"])
     def kickout(self, request, pk=None):
-        user = get_user_model().objects.get(pk=pk)
+        user = self.get_object()
         try:
             user.auth_token.delete()
         except Exception:
             pass
-
         return Response({})
 
 
@@ -56,7 +60,7 @@ class PermissionViewSet(BaseModelViewset):
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer
     model = Permission
-    permission_classes = (CamomillaSuperUser,)
+    permission_classes = (CamomillaSuperUser | ReadOnly,)
     http_method_names = ["get", "put", "options", "head"]
 
     def get_queryset(self):
@@ -67,18 +71,3 @@ class PermissionViewSet(BaseModelViewset):
             | Q(content_type__model="user")
         )
         return permissions
-
-
-class UserProfileViewSet(BaseModelViewset):
-
-    queryset = get_user_model().objects.all()
-    serializer_class = UserProfileSerializer
-    model = get_user_model()
-    http_method_names = ["get", "put", "options", "head"]
-
-    @action(detail=False, methods=["get"])
-    def me(self, request):
-        personal_profile = request.user
-        return Response(
-            self.serializer_class(personal_profile, context={"request": request}).data
-        )

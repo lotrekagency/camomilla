@@ -3,6 +3,7 @@
 from django.db import migrations, models
 from ..models import Media
 
+
 def forwards_func(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     for m in Media.objects.using(db_alias).all():
@@ -16,17 +17,17 @@ def reverse_func(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camomilla', '0005_media_image_props'),
+        ("camomilla", "0005_media_image_props"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='media',
-            name='is_image',
+            model_name="media",
+            name="is_image",
         ),
         migrations.AddField(
-            model_name='media',
-            name='mime_type',
+            model_name="media",
+            name="mime_type",
             field=models.CharField(blank=True, max_length=128, null=True),
         ),
         migrations.RunPython(forwards_func, reverse_func),
