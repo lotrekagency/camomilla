@@ -31,7 +31,11 @@ class RelatedField(serializers.PrimaryKeyRelatedField):
 
     def to_internal_value(self, data):
         if isinstance(data, dict):
-            instance = self.get_queryset().filter(**{self.lookup: data.get(self.lookup, None)}).first()
+            instance = (
+                self.get_queryset()
+                .filter(**{self.lookup: data.get(self.lookup, None)})
+                .first()
+            )
             if len(data.keys()) and self.serializer:
                 serialized_data = self.serializer(instance=instance, data=data)
                 if serialized_data.is_valid(raise_exception=ValueError):
