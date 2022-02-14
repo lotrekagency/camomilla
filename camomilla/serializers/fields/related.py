@@ -37,7 +37,7 @@ class RelatedField(serializers.PrimaryKeyRelatedField):
                 .filter(**{self.lookup: data.get(self.lookup, None)})
                 .first()
             )
-            if self.allow_insert == True and len(data.keys()) and self.serializer:
+            if self.allow_insert is True and len(data.keys()) and self.serializer:
                 serialized_data = self.serializer(
                     instance=instance, data=data, context=self.context
                 )
