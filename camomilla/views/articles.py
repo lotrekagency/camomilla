@@ -11,5 +11,5 @@ class ArticleViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     permission_classes = (CamomillaBasePermissions,)
-    search_fields = ["title"]
+    search_fields = ["title", "identifier", "content", "permalink"]
     model = Article
