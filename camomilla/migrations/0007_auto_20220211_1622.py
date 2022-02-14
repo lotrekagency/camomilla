@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camomilla', '0006_auto_20220103_1845'),
+        ("camomilla", "0006_auto_20220103_1845"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='articletranslation',
-            name='permalink',
+            model_name="articletranslation",
+            name="permalink",
             field=models.SlugField(max_length=200),
         ),
     ]
