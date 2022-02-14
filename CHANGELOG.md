@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v5.5.2 (2022-02-14)
+### Fix
+* Fix djsuperadmin reverse url ([`035d377`](https://github.com/lotrekagency/camomilla/commit/035d377ef9c4dfc25516103542c0aea28a0445a6))
+
 ## v5.5.1 (2022-02-14)
 ### Fix
 * Fix RelatedField allow_insert condition ([`90ba04f`](https://github.com/lotrekagency/camomilla/commit/90ba04f2520bf131c95145121362984535f367e2))
