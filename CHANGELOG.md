@@ -2,6 +2,19 @@
 
 <!--next-version-placeholder-->
 
+## v5.5.0 (2022-02-12)
+### Feature
+* **api:** Brand new serializators views and permissions for users endpoint ([`0f5b824`](https://github.com/lotrekagency/camomilla/commit/0f5b824c0c614d9ec8fbb1ffd04644e3d30e774c))
+* **api:** Added trigram search mixin to medias ([`0002c8b`](https://github.com/lotrekagency/camomilla/commit/0002c8b40a317b3d6bae64c1c12764e31e59cb6c))
+
+### Fix
+* Fix File fields imports ([`3a0af76`](https://github.com/lotrekagency/camomilla/commit/3a0af764afefc88336bcb0646e13dc3c9deee609))
+* Added creation logics for Related fields ([`56f20a5`](https://github.com/lotrekagency/camomilla/commit/56f20a5df522035ef5bbdca6e8c67bfa40daf274))
+* Integrate Camomilla fields in Base model serializers ([`3556d33`](https://github.com/lotrekagency/camomilla/commit/3556d33c7343208b9f7b0e380bb1614c24298169))
+* Added FileField and ImageField to fix drf Fields ([`7fc3160`](https://github.com/lotrekagency/camomilla/commit/7fc3160b493cc102ffa1be029e651bc3196266cc))
+* Article permalink is now slugfield to prevent bad inputs ([`aafd92c`](https://github.com/lotrekagency/camomilla/commit/aafd92cb518fe5e768ad3fd6f515af0c8599747a))
+* Fix article serializer missing categories ([`93b4284`](https://github.com/lotrekagency/camomilla/commit/93b42840980da194dd6b40646d7d5685c7da930a))
+
 ## v5.4.2 (2022-01-18)
 ### Fix
 * Fix versioning ([`39b5226`](https://github.com/lotrekagency/camomilla/commit/39b522637ff79c7ff05237d1ad85e1cae26d2a94))
