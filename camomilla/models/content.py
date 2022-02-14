@@ -25,11 +25,11 @@ class BaseContent(DjSuperAdminMixin, TranslatableModel):
 
     @property
     def superadmin_get_url(self):
-        return reverse("content-djsuperadmin", kwargs={"pk": self.pk})
+        return reverse("camomilla-content-djsuperadmin", kwargs={"pk": self.pk})
 
     @property
     def superadmin_patch_url(self):
-        return reverse("content-djsuperadmin", kwargs={"pk": self.pk})
+        return reverse("camomilla-content-djsuperadmin", kwargs={"pk": self.pk})
 
     class Meta:
         abstract = True
