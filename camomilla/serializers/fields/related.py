@@ -18,6 +18,7 @@ class RelatedField(serializers.PrimaryKeyRelatedField):
             kwargs["queryset"] = kwargs.get(
                 "queryset", self.serializer.Meta.model.objects.all()
             )
+            self.allow_insert = kwargs.pop("allow_insert", False)
             # kwargs["allow_null"] = kwargs.get("allow_null", self.serializer.Meta.model._meta.get_field(self.source).null)
         super().__init__(**kwargs)
 
@@ -36,8 +37,10 @@ class RelatedField(serializers.PrimaryKeyRelatedField):
                 .filter(**{self.lookup: data.get(self.lookup, None)})
                 .first()
             )
-            if len(data.keys()) and self.serializer:
-                serialized_data = self.serializer(instance=instance, data=data)
+            if self.allow_insert == True and len(data.keys()) and self.serializer:
+                serialized_data = self.serializer(
+                    instance=instance, data=data, context=self.context
+                )
                 if serialized_data.is_valid(raise_exception=ValueError):
                     instance = serialized_data.save()
             return instance
