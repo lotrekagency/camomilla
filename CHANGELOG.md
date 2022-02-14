@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v5.5.1 (2022-02-14)
+### Fix
+* Fix RelatedField allow_insert condition ([`90ba04f`](https://github.com/lotrekagency/camomilla/commit/90ba04f2520bf131c95145121362984535f367e2))
+* Fix serarchfield for article viewset ([`2c9cda4`](https://github.com/lotrekagency/camomilla/commit/2c9cda4f387bc4bbc5909f7f40ebd484591cb402))
+* Added missing migration ([`a018f0f`](https://github.com/lotrekagency/camomilla/commit/a018f0f125e68548492d3fd74a5cd8bddda61293))
+* Refactor filefield and fix bad return value ([`1f1a36a`](https://github.com/lotrekagency/camomilla/commit/1f1a36aaa2fad7e43a348ef2513e1aaabdddaae3))
+* Fix related field trying to insert new values all the time ([`2465598`](https://github.com/lotrekagency/camomilla/commit/246559814ef351d2cd010fd6f7385777dd075cf2))
+
 ## v5.5.0 (2022-02-12)
 ### Feature
 * **api:** Brand new serializators views and permissions for users endpoint ([`0f5b824`](https://github.com/lotrekagency/camomilla/commit/0f5b824c0c614d9ec8fbb1ffd04644e3d30e774c))
