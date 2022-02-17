@@ -1,5 +1,4 @@
 from django.forms import ValidationError
-from .fields.related import RelatedField
 from .base import BaseModelSerializer
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.models import Permission
@@ -55,9 +54,6 @@ class UserSerializer(BaseModelSerializer):
     )
     level = serializers.CharField(required=False)
     has_token = serializers.SerializerMethodField("get_token", read_only=True)
-    user_permissions = RelatedField(
-        serializer=PermissionSerializer, many=True, required=False, allow_null=True
-    )
 
     def get_token(self, obj):
         return hasattr(obj, "auth_token")
