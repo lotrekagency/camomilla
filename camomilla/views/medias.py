@@ -1,6 +1,7 @@
 from .base import BaseModelViewset
 from .mixins import BulkDeleteMixin, GetUserLanguageMixin, TrigramSearchMixin
 from ..parsers import MultipartJsonParser
+from ..permissions import CamomillaBasePermissions
 
 
 from rest_framework.response import Response
@@ -25,6 +26,7 @@ class MediaFolderViewSet(
 ):
     model = MediaFolder
     serializer_class = MediaFolderSerializer
+    permission_classes = (CamomillaBasePermissions,)
     items_per_page = 18
     search_fields = ["name", "title", "alt_text"]
 
@@ -77,5 +79,6 @@ class MediaViewSet(
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
+    permission_classes = (CamomillaBasePermissions,)
     model = Media
     parser_classes = [MultipartJsonParser]
