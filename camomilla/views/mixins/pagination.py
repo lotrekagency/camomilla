@@ -26,6 +26,12 @@ class TrigramSearchMixin:
 
 
 class PaginateStackMixin:
+    def get_model(self, list_handler=None):
+        list_handler = list_handler if list_handler is not None else self.get_queryset()
+        return getattr(
+            list_handler, "shared_model", getattr(list_handler, "model", None)
+        )
+
     def parse_qs_value(self, string: str):
         if string and string.startswith("[") and string.endswith("]"):
             string = [self.parse_qs_value(substr) for substr in string[1:-1].split(",")]
@@ -66,9 +72,9 @@ class PaginateStackMixin:
     def handle_ordering(self, list_handler=None):
         list_handler = list_handler if list_handler is not None else self.get_queryset()
         sort = [p for p in self.request.GET.get("sort", "").split(",") if p]
+        sort += list(self.get_model()._meta.ordering) or ["-pk"]
         order = self.request.GET.get("order", "asc")
-        if sort:
-            list_handler = list_handler.order_by(*sort)
+        list_handler = list_handler.order_by(*sort)
         if order == "desc":
             list_handler = list_handler.reverse()
         return list_handler
