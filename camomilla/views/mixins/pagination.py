@@ -131,10 +131,17 @@ class PaginateStackMixin:
         active = getattr(self, "force_active", False) or (
             self.request.GET.get("items", -1) != -1
         )
-        return (
-            Response(
+        if active:
+            return Response(
                 self.format_output(*self.handle_pagination_stack(self.get_queryset()))
             )
-            if active
-            else super().list(*args, **kwargs)
-        )
+        else:
+            return Response(
+                self.get_serializer_class()(
+                    self.handle_ordering(
+                        self.handle_filters(self.handle_search(self.get_queryset()))
+                    ),
+                    many=True,
+                    context=self.get_serializer_context(),
+                ).data
+            )
