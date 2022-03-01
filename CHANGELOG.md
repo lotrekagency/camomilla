@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v5.6.0 (2022-02-26)
+### Feature
+* Added permission classes to media api ([`558cac2`](https://github.com/lotrekagency/camomilla/commit/558cac2a2b852dcd76d2ad20ce1ab14b4ccb01b0))
+* Auto-order pagination mixins ([`125dd71`](https://github.com/lotrekagency/camomilla/commit/125dd71b05faa6554a9def76bd664b837ca8d8fe))
+* **serializers:** Automagically 🧙 create nested serializers at runtime avoiding the need of declaring RelatedField classes ([`4748786`](https://github.com/lotrekagency/camomilla/commit/47487860494b56f5fdbff11b4bcc1790e2f9581a))
+
+### Fix
+* Fix paginate stack oredering ([`685cf8d`](https://github.com/lotrekagency/camomilla/commit/685cf8dbca2aae00fd2536ed1e1dca6696e88734))
+
 ## v5.5.2 (2022-02-14)
 ### Fix
 * Fix djsuperadmin reverse url ([`035d377`](https://github.com/lotrekagency/camomilla/commit/035d377ef9c4dfc25516103542c0aea28a0445a6))
