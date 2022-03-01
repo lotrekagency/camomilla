@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v5.6.1 (2022-03-01)
+### Fix
+* Fix pagination mixin to provide order filter and search also for unpaginated queries ([`62e8b01`](https://github.com/lotrekagency/camomilla/commit/62e8b01433aac97a5b70de6197f7bb957e5abf46))
+
 ## v5.6.0 (2022-02-26)
 ### Feature
 * Added permission classes to media api ([`558cac2`](https://github.com/lotrekagency/camomilla/commit/558cac2a2b852dcd76d2ad20ce1ab14b4ccb01b0))
