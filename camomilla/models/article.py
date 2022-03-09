@@ -40,10 +40,12 @@ class BaseArticle(SeoMixin, MetaMixin):
     pubblication_date = models.DateTimeField(null=True, blank=True)
     tags = models.ManyToManyField("camomilla.Tag", blank=True)
     categories = models.ManyToManyField("camomilla.Category", blank=True)
+    ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     class Meta:
         abstract = True
         unique_together = [("permalink", "language_code")]
+        ordering = ["ordering"]
 
     def save(self, *args, **kwargs):
         import uuid

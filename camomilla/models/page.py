@@ -7,11 +7,13 @@ from ..utils import get_page
 class BasePage(SeoMixin, MetaMixin):
     identifier = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields()
+    ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     class Meta:
         abstract = True
         verbose_name = "Page"
         verbose_name_plural = "Pages"
+        ordering = ["ordering"]
 
     @classmethod
     def get(model, request, **kwargs):

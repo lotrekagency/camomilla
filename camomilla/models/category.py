@@ -9,11 +9,13 @@ class BaseCategory(TranslatableModel, MetaMixin):
         description=models.TextField(blank=True, null=True, default=""),
         slug=models.SlugField(),
     )
+    ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     class Meta:
         abstract = True
         unique_together = [("title", "language_code")]
         verbose_name_plural = "categories"
+        ordering = ["ordering"]
 
     def __str__(self):
         return self.title
