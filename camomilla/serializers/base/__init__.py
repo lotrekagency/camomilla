@@ -1,4 +1,9 @@
-from ..mixins import LangInfoMixin, SetupEagerLoadingMixin, TranslationSetMixin
+from ..mixins import (
+    LangInfoMixin,
+    SetupEagerLoadingMixin,
+    TranslationSetMixin,
+    OrderingMixin,
+)
 from rest_framework import serializers
 from hvad.contrib.restframework import TranslatableModelSerializer
 from django.db import models
@@ -18,7 +23,9 @@ def build_standard_model_serializer(model):
     )
 
 
-class BaseModelSerializer(SetupEagerLoadingMixin, serializers.ModelSerializer):
+class BaseModelSerializer(
+    OrderingMixin, SetupEagerLoadingMixin, serializers.ModelSerializer
+):
     serializer_field_mapping = {
         **serializers.ModelSerializer.serializer_field_mapping,
         models.FileField: FileField,
@@ -35,7 +42,7 @@ class BaseModelSerializer(SetupEagerLoadingMixin, serializers.ModelSerializer):
 
 
 class BaseTranslatableModelSerializer(
-    LangInfoMixin, TranslationSetMixin, TranslatableModelSerializer
+    OrderingMixin, LangInfoMixin, TranslationSetMixin, TranslatableModelSerializer
 ):
     serializer_field_mapping = {
         **TranslatableModelSerializer.serializer_field_mapping,
