@@ -31,7 +31,7 @@ class OrderingMixin:
         self.reordered = False
         model = self._get_model()
         (
-            self.default_order_direction,
+            self.default_order_inverse,
             self.default_order_field,
         ) = self._get_default_ordering(model)
         rank_field = self.default_order_field
@@ -105,7 +105,7 @@ class OrderingMixin:
             raise ImproperlyConfigured(
                 f"Model {model.__module__}.{model.__name__} requires a list or tuple 'ordering' in its Meta class"
             )
-        return prefix, field_name
+        return prefix == "-", field_name
 
     def _get_model(self):
         qs = self.get_queryset()
@@ -121,7 +121,11 @@ class OrderingMixin:
 
     def _reorder(self, model):
         self.reordered = True
-        order = [self.default_order_direction + self.default_order_field, "pk"]
+
+        order = [
+            "-" if self.default_order_inverse else "" + self.default_order_field,
+            "pk" if self.default_order_inverse else "-pk",
+        ]
         for index, obj in enumerate(model.objects.order_by(*order).iterator()):
             setattr(obj, self.default_order_field, index)
             obj.save()
