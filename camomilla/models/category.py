@@ -1,8 +1,9 @@
 from django.db import models
 from hvad.models import TranslatableModel, TranslatedFields
+from .mixins import MetaMixin
 
 
-class BaseCategory(TranslatableModel):
+class BaseCategory(TranslatableModel, MetaMixin):
     translations = TranslatedFields(
         title=models.CharField(max_length=200),
         description=models.TextField(blank=True, null=True, default=""),

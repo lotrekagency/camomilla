@@ -1,10 +1,10 @@
 from django.db import models
 from hvad.models import TranslatedFields
-from .mixins import SeoMixin
+from .mixins import SeoMixin, MetaMixin
 from ..utils import get_page
 
 
-class BasePage(SeoMixin):
+class BasePage(SeoMixin, MetaMixin):
     identifier = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields()
 
