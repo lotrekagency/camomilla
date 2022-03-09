@@ -58,9 +58,10 @@ class SlugMixin(object):
         self.slug = slugify(getattr(self, self.slug_attr))
         super(SlugMixin, self).save(*args, **kwargs)
 
+
 class MetaMixin(models.Model):
     meta = JSONField(default=dict)
-    
+
     def get_meta(self, key, default):
         return self.meta_items.get(key, default)
 
