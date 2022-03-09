@@ -72,7 +72,7 @@ class PaginateStackMixin:
     def handle_ordering(self, list_handler=None):
         list_handler = list_handler if list_handler is not None else self.get_queryset()
         sort = [p for p in self.request.GET.get("sort", "").split(",") if p]
-        sort += list(self.get_model()._meta.ordering) or ["-pk"]
+        sort += list(self.get_model()._meta.ordering) + ["-pk"]
         order = self.request.GET.get("order", "asc")
         list_handler = list_handler.order_by(*sort)
         if order == "desc":
