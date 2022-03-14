@@ -62,16 +62,16 @@ class SlugMixin(object):
 class MetaMixin(models.Model):
     meta = JSONField(default=dict)
 
-    def get_meta(self, key, default):
-        return self.meta_items.get(key, default)
+    def get_meta(self, key, default=None):
+        return self.meta.get(key, default)
 
     def update_meta(self, key, value):
-        self.meta_items[key] = value
-        super(MetaMixin, self).save(update_fields=["meta_items"])
+        self.meta[key] = value
+        super(MetaMixin, self).save(update_fields=["meta"])
 
     def delete_meta(self, key):
-        del self.meta_items[key]
-        super(MetaMixin, self).save(update_fields=["meta_items"])
+        del self.meta[key]
+        super(MetaMixin, self).save(update_fields=["meta"])
 
     class Meta:
         abstract = True
