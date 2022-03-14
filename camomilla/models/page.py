@@ -1,17 +1,19 @@
 from django.db import models
 from hvad.models import TranslatedFields
-from .mixins import SeoMixin
+from .mixins import SeoMixin, MetaMixin
 from ..utils import get_page
 
 
-class BasePage(SeoMixin):
+class BasePage(SeoMixin, MetaMixin):
     identifier = models.CharField(max_length=200, unique=True)
     translations = TranslatedFields()
+    ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     class Meta:
         abstract = True
         verbose_name = "Page"
         verbose_name_plural = "Pages"
+        ordering = ["ordering"]
 
     @classmethod
     def get(model, request, **kwargs):

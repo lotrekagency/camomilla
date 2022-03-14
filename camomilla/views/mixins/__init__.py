@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .pagination import *
+from .ordering import *
 from ...permissions import CamomillaBasePermissions
 from django.utils import translation
 
