@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## v5.7.0 (2022-03-14)
+### Feature
+* Added ordering to Articles Categories and Pages ([`8cb6d75`](https://github.com/lotrekagency/camomilla/commit/8cb6d752e462462c37add877c056827fddb491cc))
+* Added meta to Articles Categories and Pages ([`f859c37`](https://github.com/lotrekagency/camomilla/commit/f859c370add3b34c081edccc4925c0cd99064d42))
+* Meta mixin for models 🦹 ([`88c4b4a`](https://github.com/lotrekagency/camomilla/commit/88c4b4afbfc042ea024c9f4ab6090ccb5b73b272))
+* Added ordering mixin for rest framework inspired by django adminsortable2 ([`cb619bc`](https://github.com/lotrekagency/camomilla/commit/cb619bcb10650174d8e01835fdb9ecf44ece81a7))
+
+### Fix
+* Fix meta mixin methods ([`7d7e3a8`](https://github.com/lotrekagency/camomilla/commit/7d7e3a80bda93a5faec92ebe52ed7be28635790d))
+* Fixed reverse ordering in update_order endpoint ([`b8ae096`](https://github.com/lotrekagency/camomilla/commit/b8ae0962bdb75895945b0cc696fb64647e079b31))
+* Fix pagination ordering without default order field ([`ca07303`](https://github.com/lotrekagency/camomilla/commit/ca07303c951fe4e6142a8af74ff282d0f90c67c2))
+
 ## v5.6.1 (2022-03-01)
 ### Fix
 * Fix pagination mixin to provide order filter and search also for unpaginated queries ([`62e8b01`](https://github.com/lotrekagency/camomilla/commit/62e8b01433aac97a5b70de6197f7bb957e5abf46))
