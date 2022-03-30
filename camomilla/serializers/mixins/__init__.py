@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.utils import translation
 from django.db.models.aggregates import Max
 from django.db.models.functions import Coalesce
-from ...views.mixins.ordering import ORDERING_ACCEPTED_FIELDS
+from ...fields import ORDERING_ACCEPTED_FIELDS
 
 
 class LangInfoMixin(metaclass=serializers.SerializerMetaclass):

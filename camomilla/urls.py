@@ -1,6 +1,8 @@
 from .views import (
     ArticleViewSet,
     CamomillaObtainAuthToken,
+    CamomillaAuthLogout,
+    CamomillaAuthLogin,
     CategoryViewSet,
     MediaFolderViewSet,
 )
@@ -32,5 +34,7 @@ urlpatterns = [
         "profiles/me/", lambda _: redirect("../../users/current/"), name="profiles-me"
     ),
     path("token-auth/", CamomillaObtainAuthToken.as_view(), name="api_token"),
+    path("auth/login/", CamomillaAuthLogin.as_view(), name="login"),
+    path("auth/logout/", CamomillaAuthLogout.as_view(), name="logout"),
     path("languages/", LanguageViewSet.as_view(), name="get_languages"),
 ]
