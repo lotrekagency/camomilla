@@ -83,8 +83,9 @@ class CamomillaAuthLogin(ObtainAuthToken):
         login(request, user)
         return Response({"detail": "Logged in"})
 
+
 class CamomillaAuthLogout(APIView):
     def get(self, request, *args, **kwargs):
-        if (request.user):
+        if request.user:
             logout(request)
         return Response({"detail": "Logged out"})
