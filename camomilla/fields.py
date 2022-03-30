@@ -5,7 +5,16 @@ from django.contrib.postgres.fields import (
     JSONField as DjangoJSONField,
     ArrayField as DjangoArrayField,
 )
-from django.db.models import Field
+from django.db import models
+
+
+ORDERING_ACCEPTED_FIELDS = (
+    models.BigIntegerField,
+    models.IntegerField,
+    models.PositiveIntegerField,
+    models.PositiveSmallIntegerField,
+    models.SmallIntegerField,
+)
 
 
 class JSONField(DjangoJSONField):
@@ -18,7 +27,7 @@ class ArrayField(DjangoArrayField):
 
 if "sqlite" in settings.DATABASES["default"]["ENGINE"]:
 
-    class JSONField(Field):
+    class JSONField(models.Field):
         def db_type(self, connection):
             return "text"
 

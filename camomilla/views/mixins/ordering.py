@@ -6,14 +6,7 @@ from django.db import transaction, router, models
 from django.db.models.signals import post_save, pre_save
 from itertools import chain
 from django.db.models.expressions import F
-
-ORDERING_ACCEPTED_FIELDS = (
-    models.BigIntegerField,
-    models.IntegerField,
-    models.PositiveIntegerField,
-    models.PositiveSmallIntegerField,
-    models.SmallIntegerField,
-)
+from ...fields import ORDERING_ACCEPTED_FIELDS
 
 
 class OrderingMixin:
