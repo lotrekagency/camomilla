@@ -2,7 +2,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from ...permissions import CamomillaBasePermissions
 from django.core.exceptions import ImproperlyConfigured
-from django.db import transaction, router, models
+from django.db import transaction, router
 from django.db.models.signals import post_save, pre_save
 from itertools import chain
 from django.db.models.expressions import F
