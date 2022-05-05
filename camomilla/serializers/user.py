@@ -3,7 +3,7 @@ from .base import BaseModelSerializer
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.models import Permission
 from rest_framework import serializers
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class PermissionSerializer(BaseModelSerializer):
