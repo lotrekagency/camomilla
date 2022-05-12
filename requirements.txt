@@ -1,4 +1,4 @@
-lotrek-django-hvad>=1.8.1
+lotrek-django-hvad>=2.0.0
 djsuperadmin>=0.9,<1.0.0
 djangorestframework>=3.10.0<4.0.0
 djlotrek>=0.0.7,<1.0.0
