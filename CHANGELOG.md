@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v5.7.1 (2022-03-30)
+### Fix
+* Fix circular import error ([`8b3f6ff`](https://github.com/lotrekagency/camomilla/commit/8b3f6ff2d7a01a2f138506ef4ad94fe78b691521))
+* Fix session login urls ([`2688c1a`](https://github.com/lotrekagency/camomilla/commit/2688c1aae082654bebd84f3bfd8f2b74104fa930))
+* Fix drf session authentication ([`538e709`](https://github.com/lotrekagency/camomilla/commit/538e709dcc8fd2799b4063c265687b2e0315c076))
+
 ## v5.7.0 (2022-03-14)
 ### Feature
 * Added ordering to Articles Categories and Pages ([`8cb6d75`](https://github.com/lotrekagency/camomilla/commit/8cb6d752e462462c37add877c056827fddb491cc))

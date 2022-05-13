@@ -17,7 +17,7 @@ class LangInfoMixin(metaclass=serializers.SerializerMetaclass):
         return {
             "default": settings.LANGUAGE_CODE,
             "active": translation.get_language(),
-            "translated_in": obj.get_available_languages(),
+            "translated_in": obj.translations.all_languages(),
             "site_languages": languages,
         }
 
