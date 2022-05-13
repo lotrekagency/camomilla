@@ -45,9 +45,7 @@ def get_page(
             .get(**kwargs)
         )
     except model_page.DoesNotExist:
-        page, _ = model_page.objects.get_or_create(**kwargs)
-        page.translate(get_language())
-        page.save()
+        page, _ = model_page.objects.language(get_language()).get_or_create(**kwargs)
     page = compile_seo(request, page, lang)
     return page
 
