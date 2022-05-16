@@ -2,15 +2,10 @@ import json
 import django
 from django.conf import settings
 if django.VERSION >= (4, 0):
-    from django.db.models import (
-        JSONField as DjangoJSONField,
-        ArrayField as DjangoArrayField,
-    )
+    from django.db.models import JSONField as DjangoJSONField
 else:
-    from django.contrib.postgres.fields import (
-        JSONField as DjangoJSONField,
-        ArrayField as DjangoArrayField,
-    )
+    from django.contrib.postgres.fields import JSONField as DjangoJSONField
+from django.contrib.postgres.fields import ArrayField as DjangoArrayField
 from django.db import models
 
 
