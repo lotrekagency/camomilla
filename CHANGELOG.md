@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v5.7.3 (2022-05-16)
+### Fix
+* Fix Arrayfield import ([`2cfdaca`](https://github.com/lotrekagency/camomilla/commit/2cfdacacb63d59cea79ae59f0c3d9839efe56088))
+* Fix jsonfield imports ([`be4b566`](https://github.com/lotrekagency/camomilla/commit/be4b56622df269ee5d200dc5666536b39e7fe0cc))
+
 ## v5.7.2 (2022-05-13)
 ### Fix
 * Fix get page to work with new hvad ([`2cd8b89`](https://github.com/lotrekagency/camomilla/commit/2cd8b8948df44fd82c214835770e92b10a3f5512))
