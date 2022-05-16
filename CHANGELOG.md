@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v5.7.2 (2022-05-13)
+### Fix
+* Fix get page to work with new hvad ([`2cd8b89`](https://github.com/lotrekagency/camomilla/commit/2cd8b8948df44fd82c214835770e92b10a3f5512))
+* Fix camomilla filter content to work with new hvad ([`0193509`](https://github.com/lotrekagency/camomilla/commit/019350929c19cccdfedbdfc2b493039484a08400))
+* Update camomilla template to support new django admin static ([`92afbc0`](https://github.com/lotrekagency/camomilla/commit/92afbc07a1345cf19ed4a5a83317f7658b008804))
+* Fix gettext_lazy import deprecated in django4 ([`626dfe1`](https://github.com/lotrekagency/camomilla/commit/626dfe16a9fb6457e463ac995eb9d4d809c51e22))
+
 ## v5.7.1 (2022-03-30)
 ### Fix
 * Fix circular import error ([`8b3f6ff`](https://github.com/lotrekagency/camomilla/commit/8b3f6ff2d7a01a2f138506ef4ad94fe78b691521))
