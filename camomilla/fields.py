@@ -1,7 +1,7 @@
 import json
 import django
 from django.conf import settings
-if django.VERSION >= (4,0):
+if django.VERSION >= (4, 0):
     from django.db.models import (
         JSONField as DjangoJSONField,
         ArrayField as DjangoArrayField,
