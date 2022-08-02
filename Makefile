@@ -5,7 +5,8 @@ clean:
 
 test: clean
 	@flake8 camomilla
-	@pytest-3 --cov=camomilla -s --cov-report=xml --cov-report=term-missing
+	# @pytest-3 --cov=camomilla -s --cov-report=xml --cov-report=term-missing
+	@pytest --cov=camomilla -s --cov-report=xml --cov-report=term-missing
 
 docs: clean
 	@sphinx-build -b html ./docs camomilla_docs
