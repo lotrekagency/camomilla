@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v5.7.4 (2022-08-02)
+### Fix
+* Added missing migrations ([`e57989e`](https://github.com/lotrekagency/camomilla/commit/e57989e7174374bdcff19d042956327e12b65fe4))
+* Fix media migration to be compliant with hvad ([`dc5e83a`](https://github.com/lotrekagency/camomilla/commit/dc5e83ad0d639024319a49ac00b01f8845fbe9f1))
+* Fix makefile ([`925a270`](https://github.com/lotrekagency/camomilla/commit/925a2706f00c2b6ab5cc9055a557192a4bbd8d4a))
+* Added missing migrations for django 4 ([`8a79998`](https://github.com/lotrekagency/camomilla/commit/8a79998e39c9555385ab0d9e87f299b0ede2883d))
+
 ## v5.7.3 (2022-05-16)
 ### Fix
 * Fix Arrayfield import ([`2cfdaca`](https://github.com/lotrekagency/camomilla/commit/2cfdacacb63d59cea79ae59f0c3d9839efe56088))
