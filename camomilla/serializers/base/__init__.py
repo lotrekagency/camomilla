@@ -37,7 +37,8 @@ class BaseModelSerializer(
         field_class, field_kwargs = super().build_relational_field(
             field_name, relation_info
         )
-        field_kwargs["serializer"] = build_standard_model_serializer(relation_info[1])
+        if isinstance(field_class, RelatedField):
+            field_kwargs["serializer"] = build_standard_model_serializer(relation_info[1])
         return field_class, field_kwargs
 
 
@@ -55,5 +56,6 @@ class BaseTranslatableModelSerializer(
         field_class, field_kwargs = super().build_relational_field(
             field_name, relation_info
         )
-        field_kwargs["serializer"] = build_standard_model_serializer(relation_info[1])
+        if isinstance(field_class, RelatedField):
+            field_kwargs["serializer"] = build_standard_model_serializer(relation_info[1])
         return field_class, field_kwargs
