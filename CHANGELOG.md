@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v5.7.6 (2022-08-12)
+### Fix
+* Fix BaseModelSerializer related field injectig serializer kwargs in wrong class ([`a212c2f`](https://github.com/lotrekagency/camomilla/commit/a212c2fa5fd611fb63899a05026a78ff5f3d4d02))
+
 ## v5.7.5 (2022-08-11)
 ### Fix
 * Explicit default_auto_field in app config to prevent unwanted migrations ([`ec33de8`](https://github.com/lotrekagency/camomilla/commit/ec33de87be8f7fc7fc466070e8fe20b7e75ef438))
