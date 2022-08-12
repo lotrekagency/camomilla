@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v5.7.7 (2022-08-12)
+### Fix
+* Fix bad typechecking in BaseModelSerializer ([`5063abf`](https://github.com/lotrekagency/camomilla/commit/5063abfddb47e79cd7ec7b16ce43536021138f55))
+
 ## v5.7.6 (2022-08-12)
 ### Fix
 * Fix BaseModelSerializer related field injectig serializer kwargs in wrong class ([`a212c2f`](https://github.com/lotrekagency/camomilla/commit/a212c2fa5fd611fb63899a05026a78ff5f3d4d02))
