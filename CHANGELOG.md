@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v5.7.5 (2022-08-11)
+### Fix
+* Explicit default_auto_field in app config to prevent unwanted migrations ([`ec33de8`](https://github.com/lotrekagency/camomilla/commit/ec33de87be8f7fc7fc466070e8fe20b7e75ef438))
+
 ## v5.7.4 (2022-08-02)
 ### Fix
 * Added missing migrations ([`e57989e`](https://github.com/lotrekagency/camomilla/commit/e57989e7174374bdcff19d042956327e12b65fe4))
