@@ -39,13 +39,10 @@ def get_page(
         lang = get_language()
     kwargs = {attr_page: identifier}
     try:
-        page = (
-            model_page.objects.language(get_language())
-            .prefetch_related("contents")
-            .get(**kwargs)
-        )
+        page = model_page.objects.prefetch_related("contents").get(**kwargs)
     except model_page.DoesNotExist:
-        page, _ = model_page.objects.language(get_language()).get_or_create(**kwargs)
+        page, _ = model_page.objects.get_or_create(**kwargs)
+    page.translate(lang)
     page = compile_seo(request, page, lang)
     return page
 
