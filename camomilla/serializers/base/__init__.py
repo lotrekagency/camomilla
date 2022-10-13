@@ -15,6 +15,7 @@ def build_standard_model_serializer(model):
     return type(
         f"{model.__name__}StandardSerializer",
         (
+            BaseModelSerializer,
             TranslatableModelSerializer
             if issubclass(model, TranslatableModel)
             else serializers.ModelSerializer,
