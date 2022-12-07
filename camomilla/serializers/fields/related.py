@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from rest_framework import serializers
+from rest_framework import serializers, relations
 
 
 class RelatedField(serializers.PrimaryKeyRelatedField):
@@ -62,3 +62,42 @@ class RelatedField(serializers.PrimaryKeyRelatedField):
                 for item in queryset
             ]
         )
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        class ManyRelatedField(serializers.ManyRelatedField):
+            def to_internal_value(self, data):
+                if isinstance(data, str) or not hasattr(data, "__iter__"):
+                    self.fail("not_a_list", input_type=type(data).__name__)
+                if not self.allow_empty and len(data) == 0:
+                    self.fail("empty")
+
+                child = self.child_relation
+                instances = {getattr(item, child.lookup):item for item in
+                    child.get_queryset().filter(
+                        **{
+                            f"{child.lookup}__in": [
+                                item.get(child.lookup, None) for item in data
+                            ]
+                        }
+                    )
+                }
+                if (
+                    child.allow_insert is True
+                    and len(data.keys())
+                    and child.serializer
+                ):
+                    for item in data:
+                        serialized_data = child.serializer(
+                            instance=instances.get(item.get(child.lookup)), data=item, context=child.context
+                        )
+                        if serialized_data.is_valid(raise_exception=ValueError):
+                            instance = serialized_data.save()
+                            instances[instance.pk] = instance
+                return instances.values()
+
+        list_kwargs = {"child_relation": cls(*args, **kwargs)}
+        for key in kwargs:
+            if key in relations.MANY_RELATION_KWARGS:
+                list_kwargs[key] = kwargs[key]
+        return ManyRelatedField(**list_kwargs)
