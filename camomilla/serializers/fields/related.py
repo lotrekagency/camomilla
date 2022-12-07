@@ -73,8 +73,9 @@ class RelatedField(serializers.PrimaryKeyRelatedField):
                     self.fail("empty")
 
                 child = self.child_relation
-                instances = {getattr(item, child.lookup):item for item in
-                    child.get_queryset().filter(
+                instances = {
+                    getattr(item, child.lookup): item
+                    for item in child.get_queryset().filter(
                         **{
                             f"{child.lookup}__in": [
                                 item.get(child.lookup, None) for item in data
@@ -82,14 +83,12 @@ class RelatedField(serializers.PrimaryKeyRelatedField):
                         }
                     )
                 }
-                if (
-                    child.allow_insert is True
-                    and len(data.keys())
-                    and child.serializer
-                ):
+                if child.allow_insert is True and len(data.keys()) and child.serializer:
                     for item in data:
                         serialized_data = child.serializer(
-                            instance=instances.get(item.get(child.lookup)), data=item, context=child.context
+                            instance=instances.get(item.get(child.lookup)),
+                            data=item,
+                            context=child.context,
                         )
                         if serialized_data.is_valid(raise_exception=ValueError):
                             instance = serialized_data.save()
