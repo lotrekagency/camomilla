@@ -78,7 +78,10 @@ class RelatedField(serializers.PrimaryKeyRelatedField):
                     for item in child.get_queryset().filter(
                         **{
                             f"{child.lookup}__in": [
-                                item.get(child.lookup, None) for item in data
+                                item.get(child.lookup, None)
+                                if isinstance(item, dict)
+                                else item
+                                for item in data
                             ]
                         }
                     )
