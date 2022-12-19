@@ -42,9 +42,9 @@ class MediaFolderViewSet(
         parent_folder = MediaFolderSerializer(
             self.model.objects.filter(pk=updir).first()
         ).data
-        folder_queryset = self.model.objects.filter(updir__pk=updir)
+        folder_queryset = self.model.objects.language(self.active_language).fallbacks().filter(updir__pk=updir)
         media_queryset = (
-            Media.objects.language(self.active_language)
+            Media.objects.language(self.active_language).fallbacks()
             if request.GET.get("search", None)
             else Media.objects.all()
         ).filter(folder__pk=updir)
