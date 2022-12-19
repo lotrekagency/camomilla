@@ -5,6 +5,14 @@ from django.utils import translation
 from django.db.models.aggregates import Max
 from django.db.models.functions import Coalesce
 from ...fields import ORDERING_ACCEPTED_FIELDS
+from ...utils import dict_merge
+from rest_framework.utils import model_meta
+import django
+
+if django.VERSION >= (4, 0):
+    from django.db.models import JSONField as DjangoJSONField
+else:
+    from django.contrib.postgres.fields import JSONField as DjangoJSONField
 
 
 class LangInfoMixin(metaclass=serializers.SerializerMetaclass):
@@ -73,3 +81,19 @@ class OrderingMixin:
         ):
             field_kwargs["default"] = self.get_max_order(field_name) + 1
         return field_class, field_kwargs
+
+
+class JSONFieldPatchMixin:
+    def update(self, instance, validated_data):
+        if self.partial:
+            info = model_meta.get_field_info(instance)
+            for attr, value in validated_data.items():
+                if (
+                    attr in info.fields
+                    and isinstance(info.fields[attr], DjangoJSONField)
+                    and isinstance(value, dict)
+                ):
+                    validated_data[attr] = dict_merge(
+                        getattr(instance, attr, {}), value
+                    )
+        return super().update(instance, validated_data)

@@ -93,3 +93,11 @@ def find_or_redirect(request, obj_class, **kwargs):
                 pass
         activate(cur_language)
         raise Http404()
+
+
+def dict_merge(dct, merge_dct):
+    for k, v in merge_dct.iteritems():
+        if k in dct and isinstance(dct[k], dict) and isinstance(v, dict):  # noqa
+            dict_merge(dct[k], v)
+        else:
+            dct[k] = v
