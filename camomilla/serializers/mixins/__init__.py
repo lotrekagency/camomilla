@@ -8,6 +8,7 @@ from ...fields import ORDERING_ACCEPTED_FIELDS
 from ...utils import dict_merge
 from rest_framework.utils import model_meta
 import django
+from ..fields.related import RelatedField
 
 if django.VERSION >= (4, 0):
     from django.db.models import JSONField as DjangoJSONField
@@ -97,3 +98,23 @@ class JSONFieldPatchMixin:
                         getattr(instance, attr, {}), value
                     )
         return super().update(instance, validated_data)
+
+
+DEFAULT_NESTING_DEPTH = 10
+
+
+class NestMixin:
+    def build_nested_field(self, field_name, relation_info, nested_depth):
+        return self.build_relational_field(field_name, relation_info, nested_depth)
+
+    def build_relational_field(
+        self, field_name, relation_info, nested_depth=DEFAULT_NESTING_DEPTH
+    ):
+        field_class, field_kwargs = super().build_relational_field(
+            field_name, relation_info
+        )
+        if field_class is RelatedField:
+            field_kwargs["serializer"] = self.build_standard_model_serializer(
+                relation_info[1], nested_depth - 1
+            )
+        return field_class, field_kwargs
