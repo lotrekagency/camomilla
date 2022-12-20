@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v5.8.1 (2022-12-20)
+### Fix
+* Fix potential recursion error in NestMixin ([`f337155`](https://github.com/lotrekagency/camomilla/commit/f33715549ecb2555eba07ddc2a676e314e48c235))
+* **media:** Allow json parser in media for patch requests without files ([`b117229`](https://github.com/lotrekagency/camomilla/commit/b1172297f22cf032c41efefe6a58b206c34d5e2b))
+* Show all permissions on profile serializer ([`fb1dc5e`](https://github.com/lotrekagency/camomilla/commit/fb1dc5ee3e27dec4d382e6a06a60599ab82cff1e))
+* **media:** Allow json parser in media for patch requests without files ([`00b1d24`](https://github.com/lotrekagency/camomilla/commit/00b1d24a0de19c3a4cfb0bbeafba9e48e06c46ce))
+* Show all permissions on profile serializer ([`e2a0116`](https://github.com/lotrekagency/camomilla/commit/e2a011602520945c9835091797d3d7ca508f0f52))
+
 ## v5.8.0 (2022-12-20)
 ### Feature
 * **rest_framework:** Go down in nested relation with updatable serializers, DEFAULT_NEST_DEPTH = 10 ([`d22ea66`](https://github.com/lotrekagency/camomilla/commit/d22ea664820e8b5843435aaa7c279502888992f0))
