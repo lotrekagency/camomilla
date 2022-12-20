@@ -5,6 +5,7 @@ from ..permissions import CamomillaBasePermissions
 
 
 from rest_framework.response import Response
+from rest_framework.parsers import JSONParser
 
 from ..models import Media, MediaFolder
 from ..serializers import MediaSerializer, MediaFolderSerializer, MediaListSerializer
@@ -81,4 +82,4 @@ class MediaViewSet(
     serializer_class = MediaSerializer
     permission_classes = (CamomillaBasePermissions,)
     model = Media
-    parser_classes = [MultipartJsonParser]
+    parser_classes = [MultipartJsonParser, JSONParser]
