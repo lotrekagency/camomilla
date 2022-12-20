@@ -2,6 +2,19 @@
 
 <!--next-version-placeholder-->
 
+## v5.8.0 (2022-12-20)
+### Feature
+* **rest_framework:** Go down in nested relation with updatable serializers, DEFAULT_NEST_DEPTH = 10 ([`d22ea66`](https://github.com/lotrekagency/camomilla/commit/d22ea664820e8b5843435aaa7c279502888992f0))
+* Optimize many related field to fetch all existing objects ([`8ba3982`](https://github.com/lotrekagency/camomilla/commit/8ba39828c3dbf3c16c5cc89c38e69fb939c8a062))
+
+### Fix
+* Fallback media api translations ([`e279f7a`](https://github.com/lotrekagency/camomilla/commit/e279f7ad4eec933ddb4f43b85f0498d1fbf3d17b))
+* Fix patch method overriding json field ([`faf7e4b`](https://github.com/lotrekagency/camomilla/commit/faf7e4b5586801639d3633e6db37c0d1e95d9d15))
+* Handle ints in many related fields ([`eb7140a`](https://github.com/lotrekagency/camomilla/commit/eb7140a03d0b933939fd6b163744420bc8f9cf59))
+* **serializers:** Added BaseModelSerializer to default serializers of RelatedFields ([`e9a37b5`](https://github.com/lotrekagency/camomilla/commit/e9a37b54c0e15acdd7c95ed008b6b5b9722d13c5))
+* **page:** Added safe page translation getter in get_page ([`bea64d7`](https://github.com/lotrekagency/camomilla/commit/bea64d7890d9713f1d9043902b9dd9cfe30f7ce9))
+* **db:** Added trigram extension in migrations ([`bdadea1`](https://github.com/lotrekagency/camomilla/commit/bdadea19f56bfe1a518f020ec18615e448a3df2d))
+
 ## v5.7.7 (2022-08-12)
 ### Fix
 * Fix bad typechecking in BaseModelSerializer ([`5063abf`](https://github.com/lotrekagency/camomilla/commit/5063abfddb47e79cd7ec7b16ce43536021138f55))
