@@ -108,12 +108,14 @@ class NestMixin:
         return self.build_relational_field(field_name, relation_info, nested_depth)
 
     def build_relational_field(
-        self, field_name, relation_info, nested_depth=DEFAULT_NESTING_DEPTH
+        self, field_name, relation_info, nested_depth=DEFAULT_NESTING_DEPTH + 1
     ):
         field_class, field_kwargs = super().build_relational_field(
             field_name, relation_info
         )
-        if field_class is RelatedField:
+        if (
+            field_class is RelatedField and nested_depth > 1
+        ):  # stop recursion one step before the jump :P
             field_kwargs["serializer"] = self.build_standard_model_serializer(
                 relation_info[1], nested_depth - 1
             )
