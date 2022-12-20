@@ -13,8 +13,9 @@ class PermissionSerializer(BaseModelSerializer):
 
 
 class UserProfileSerializer(BaseModelSerializer):
-
     user_permissions = PermissionSerializer(read_only=True, many=True)
+    group_permissions = serializers.SerializerMethodField()
+    all_permissions = serializers.SerializerMethodField()
     password = serializers.CharField(
         write_only=True, required=False, allow_null=True, allow_blank=True
     )
@@ -25,6 +26,24 @@ class UserProfileSerializer(BaseModelSerializer):
     class Meta:
         model = get_user_model()
         fields = "__all__"
+
+    def get_group_permissions(self, instance):
+        return PermissionSerializer(
+            Permission.objects.filter(
+                group__pk__in=instance.groups.values_list("pk", flat=True)
+            ),
+            context=self.context,
+            many=True,
+        ).data
+
+    def get_all_permissions(self, instance):
+        return PermissionSerializer(
+            Permission.objects.filter(
+                group__pk__in=instance.groups.values_list("pk", flat=True)
+            ).union(instance.user_permissions.all()),
+            context=self.context,
+            many=True,
+        ).data
 
     def validate_password(self, value):
         password_validation.validate_password(value)
