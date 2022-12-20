@@ -1,61 +1,55 @@
+from hvad.contrib.restframework import TranslatableModelSerializer
+from hvad.models import TranslatableModel
+from rest_framework import serializers
+
+from ..fields import FieldsOverrideMixin, TranslatableFieldsOverrideMixin
 from ..mixins import (
+    JSONFieldPatchMixin,
     LangInfoMixin,
+    OrderingMixin,
     SetupEagerLoadingMixin,
     TranslationSetMixin,
-    OrderingMixin,
+    NestMixin,
 )
-from rest_framework import serializers
-from hvad.contrib.restframework import TranslatableModelSerializer
-from django.db import models
-from ..fields import FileField, ImageField, RelatedField
-from hvad.models import TranslatableModel
 
 
-def build_standard_model_serializer(model):
+def build_standard_model_serializer(self, model, depth):
     return type(
         f"{model.__name__}StandardSerializer",
         (
-            TranslatableModelSerializer
+            BaseTranslatableModelSerializer
             if issubclass(model, TranslatableModel)
-            else serializers.ModelSerializer,
+            else BaseModelSerializer,
         ),
-        {"Meta": type("Meta", (object,), {"model": model, "fields": "__all__"})},
+        {
+            "Meta": type(
+                "Meta",
+                (object,),
+                {"model": model, "depth": depth, "fields": "__all__"},
+            )
+        },
     )
 
 
 class BaseModelSerializer(
-    OrderingMixin, SetupEagerLoadingMixin, serializers.ModelSerializer
+    NestMixin,
+    FieldsOverrideMixin,
+    JSONFieldPatchMixin,
+    OrderingMixin,
+    SetupEagerLoadingMixin,
+    serializers.ModelSerializer,
 ):
-    serializer_field_mapping = {
-        **serializers.ModelSerializer.serializer_field_mapping,
-        models.FileField: FileField,
-        models.ImageField: ImageField,
-    }
-    serializer_related_field = RelatedField
 
-    def build_relational_field(self, field_name, relation_info):
-        field_class, field_kwargs = super().build_relational_field(
-            field_name, relation_info
-        )
-        if field_class is RelatedField:
-            field_kwargs["serializer"] = build_standard_model_serializer(relation_info[1])
-        return field_class, field_kwargs
+    build_standard_model_serializer = build_standard_model_serializer
 
 
 class BaseTranslatableModelSerializer(
-    OrderingMixin, LangInfoMixin, TranslationSetMixin, TranslatableModelSerializer
+    NestMixin,
+    TranslatableFieldsOverrideMixin,
+    JSONFieldPatchMixin,
+    OrderingMixin,
+    LangInfoMixin,
+    TranslationSetMixin,
+    TranslatableModelSerializer,
 ):
-    serializer_field_mapping = {
-        **TranslatableModelSerializer.serializer_field_mapping,
-        models.FileField: FileField,
-        models.ImageField: ImageField,
-    }
-    serializer_related_field = RelatedField
-
-    def build_relational_field(self, field_name, relation_info):
-        field_class, field_kwargs = super().build_relational_field(
-            field_name, relation_info
-        )
-        if field_class is RelatedField:
-            field_kwargs["serializer"] = build_standard_model_serializer(relation_info[1])
-        return field_class, field_kwargs
+    build_standard_model_serializer = build_standard_model_serializer
