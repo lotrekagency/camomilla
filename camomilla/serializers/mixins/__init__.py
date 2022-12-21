@@ -103,7 +103,7 @@ class JSONFieldPatchMixin:
         return super().update(instance, validated_data)
 
 
-DEFAULT_NESTING_DEPTH = 10
+DEFAULT_NESTING_DEPTH = getattr(settings, "CAMOMILLA_DRF_NESTING_DEPTH", 10)
 
 
 class NestMixin:
