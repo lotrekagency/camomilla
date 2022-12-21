@@ -88,19 +88,47 @@ class OrderingMixin:
 
 
 class JSONFieldPatchMixin:
+    def is_json_field(self, attr, value, info):
+        return (
+            attr in info.fields
+            and isinstance(info.fields[attr], DjangoJSONField)
+            and isinstance(value, dict)
+        )
+
     def update(self, instance, validated_data):
         if self.partial:
+            if isinstance(self, TranslationsMixin):
+                validated_data = self.merge_trans_jsonfields(instance, validated_data)
             info = model_meta.get_field_info(instance)
             for attr, value in validated_data.items():
-                if (
-                    attr in info.fields
-                    and isinstance(info.fields[attr], DjangoJSONField)
-                    and isinstance(value, dict)
-                ):
+                if self.is_json_field(attr, value, info):
                     validated_data[attr] = dict_merge(
                         getattr(instance, attr, {}), value
                     )
         return super().update(instance, validated_data)
+
+    def merge_trans_jsonfields(self, instance, validated_data):
+        accessor = self.Meta.model._meta.translations_accessor
+        if isinstance(validated_data.get(accessor), dict):
+            translations = {
+                trans.language_code: trans
+                for trans in instance._meta.translations_model.objects.filter(
+                    master=instance,
+                    language_code__in=[
+                        lang
+                        for lang, val in validated_data[accessor].items()
+                        if isinstance(val, dict)
+                    ],
+                )
+            }
+            for lang, trans in translations.items():
+                info = model_meta.get_field_info(trans)
+                for attr, value in validated_data[accessor][lang].items():
+                    if self.is_json_field(attr, value, info):
+                        validated_data[accessor][lang][attr] = dict_merge(
+                            getattr(trans, attr, {}), value
+                        )
+        return validated_data
 
 
 DEFAULT_NESTING_DEPTH = getattr(settings, "CAMOMILLA_DRF_NESTING_DEPTH", 10)

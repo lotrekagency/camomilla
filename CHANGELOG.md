@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v5.8.3 (2022-12-21)
+### Fix
+* Fix potential recursion error in NestMixin and take nesting depth from settings ([`647114c`](https://github.com/lotrekagency/camomilla/commit/647114c0b32a556773fe657929a9e3d86254b295))
+* Fix recursive nestmixin functions ([`e83586e`](https://github.com/lotrekagency/camomilla/commit/e83586eba127e970b714d78b2cb0ff353731d6fc))
+
 ## v5.8.2 (2022-12-21)
 ### Fix
 * Fix nested translations mixins ([`2c17ed8`](https://github.com/lotrekagency/camomilla/commit/2c17ed86d2169df67f2e14b37518e8dc16b6a121))
