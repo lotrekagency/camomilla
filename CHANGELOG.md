@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v5.8.4 (2022-12-21)
+### Fix
+* Fix jsonPatch mixin for trans jsons ([`e0c9236`](https://github.com/lotrekagency/camomilla/commit/e0c9236994fa2a776702c83f14db7496fdcc6450))
+
 ## v5.8.3 (2022-12-21)
 ### Fix
 * Fix potential recursion error in NestMixin and take nesting depth from settings ([`647114c`](https://github.com/lotrekagency/camomilla/commit/647114c0b32a556773fe657929a9e3d86254b295))
