@@ -14,13 +14,25 @@ from ..mixins import (
 
 
 def build_standard_model_serializer(self, model, depth):
+    bases = (
+        NestMixin,
+        FieldsOverrideMixin,
+        JSONFieldPatchMixin,
+        OrderingMixin,
+        SetupEagerLoadingMixin,
+        serializers.ModelSerializer,
+    )
+    if issubclass(model, TranslatableModel):
+        bases = (
+            NestMixin,
+            TranslatableFieldsOverrideMixin,
+            JSONFieldPatchMixin,
+            OrderingMixin,
+            TranslatableModelSerializer,
+        )
     return type(
         f"{model.__name__}StandardSerializer",
-        (
-            BaseTranslatableModelSerializer
-            if issubclass(model, TranslatableModel)
-            else BaseModelSerializer,
-        ),
+        bases,
         {
             "Meta": type(
                 "Meta",
