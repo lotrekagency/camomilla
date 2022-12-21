@@ -1,13 +1,16 @@
+import django
 from django.conf import settings
-from hvad.contrib.restframework import TranslationsMixin
-from rest_framework import serializers
-from django.utils import translation
 from django.db.models.aggregates import Max
 from django.db.models.functions import Coalesce
+from django.utils import translation
+from hvad.contrib.restframework import TranslatableModelSerializer, TranslationsMixin
+from hvad.models import TranslatableModel
+from rest_framework import serializers
+from rest_framework.utils import model_meta
+
 from ...fields import ORDERING_ACCEPTED_FIELDS
 from ...utils import dict_merge
-from rest_framework.utils import model_meta
-import django
+from ..fields import FieldsOverrideMixin, TranslatableFieldsOverrideMixin
 from ..fields.related import RelatedField
 
 if django.VERSION >= (4, 0):
@@ -120,3 +123,32 @@ class NestMixin:
                 relation_info[1], nested_depth - 1
             )
         return field_class, field_kwargs
+
+    def build_standard_model_serializer(self, model, depth):
+        bases = (
+            NestMixin,
+            FieldsOverrideMixin,
+            JSONFieldPatchMixin,
+            OrderingMixin,
+            SetupEagerLoadingMixin,
+            serializers.ModelSerializer,
+        )
+        if issubclass(model, TranslatableModel):
+            bases = (
+                NestMixin,
+                TranslatableFieldsOverrideMixin,
+                JSONFieldPatchMixin,
+                OrderingMixin,
+                TranslatableModelSerializer,
+            )
+        return type(
+            f"{model.__name__}StandardSerializer",
+            bases,
+            {
+                "Meta": type(
+                    "Meta",
+                    (object,),
+                    {"model": model, "depth": depth, "fields": "__all__"},
+                )
+            },
+        )
