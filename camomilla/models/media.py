@@ -14,15 +14,12 @@ from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from hvad.models import TranslatableModel, TranslatedFields
 from PIL import Image
 
 
-class BaseMediaFolder(TranslatableModel):
-    translations = TranslatedFields(
-        description=models.CharField(max_length=200, blank=True, null=True),
-        title=models.CharField(max_length=200, blank=True, null=True),
-    )
+class BaseMediaFolder(models.Model):
+    description=models.CharField(max_length=200, blank=True, null=True)
+    title=models.CharField(max_length=200, blank=True, null=True)
     slug = models.SlugField()
     creation_date = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
@@ -69,15 +66,13 @@ class BaseMediaFolder(TranslatableModel):
 
 
 class MediaFolder(BaseMediaFolder):
-    translations = TranslatedFields()
+    pass
 
 
-class Media(TranslatableModel):
-    translations = TranslatedFields(
-        alt_text=models.CharField(max_length=200, blank=True, null=True),
-        title=models.CharField(max_length=200, blank=True, null=True),
-        description=models.TextField(blank=True, null=True),
-    )
+class Media(models.Model):
+    alt_text=models.CharField(max_length=200, blank=True, null=True)
+    title=models.CharField(max_length=200, blank=True, null=True)
+    description=models.TextField(blank=True, null=True)
     file = models.FileField()
     thumbnail = models.ImageField(
         upload_to=getattr(settings, "THUMB_FOLDER", "thumbnails"),

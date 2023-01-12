@@ -3,8 +3,6 @@ from django.db import models
 
 from django.utils.translation import gettext_lazy as _
 
-from hvad.models import TranslatedFields
-
 from .mixins import SeoMixin, MetaMixin
 
 
@@ -21,10 +19,8 @@ class BaseArticle(SeoMixin, MetaMixin):
     seo_attr = "permalink"
 
     identifier = models.CharField(max_length=200, unique=True)
-    translations = TranslatedFields(
-        content=models.TextField(default=""),
-        permalink=models.SlugField(max_length=200, blank=False),
-    )
+    content=models.TextField(default="")
+    permalink=models.SlugField(max_length=200, null=True, unique=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL
     )
@@ -44,7 +40,6 @@ class BaseArticle(SeoMixin, MetaMixin):
 
     class Meta:
         abstract = True
-        unique_together = [("permalink", "language_code")]
         ordering = ["ordering"]
 
     def save(self, *args, **kwargs):
@@ -59,4 +54,4 @@ class BaseArticle(SeoMixin, MetaMixin):
 
 
 class Article(BaseArticle):
-    translations = TranslatedFields()
+    pass

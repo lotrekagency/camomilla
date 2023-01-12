@@ -1,6 +1,5 @@
 from django.db import models
 from ...fields import JSONField
-from hvad.models import TranslatableModel, TranslatedFields
 
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
@@ -10,20 +9,17 @@ from ...utils import get_seo_model
 from djlotrek.utils import alternate_seo_url_with_object
 
 
-class SeoMixin(TranslatableModel):
+class SeoMixin(models.Model):
 
     seo_attr = "identifier"
-
-    translations = TranslatedFields(
-        title=models.CharField(max_length=200),
-        description=models.TextField(blank=True, null=True, default=""),
-        permalink=models.CharField(max_length=200, blank=True),
-        og_description=models.TextField(blank=True, null=True, default=""),
-        og_title=models.CharField(max_length=200, blank=True, null=True, default=""),
-        og_type=models.CharField(max_length=200, blank=True, null=True, default=""),
-        og_url=models.CharField(max_length=200, blank=True, null=True, default=""),
-        canonical=models.CharField(max_length=200, blank=True, null=True, default=""),
-    )
+    title=models.CharField(max_length=200, null=True)
+    description=models.TextField(blank=True, null=True, default="")
+    permalink=models.CharField(max_length=200, blank=True)
+    og_description=models.TextField(blank=True, null=True, default="")
+    og_title=models.CharField(max_length=200, blank=True, null=True, default="")
+    og_type=models.CharField(max_length=200, blank=True, null=True, default="")
+    og_url=models.CharField(max_length=200, blank=True, null=True, default="")
+    canonical=models.CharField(max_length=200, blank=True, null=True, default="")
     og_image = models.ForeignKey(
         "camomilla.Media",
         blank=True,

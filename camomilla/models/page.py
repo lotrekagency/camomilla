@@ -1,12 +1,10 @@
 from django.db import models
-from hvad.models import TranslatedFields
 from .mixins import SeoMixin, MetaMixin
 from ..utils import get_page
 
 
 class BasePage(SeoMixin, MetaMixin):
-    identifier = models.CharField(max_length=200, unique=True)
-    translations = TranslatedFields()
+    identifier = models.CharField(max_length=200, unique=True, null=True)
     ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     class Meta:
@@ -29,4 +27,4 @@ class BasePage(SeoMixin, MetaMixin):
 
 
 class Page(BasePage):
-    translations = TranslatedFields()
+    pass
