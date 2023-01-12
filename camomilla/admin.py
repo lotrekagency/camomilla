@@ -7,8 +7,8 @@ from .models import Article, Tag, Category, Content, Media, Page, MediaFolder
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 
-from hvad.admin import TranslatableAdmin
-from hvad.forms import TranslatableModelForm
+from modeltranslation.admin import TranslationAdmin
+from modeltranslation.forms import TranslationModelForm
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -18,7 +18,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     pass
 
 
-class ArticleAdminForm(TranslatableModelForm):
+class ArticleAdminForm(TranslationModelForm):
     content = forms.CharField(widget=CKEditorUploadingWidget())
 
     class Meta:
@@ -26,36 +26,37 @@ class ArticleAdminForm(TranslatableModelForm):
         exclude = ("slug",)
 
 
-class ArticleAdmin(TranslatableAdmin):
+class ArticleAdmin(TranslationAdmin):
     filter_horizontal = ("tags", "categories")
     form = ArticleAdminForm
 
 
-class TagAdmin(TranslatableAdmin):
+class TagAdmin(TranslationAdmin):
     pass
 
 
-class CategoryAdmin(TranslatableAdmin):
+class CategoryAdmin(TranslationAdmin):
     pass
 
 
-class MediaFolderAdmin(TranslatableAdmin):
+class MediaFolderAdmin(TranslationAdmin):
     pass
 
 
-class ContentAdminForm(TranslatableModelForm):
+class ContentAdminForm(TranslationModelForm):
     exclude = ("permalink",)
     content = forms.CharField(widget=CKEditorUploadingWidget())
 
     class Meta:
         model = Content
+        fields = "__all__"
 
 
-class ContentAdmin(TranslatableAdmin):
+class ContentAdmin(TranslationAdmin):
     form = ContentAdminForm
 
 
-class MediaAdmin(TranslatableAdmin):
+class MediaAdmin(TranslationAdmin):
     exclude = (
         "thumbnail",
         "size",
@@ -81,7 +82,7 @@ class MediaAdmin(TranslatableAdmin):
             return super(MediaAdmin, self).response_add(request, obj)
 
 
-class PageAdmin(TranslatableAdmin):
+class PageAdmin(TranslationAdmin):
     exclude = ("permalink",)
 
 
