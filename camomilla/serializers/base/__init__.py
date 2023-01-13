@@ -1,14 +1,13 @@
-from hvad.contrib.restframework import TranslatableModelSerializer
 from rest_framework import serializers
 
-from ..fields import FieldsOverrideMixin, TranslatableFieldsOverrideMixin
+from ...contrib.rest_framework.serializer import TranslationsMixin
+from ..fields import FieldsOverrideMixin
 from ..mixins import (
     JSONFieldPatchMixin,
     LangInfoMixin,
+    NestMixin,
     OrderingMixin,
     SetupEagerLoadingMixin,
-    TranslationSetMixin,
-    NestMixin,
 )
 
 
@@ -18,18 +17,7 @@ class BaseModelSerializer(
     JSONFieldPatchMixin,
     OrderingMixin,
     SetupEagerLoadingMixin,
+    TranslationsMixin,
     serializers.ModelSerializer,
-):
-    pass
-
-
-class BaseTranslatableModelSerializer(
-    NestMixin,
-    TranslatableFieldsOverrideMixin,
-    JSONFieldPatchMixin,
-    OrderingMixin,
-    LangInfoMixin,
-    TranslationSetMixin,
-    TranslatableModelSerializer,
 ):
     pass

@@ -2,10 +2,10 @@ from rest_framework import serializers
 
 from ..models import Media, MediaFolder
 from ..storages import OverwriteStorage
-from .base import BaseTranslatableModelSerializer
+from .base import BaseModelSerializer
 
 
-class MediaListSerializer(BaseTranslatableModelSerializer):
+class MediaListSerializer(BaseModelSerializer):
     is_image = serializers.SerializerMethodField("get_is_image")
 
     def get_is_image(self, obj):
@@ -16,7 +16,7 @@ class MediaListSerializer(BaseTranslatableModelSerializer):
         fields = "__all__"
 
 
-class MediaSerializer(BaseTranslatableModelSerializer):
+class MediaSerializer(BaseModelSerializer):
     links = serializers.SerializerMethodField("get_linked_instances")
     is_image = serializers.SerializerMethodField("get_is_image")
 
@@ -29,8 +29,6 @@ class MediaSerializer(BaseTranslatableModelSerializer):
         links = obj.get_foreign_fields()
         for link in links:
             manager = getattr(obj, link)
-            if hasattr(manager, "language"):
-                manager = manager.language()
             for item in manager.all():
                 if item.__class__.__name__ != "MediaTranslation":
                     result.append(
@@ -57,7 +55,7 @@ class MediaSerializer(BaseTranslatableModelSerializer):
         return obj.is_image
 
 
-class MediaFolderSerializer(BaseTranslatableModelSerializer):
+class MediaFolderSerializer(BaseModelSerializer):
     icon = MediaSerializer(read_only=True)
 
     class Meta:

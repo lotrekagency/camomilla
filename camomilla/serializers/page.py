@@ -1,14 +1,14 @@
 from ..models import Content, Page
-from .base import BaseTranslatableModelSerializer
+from .base import BaseModelSerializer
 
 
-class ContentSerializer(BaseTranslatableModelSerializer):
+class ContentSerializer(BaseModelSerializer):
     class Meta:
         model = Content
         fields = "__all__"
 
 
-class PageSerializer(BaseTranslatableModelSerializer):
+class PageSerializer(BaseModelSerializer):
     class Meta:
         model = Page
         fields = "__all__"
