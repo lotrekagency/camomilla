@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.db import migrations, connection
 
-import json
-
 
 class KeepTranslationsMixin:
 

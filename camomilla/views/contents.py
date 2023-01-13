@@ -20,13 +20,10 @@ class ContentViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
 
     @action(detail=True, methods=["get", "patch"])
     def djsuperadmin(self, request, pk):
-        # content, _ = Content.objects.get_or_create(pk=pk)
-        # content.translate(get_language())
         try:
-            content = Content.objects.language(get_language()).get(pk=pk)
+            content = Content.objects.get(pk=pk)
         except Content.DoesNotExist:
             content, _ = Content.objects.get_or_create(pk=pk)
-            content.translate(get_language())
         if request.method == "GET":
             return JsonResponse({"content": content.content})
         if request.method == "PATCH":

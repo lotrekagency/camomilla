@@ -42,7 +42,6 @@ def get_page(
         page = model_page.objects.prefetch_related("contents").get(**kwargs)
     except model_page.DoesNotExist:
         page, _ = model_page.objects.get_or_create(**kwargs)
-    page.translate(lang)
     page = compile_seo(request, page, lang)
     return page
 
@@ -73,16 +72,16 @@ def compile_seo(request, seo_obj, lang=""):
 
 def find_or_redirect(request, obj_class, **kwargs):
     try:
-        obj = obj_class.objects.language().get(**kwargs)
+        obj = obj_class.objects.get(**kwargs)
         return obj
     except obj_class.DoesNotExist:
         cur_language = get_language()
         for language in settings.LANGUAGES:
             try:
                 activate(language[0])
-                obj = obj_class.objects.language().get(**kwargs)
+                obj = obj_class.objects.get(**kwargs)
                 activate(cur_language)
-                obj = obj_class.objects.language().get(pk=obj.pk)
+                obj = obj_class.objects.get(pk=obj.pk)
                 args = []
                 for kwarg_key, kwarg_val in kwargs.items():
                     args.append(getattr(obj, kwarg_key))

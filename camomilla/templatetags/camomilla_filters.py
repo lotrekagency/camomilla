@@ -7,14 +7,10 @@ register = template.Library()
 
 @register.filter(name="filter_content")
 def filter_content(page, args):
-    curr_lang = get_language()
     try:
-        content = page.contents.language(curr_lang).get(identifier=args)
+        content = page.contents.get(identifier=args)
     except page.contents.model.DoesNotExist:
         content, _ = page.contents.get_or_create(identifier=args)
-    if curr_lang not in content.translations.all_languages():
-        content.translate(curr_lang)
-        content.save()
     return content
 
 

@@ -30,11 +30,7 @@ class GetUserLanguageMixin(object):
         return super().initialize_request(request, *args, **kwargs)
 
     def get_queryset(self):
-        return (
-            self.model.objects.language(self.active_language).fallbacks().all()
-            if self.language_fallbacks
-            else self.model.objects.language(self.active_language).all()
-        )
+        return self.model.objects.all()
 
 
 class OptimViewMixin:
