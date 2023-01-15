@@ -54,25 +54,37 @@ class KeepTranslationsMixin:
                         )
 
     def _getDataFromModelTranslation(self, apps, schemaeditor):
-        pass
-        # for modelPath, fields in self.keep_translations.items():
-        #     Model = apps.get_model(*modelPath.split('.'))
-        #     table = Model._meta.db_table
-        #     trans_fields = ('id',)
-        #     for language_code in self.language_codes:
-        #         trans_fields += ("{0}_{1}".format(field, language_code) for field in fields if field != "id")
-        #     with connection.cursor() as cursor:
-        #         cursor.execute("SELECT {0} FROM {1}".format(','.join(trans_fields), table))
-        #         rows = cursor.fetchall()
-        #         self._saved_data_from_plain[modelPath] = []
-        #         for row in rows:
-        #             self._saved_data_from_plain[modelPath].append(dict(zip(fields, row)))
+        for modelPath, fields in self.keep_translations.items():
+            Model = apps.get_model(*modelPath.split("."))
+            table = Model._meta.db_table
+            for lang in self.language_codes:
+                t_fields = ("id",) + tuple(
+                    "{0}_{1}".format(f, lang) for f in fields if f != "id"
+                )
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT {0} FROM {1}".format(
+                            ",".join(t_fields),
+                            table,
+                        )
+                    )
+                    rows = cursor.fetchall()
+                    self._saved_data_from_plain[
+                        modelPath
+                    ] = self._saved_data_from_plain.get(modelPath, [])
+                    for row in rows:
+                        row_data = dict(zip(("master_id", *fields), row))
+                        row_data.update({"language_code": lang})
+                        self._saved_data_from_plain[modelPath].append(row_data)
 
     def _restoreDataToModelTranslation(self, apps, schemaeditor):
         for key, master_dict in self._saved_data_from_plain.items():
             Model = apps.get_model(*key.split("."))
             for pk, translations in master_dict.items():
-                obj = Model.objects.get(pk=pk)
+                try:
+                    obj = Model.objects.get(pk=pk)
+                except Model.DoesNotExist:
+                    continue
                 for translation in translations:
                     lang = translation.pop("language_code")
                     for attr, value in translation.items():
@@ -80,18 +92,21 @@ class KeepTranslationsMixin:
                 obj.save()
 
     def _restoreDataToHvad(self, apps, schemaeditor):
-        pass
-        # for key, rows in self._saved_data_from_plain.items():
-        #     Model = apps.get_model(*key.split('.'))
-        #     key = key + 'Translation'
-        #     ModelTanslatable = apps.get_model(*key.split('.'))
-        #     for row in rows:
-        #         obj_to_trans = Model.objects.get(pk=row['id'])
-        #         for language_code in self.language_codes:
-        #             obj, _ = ModelTanslatable.objects.get_or_create(
-        #                 master=obj_to_trans, language_code=language_code
-        #             )
-        #             for attribute, attribute_value in row.items():
-        #                 if attribute != 'id' and attribute.endswith(language_code):
-        #                     setattr(obj, attribute.rstrip('_{0}'.format(language_code)), attribute_value)
-        #             obj.save()
+        for key, rows in self._saved_data_from_plain.items():
+            Model = apps.get_model(*key.split("."))
+            table = Model._meta.db_table + "_translation"
+            for row in rows:
+                with connection.cursor() as cursor:
+                    print(row)
+                    cursor.execute(
+                        "INSERT INTO {0} ({1}) VALUES ({2});".format(
+                            table,
+                            ",".join(row.keys()),
+                            ",".join(
+                                [
+                                    "'{}'".format(v).replace("'None'", "NULL")
+                                    for v in row.values()
+                                ]
+                            ),
+                        )
+                    )
