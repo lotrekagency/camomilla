@@ -6,6 +6,8 @@ from hvad.models import TranslatableModel, TranslatedFields
 
 from djsuperadmin.mixins import DjSuperAdminMixin
 
+from ..utils import get_camomilla_model
+
 
 class BaseContent(DjSuperAdminMixin, TranslatableModel):
     identifier = models.CharField(max_length=200)
@@ -16,7 +18,7 @@ class BaseContent(DjSuperAdminMixin, TranslatableModel):
         content=models.TextField(default=""),
     )
     page = models.ForeignKey(
-        "camomilla.Page",
+        get_camomilla_model("page", string=True),
         blank=False,
         null=True,
         on_delete=models.SET_NULL,

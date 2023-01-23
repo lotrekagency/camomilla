@@ -2,12 +2,11 @@ from .base import BaseModelViewset
 from .mixins import BulkDeleteMixin, GetUserLanguageMixin, TrigramSearchMixin
 from ..parsers import MultipartJsonParser
 from ..permissions import CamomillaBasePermissions
-
+from ..utils import get_camomilla_model
 
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 
-from ..models import Media, MediaFolder
 from ..serializers import MediaSerializer, MediaFolderSerializer, MediaListSerializer
 
 
@@ -25,7 +24,7 @@ class ParseMimeMixin(object):
 class MediaFolderViewSet(
     GetUserLanguageMixin, ParseMimeMixin, TrigramSearchMixin, BaseModelViewset
 ):
-    model = MediaFolder
+    model = get_camomilla_model("media_folder")
     serializer_class = MediaFolderSerializer
     permission_classes = (CamomillaBasePermissions,)
     items_per_page = 18
@@ -43,11 +42,17 @@ class MediaFolderViewSet(
         parent_folder = MediaFolderSerializer(
             self.model.objects.filter(pk=updir).first()
         ).data
-        folder_queryset = self.model.objects.language(self.active_language).fallbacks().filter(updir__pk=updir)
+        folder_queryset = (
+            self.model.objects.language(self.active_language)
+            .fallbacks()
+            .filter(updir__pk=updir)
+        )
         media_queryset = (
-            Media.objects.language(self.active_language).fallbacks()
+            get_camomilla_model("media")
+            .objects.language(self.active_language)
+            .fallbacks()
             if request.GET.get("search", None)
-            else Media.objects.all()
+            else get_camomilla_model("media").objects.all()
         ).filter(folder__pk=updir)
 
         folder_data = MediaFolderSerializer(
@@ -78,8 +83,8 @@ class MediaViewSet(
     BaseModelViewset,
 ):
 
-    queryset = Media.objects.all()
+    queryset = get_camomilla_model("media").objects.all()
     serializer_class = MediaSerializer
     permission_classes = (CamomillaBasePermissions,)
-    model = Media
+    model = get_camomilla_model("media")
     parser_classes = [MultipartJsonParser, JSONParser]

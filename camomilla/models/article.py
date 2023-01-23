@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from hvad.models import TranslatedFields
 
 from .mixins import SeoMixin, MetaMixin
+from ..utils import get_camomilla_model
 
 
 CONTENT_STATUS = (
@@ -34,12 +35,12 @@ class BaseArticle(SeoMixin, MetaMixin):
         default="DRF",
     )
     highlight_image = models.ForeignKey(
-        "camomilla.Media", blank=True, null=True, on_delete=models.SET_NULL
+        get_camomilla_model("media", string=True), blank=True, null=True, on_delete=models.SET_NULL
     )
     date = models.DateTimeField(auto_now=True)
     pubblication_date = models.DateTimeField(null=True, blank=True)
-    tags = models.ManyToManyField("camomilla.Tag", blank=True)
-    categories = models.ManyToManyField("camomilla.Category", blank=True)
+    tags = models.ManyToManyField(get_camomilla_model("tag", string=True), blank=True)
+    categories = models.ManyToManyField(get_camomilla_model("category", string=True), blank=True)
     ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     class Meta:

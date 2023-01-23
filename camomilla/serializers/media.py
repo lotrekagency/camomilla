@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ..models import Media, MediaFolder
+from ..utils import get_camomilla_model
 from ..storages import OverwriteStorage
 from .base import BaseTranslatableModelSerializer
 
@@ -12,7 +12,7 @@ class MediaListSerializer(BaseTranslatableModelSerializer):
         return obj.is_image
 
     class Meta:
-        model = Media
+        model = get_camomilla_model("media")
         fields = "__all__"
 
 
@@ -21,7 +21,7 @@ class MediaSerializer(BaseTranslatableModelSerializer):
     is_image = serializers.SerializerMethodField("get_is_image")
 
     class Meta:
-        model = Media
+        model = get_camomilla_model("media")
         fields = "__all__"
 
     def get_linked_instances(self, obj):
@@ -61,5 +61,5 @@ class MediaFolderSerializer(BaseTranslatableModelSerializer):
     icon = MediaSerializer(read_only=True)
 
     class Meta:
-        model = MediaFolder
+        model = get_camomilla_model("media_folder")
         fields = "__all__"

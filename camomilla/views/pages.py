@@ -1,13 +1,13 @@
 from .base import BaseModelViewset
 from .mixins import GetUserLanguageMixin, BulkDeleteMixin
-from ..models import Page
+from ..utils import get_camomilla_model
 from ..serializers import PageSerializer
 from ..permissions import CamomillaBasePermissions
 
 
 class PageViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
 
-    queryset = Page.objects.all()
+    queryset = get_camomilla_model("page").objects.all()
     serializer_class = PageSerializer
     permission_classes = (CamomillaBasePermissions,)
-    model = Page
+    model = get_camomilla_model("page")

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from camomilla.models import Media
+from ...utils import get_camomilla_model
 
 
 class Command(BaseCommand):
@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = "Regenerates all the thumbnail"
 
     def handle(self, *args, **options):
-        for media in Media.objects.all():
+        for media in get_camomilla_model("media").objects.all():
             media.regenerate_thumbnail()
             media.save()
             self.stdout.write(

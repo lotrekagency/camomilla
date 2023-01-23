@@ -16,6 +16,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from hvad.models import TranslatableModel, TranslatedFields
 from PIL import Image
+from ..utils import get_camomilla_model
 
 
 class BaseMediaFolder(TranslatableModel):
@@ -27,7 +28,7 @@ class BaseMediaFolder(TranslatableModel):
     creation_date = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
     icon = models.ForeignKey(
-        "camomilla.Media",
+        get_camomilla_model("media", string=True),
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -72,7 +73,7 @@ class MediaFolder(BaseMediaFolder):
     translations = TranslatedFields()
 
 
-class Media(TranslatableModel):
+class BaseMedia(TranslatableModel):
     translations = TranslatedFields(
         alt_text=models.CharField(max_length=200, blank=True, null=True),
         title=models.CharField(max_length=200, blank=True, null=True),
@@ -91,7 +92,7 @@ class Media(TranslatableModel):
     mime_type = models.CharField(max_length=128, blank=True, null=True)
     image_props = JSONField(default=dict, blank=True)
     folder = models.ForeignKey(
-        MediaFolder,
+        get_camomilla_model("media_folder", string=True),
         null=True,
         blank=True,
         related_name="media_folder",
@@ -119,6 +120,7 @@ class Media(TranslatableModel):
 
     class Meta:
         ordering = ["-pk"]
+        abstract = True
 
     def regenerate_thumbnail(self):
         if self.file:
@@ -218,11 +220,17 @@ class Media(TranslatableModel):
         return self.file.name
 
 
-@receiver(post_save, sender=Media, dispatch_uid="make thumbnails")
+class Media(BaseMedia):
+    translations = TranslatedFields()
+
+
+@receiver(
+    post_save, sender=BaseMedia, dispatch_uid="make thumbnails"
+)
 def update_media(sender, instance, **kwargs):
     instance._remove_thumbnail()
     instance._make_thumbnail()
-    Media.objects.filter(pk=instance.pk).update(
+    get_camomilla_model("media").objects.filter(pk=instance.pk).update(
         size=instance._get_file_size(),
         thumbnail=instance.thumbnail,
         mime_type=instance.mime_type,
@@ -230,7 +238,9 @@ def update_media(sender, instance, **kwargs):
     )
 
 
-@receiver(pre_delete, sender=Media, dispatch_uid="make thumbnails")
+@receiver(
+    pre_delete, sender=BaseMedia, dispatch_uid="make thumbnails"
+)
 def delete_media_files(sender, instance, **kwargs):
     instance._remove_thumbnail()
     instance._remove_file()

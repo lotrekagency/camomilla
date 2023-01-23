@@ -5,7 +5,7 @@ from hvad.models import TranslatableModel, TranslatedFields
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 
-from ...utils import get_seo_model
+from ...utils import get_seo_model, get_camomilla_model
 
 from djlotrek.utils import alternate_seo_url_with_object
 
@@ -25,7 +25,7 @@ class SeoMixin(TranslatableModel):
         canonical=models.CharField(max_length=200, blank=True, null=True, default=""),
     )
     og_image = models.ForeignKey(
-        "camomilla.Media",
+        get_camomilla_model("media", string=True),
         blank=True,
         null=True,
         on_delete=models.SET_NULL,

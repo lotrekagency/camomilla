@@ -1,13 +1,13 @@
 from .base import BaseModelViewset
 from .mixins import GetUserLanguageMixin, BulkDeleteMixin
-from ..models import Tag
 from ..serializers import TagSerializer
 from ..permissions import CamomillaBasePermissions
+from ..utils import get_camomilla_model
 
 
 class TagViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
 
-    queryset = Tag.objects.all()
+    queryset = get_camomilla_model("tag").objects.all()
     serializer_class = TagSerializer
     permission_classes = (CamomillaBasePermissions,)
-    model = Tag
+    model = get_camomilla_model("tag")

@@ -32,9 +32,9 @@ def get_page(
     model_content=None,
 ):
     if not model_content:
-        model_content = apps.get_model(app_label="camomilla", model_name="Content")
+        model_content = get_camomilla_model("content")
     if not model_page:
-        model_page = apps.get_model(app_label="camomilla", model_name="Page")
+        model_page = get_camomilla_model("page")
     if not lang:
         lang = get_language()
     kwargs = {attr_page: identifier}
@@ -102,3 +102,11 @@ def dict_merge(dct, merge_dct):
         else:
             dct[k] = v
     return dct
+
+
+def get_camomilla_model(name, string=False):
+    from .settings import DEFAULT_MODELS
+    model_path = DEFAULT_MODELS[name]
+    if string:
+        return model_path
+    return apps.get_model(*model_path.split("."), require_ready=False)
