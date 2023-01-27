@@ -1,12 +1,11 @@
 from modeltranslation.translator import register, TranslationOptions
-from .models import Article, Tag, Category, Content, Media, Page, MediaFolder
+from .models import UrlNode, Article, Tag, Content, Media, Page
 
 
 class SeoMixinTranslationOptions(TranslationOptions):
     fields = (
         "title",
         "description",
-        "permalink",
         "og_description",
         "og_title",
         "og_type",
@@ -23,30 +22,24 @@ class ArticleTranslationOptions(SeoMixinTranslationOptions):
 
 @register(Tag)
 class TagTranslationOptions(TranslationOptions):
-    fields = ("title",)
-
-
-@register(Category)
-class CategoryTranslationOptions(TranslationOptions):
-    fields = ("title", "description", "slug")
+    fields = ("name",)
 
 
 @register(Content)
 class ContentTranslationOptions(TranslationOptions):
-    fields = ("title", "subtitle", "permalink", "content")
+    fields = ("content",)
     empty_values = {"title": None}
-
-
-@register(MediaFolder)
-class MediaFolderTranslationOptions(TranslationOptions):
-    fields = ("title", "description")
 
 
 @register(Media)
 class MediaTranslationOptions(TranslationOptions):
-    fields = ("title", "description", "alt_text")
+    fields = ("title_tag", "alt_tag", "description_tag")
 
 
 @register(Page)
 class PageTranslationOptions(SeoMixinTranslationOptions):
-    pass
+    fields = ("breadcrumbs_title", "slug", "status", "indexable")
+
+@register(UrlNode)
+class UrlNodeTranslationOptions(TranslationOptions):
+    fields = ("permalink",)

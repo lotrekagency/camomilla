@@ -3,7 +3,6 @@ from .views import (
     CamomillaObtainAuthToken,
     CamomillaAuthLogout,
     CamomillaAuthLogin,
-    CategoryViewSet,
     MediaFolderViewSet,
 )
 from .views import TagViewSet, ContentViewSet, MediaViewSet, PermissionViewSet
@@ -17,7 +16,6 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 
 router.register(r"tags", TagViewSet, "camomilla-tags")
-router.register(r"categories", CategoryViewSet, "camomilla-categories")
 router.register(r"articles", ArticleViewSet, "camomilla-articles")
 router.register(r"contents", ContentViewSet, "camomilla-content")
 router.register(r"media", MediaViewSet, "camomilla-media")

@@ -3,7 +3,7 @@ from django.contrib import admin
 from django import forms
 from django.http import HttpResponse
 
-from .models import Article, Tag, Category, Content, Media, Page, MediaFolder
+from .models import Article, Tag, Content, Media, Page, MediaFolder
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 
@@ -27,7 +27,7 @@ class ArticleAdminForm(TranslationModelForm):
 
 
 class ArticleAdmin(TranslationAdmin):
-    filter_horizontal = ("tags", "categories")
+    filter_horizontal = ("tags",)
     form = ArticleAdminForm
 
 
@@ -35,16 +35,11 @@ class TagAdmin(TranslationAdmin):
     pass
 
 
-class CategoryAdmin(TranslationAdmin):
-    pass
-
-
-class MediaFolderAdmin(TranslationAdmin):
+class MediaFolderAdmin(admin.ModelAdmin):
     pass
 
 
 class ContentAdminForm(TranslationModelForm):
-    exclude = ("permalink",)
     content = forms.CharField(widget=CKEditorUploadingWidget())
 
     class Meta:
@@ -65,7 +60,7 @@ class MediaAdmin(TranslationAdmin):
     readonly_fields = ("image_preview", "image_thumb_preview")
     list_display = (
         "__str__",
-        "name",
+        "title_tag",
         "image_thumb_preview",
     )
 
@@ -87,7 +82,6 @@ class PageAdmin(TranslationAdmin):
 
 
 admin.site.register(Article, ArticleAdmin)
-admin.site.register(Category, CategoryAdmin)
 admin.site.register(MediaFolder, MediaFolderAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Content, ContentAdmin)

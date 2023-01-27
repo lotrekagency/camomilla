@@ -3,6 +3,7 @@ import os
 import magic
 from io import BytesIO
 
+from django.utils.text import slugify
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
@@ -17,19 +18,11 @@ from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
 
-class BaseMediaFolder(models.Model):
-    description=models.CharField(max_length=200, blank=True, null=True)
-    title=models.CharField(max_length=200, blank=True, null=True)
-    slug = models.SlugField()
+class AbstractMediaFolder(models.Model):
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(editable=False, max_length=200, blank=True, null=True)
     creation_date = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
-    icon = models.ForeignKey(
-        "camomilla.Media",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        verbose_name=_("Image cover"),
-    )
     path = models.TextField(blank=True, null=True)
     updir = models.ForeignKey(
         "self",
@@ -47,32 +40,32 @@ class BaseMediaFolder(models.Model):
             folder.save()
 
     def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
         if self.updir:
             if self.updir.id == self.id:
                 raise ValidationError({"updir": "Unvalid parent"})
             self.path = "{0}/{1}".format(self.updir.path, self.slug)
-
         else:
             self.path = "/{0}".format(self.slug)
 
-        super(BaseMediaFolder, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         self.update_childs()
 
     def __str__(self):
-        to_string = self.slug
-        if self.title:
-            to_string += " - " + self.title
-        return to_string
+        return "[%s] %s" % (self.__class__.__name__, self.name)
 
-
-class MediaFolder(BaseMediaFolder):
+class MediaFolder(AbstractMediaFolder):
     pass
 
 
 class Media(models.Model):
-    alt_text=models.CharField(max_length=200, blank=True, null=True)
-    title=models.CharField(max_length=200, blank=True, null=True)
-    description=models.TextField(blank=True, null=True)
+    
+    # Seo Attributes
+    alt_tag = models.CharField(max_length=200, blank=True, null=True)
+    title_tag = models.CharField(max_length=200, blank=True, null=True)
+    description_tag = models.TextField(blank=True, null=True)
+    
+    
     file = models.FileField()
     thumbnail = models.ImageField(
         upload_to=getattr(settings, "THUMB_FOLDER", "thumbnails"),
@@ -81,7 +74,6 @@ class Media(models.Model):
         blank=True,
     )
     created = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=200, blank=True, null=True)
     size = models.IntegerField(default=0, blank=True, null=True)
     mime_type = models.CharField(max_length=128, blank=True, null=True)
     image_props = JSONField(default=dict, blank=True)

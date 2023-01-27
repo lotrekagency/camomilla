@@ -17,11 +17,11 @@ class Migration(migrations.Migration):
             name='_hvad_query',
             field=hvad.fields.SingleTranslationObject('camomilla.Article', 'camomilla.articletranslation'),
         ),
-        migrations.AddField(
-            model_name='category',
-            name='_hvad_query',
-            field=hvad.fields.SingleTranslationObject('camomilla.Category', 'camomilla.categorytranslation'),
-        ),
+        # migrations.AddField(
+        #     model_name='category',
+        #     name='_hvad_query',
+        #     field=hvad.fields.SingleTranslationObject('camomilla.Category', 'camomilla.categorytranslation'),
+        # ),
         migrations.AddField(
             model_name='content',
             name='_hvad_query',

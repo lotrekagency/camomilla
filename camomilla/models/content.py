@@ -1,16 +1,11 @@
 from django.db import models
-
 from django.urls import reverse
-
 from djsuperadmin.mixins import DjSuperAdminMixin
 
 
-class BaseContent(DjSuperAdminMixin, models.Model):
-    identifier = models.CharField(max_length=200, unique=True)
-    title=models.CharField(max_length=200, null=True)
-    subtitle=models.CharField(max_length=200, blank=True, null=True, default="")
-    permalink=models.CharField(max_length=200, blank=False, null=True)
-    content=models.TextField(default="")
+class AbstractContent(DjSuperAdminMixin, models.Model):
+    identifier = models.TextField(unique=True)
+    content = models.TextField(default="")
     page = models.ForeignKey(
         "camomilla.Page",
         blank=False,
@@ -31,8 +26,10 @@ class BaseContent(DjSuperAdminMixin, models.Model):
         abstract = True
 
     def __str__(self):
+        if len(self.identifier) > 40:
+            return "%s..." % self.identifier[:40]
         return self.identifier
 
 
-class Content(BaseContent):
+class Content(AbstractContent):
     pass

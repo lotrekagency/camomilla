@@ -1,16 +1,10 @@
-from ..models import Article, Category, Tag
+from ..models import Article, Tag
 from .base import BaseModelSerializer
 
 
 class TagSerializer(BaseModelSerializer):
     class Meta:
         model = Tag
-        fields = "__all__"
-
-
-class CategorySerializer(BaseModelSerializer):
-    class Meta:
-        model = Category
         fields = "__all__"
 
 

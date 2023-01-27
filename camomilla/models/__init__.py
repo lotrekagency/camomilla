@@ -1,6 +1,4 @@
-from .article import *
-from .category import *
-from .content import *
-from .media import *
-from .page import *
-from .tag import *
+from .article import *   # NOQA
+from .content import *   # NOQA
+from .media import *   # NOQA
+from .page import *   # NOQA

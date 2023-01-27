@@ -131,10 +131,10 @@ class Migration(KeepTranslationsMixin, migrations.Migration):
             model_name='article',
             name='_hvad_query',
         ),
-        migrations.RemoveField(
-            model_name='category',
-            name='_hvad_query',
-        ),
+        # migrations.RemoveField(
+        #     model_name='category',
+        #     name='_hvad_query',
+        # ),
         migrations.RemoveField(
             model_name='media',
             name='_hvad_query',

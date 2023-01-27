@@ -1,57 +1,42 @@
 from django.conf import settings
 from django.db import models
-
 from django.utils.translation import gettext_lazy as _
 
-from .mixins import SeoMixin, MetaMixin
+from .page import AbstractPage
 
 
-CONTENT_STATUS = (
-    ("PUB", _("Published")),
-    ("DRF", _("Draft")),
-    ("TRS", _("Trash")),
-    ("PLA", _("Planned")),
-)
+class AbstractArticle(AbstractPage):
 
-
-class BaseArticle(SeoMixin, MetaMixin):
-
-    seo_attr = "permalink"
-
-    identifier = models.CharField(max_length=200, unique=True)
-    content=models.TextField(default="")
-    permalink=models.SlugField(max_length=200, null=True, unique=True)
+    content = models.TextField(default="")
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL
     )
-    status = models.CharField(
-        max_length=3,
-        choices=CONTENT_STATUS,
-        default="DRF",
-    )
     highlight_image = models.ForeignKey(
-        "camomilla.Media", blank=True, null=True, on_delete=models.SET_NULL
+        "camomilla.Media",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="%(app_label)s_%(class)s_highlight_images",
     )
-    date = models.DateTimeField(auto_now=True)
-    pubblication_date = models.DateTimeField(null=True, blank=True)
-    tags = models.ManyToManyField("camomilla.Tag", blank=True)
-    categories = models.ManyToManyField("camomilla.Category", blank=True)
-    ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
+    tags = models.ManyToManyField("Tag")
 
     class Meta:
         abstract = True
         ordering = ["ordering"]
 
-    def save(self, *args, **kwargs):
-        import uuid
 
-        if not self.identifier:
-            self.identifier = "{0}".format(str(uuid.uuid4()))
-        super(BaseArticle, self).save(*args, **kwargs)
+class Article(AbstractArticle):
+    pass
+
+
+class AbstractTag(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+
+    class Meta:
+        abstract = True
 
     def __str__(self):
-        return self.title
+        return "(%s) %s" % (self.__class__.__name__, self.name)
 
-
-class Article(BaseArticle):
+class Tag(AbstractTag):
     pass
