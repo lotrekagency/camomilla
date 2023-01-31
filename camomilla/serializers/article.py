@@ -1,5 +1,6 @@
-from ..models import Article, Tag
-from .base import BaseModelSerializer
+from camomilla.models import Article, Tag
+from camomilla.serializers.base import BaseModelSerializer
+from camomilla.serializers.mixins import AbstractPageMixin
 
 
 class TagSerializer(BaseModelSerializer):
@@ -8,7 +9,7 @@ class TagSerializer(BaseModelSerializer):
         fields = "__all__"
 
 
-class ArticleSerializer(BaseModelSerializer):
+class ArticleSerializer(AbstractPageMixin, BaseModelSerializer):
     class Meta:
         model = Article
         fields = "__all__"

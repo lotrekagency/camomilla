@@ -1,5 +1,7 @@
-from ..models import Content, Page
-from .base import BaseModelSerializer
+from camomilla.serializers.mixins import AbstractPageMixin
+from camomilla.models import Content, Page
+from camomilla.serializers.base import BaseModelSerializer
+
 
 
 class ContentSerializer(BaseModelSerializer):
@@ -8,7 +10,7 @@ class ContentSerializer(BaseModelSerializer):
         fields = "__all__"
 
 
-class PageSerializer(BaseModelSerializer):
+class PageSerializer(AbstractPageMixin, BaseModelSerializer):
     class Meta:
         model = Page
         fields = "__all__"

@@ -1,10 +1,13 @@
 from typing import Iterable
-from django.apps import apps
-from django.db import models
+from uuid import uuid4
+
+from django.db import ProgrammingError, models, transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+
+from camomilla.utils import activate_languages, get_nofallbacks, set_nofallbacks
 
 from .mixins import MetaMixin, SeoMixin
 
@@ -15,7 +18,7 @@ class UrlNodeManager(models.Manager):
         self._related_names = getattr(
             self,
             "_related_names",
-            self.values_list("related_name", flat=True).distinct(),
+            super().get_queryset().values_list("related_name", flat=True).distinct(),
         )
         return self._related_names
 
@@ -32,12 +35,17 @@ class UrlNodeManager(models.Manager):
             qs = qs.annotate(**{field_name: models.Case(*whens)})
         return qs
 
-    # def get_queryset(self):
-    #     return self._annotate_fields(super().get_queryset(), ["indexable", "status"])
+    def get_queryset(self):
+        try:
+            return self._annotate_fields(
+                super().get_queryset(), ["indexable", "status"]
+            )
+        except ProgrammingError:
+            return super().get_queryset()
 
 
 class UrlNode(models.Model):
-    permalink = models.CharField(max_length=400, unique=True)
+    permalink = models.CharField(max_length=400, unique=True, null=True)
     related_name = models.CharField(max_length=200)
     objects = UrlNodeManager()
 
@@ -64,7 +72,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
         UrlNode, on_delete=models.CASCADE, related_name=URL_NODE_RELATED_NAME, null=True
     )
     breadcrumbs_title = models.CharField(max_length=128, null=True, blank=True)
-    slug = models.SlugField(max_length=150, allow_unicode=True, blank=True)
+    slug = models.SlugField(max_length=150, allow_unicode=True, null=True, blank=True)
     status = models.CharField(
         max_length=3,
         choices=PAGE_STATUS,
@@ -82,7 +90,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
     )
 
     def __str__(self):
-        return "(%s) %s at %s" % (self.__class__.__name__, self.title, self.permalink)
+        return "(%s) %s" % (self.__class__.__name__, self.title)
 
     @property
     def model_name(self):
@@ -94,17 +102,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
 
     @property
     def permalink(self):
-        return self.safe_url_node.permalink
-
-    @property
-    def safe_url_node(self):
-        if not self.url_node:
-            self.url_node = UrlNode.objects.create(
-                permalink=self.generate_permalink(),
-                related_name=URL_NODE_RELATED_NAME % self.model_info,
-            )
-            super().save(update_fields=["url_node"])
-        return self.url_node
+        return self.url_node and self.url_node.permalink
 
     @property
     def breadcrumbs(self):
@@ -112,35 +110,59 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
             "permalink": self.permalink,
             "title": self.breadcrumbs_title or self.title or self.slug,
         }
-        if self.parent_page:
-            return self.parent_page.breadcrumbs + [breadcrumb]
+        if self.parent:
+            return self.parent.breadcrumbs + [breadcrumb]
         return [breadcrumb]
 
-    def update_url_node(self, permalink, force=False):
-        changed = self.safe_url_node.permalink != permalink
-        if changed or force:
-            self.safe_url_node.permalink = permalink
-            self.safe_url_node.save(update_fields=["permalink"])
-        if changed:
+    @property
+    def childs(self):
+        if hasattr(self, "PageMeta") and hasattr(self.PageMeta, "child_page_field"):
+            return getattr(self, self.PageMeta.child_page_field)
+        return getattr(self, PAGE_CHILD_RELATED_NAME % self.model_info)
+
+    @property
+    def parent(self):
+        if hasattr(self, "PageMeta") and hasattr(self.PageMeta, "parent_page_field"):
+            return getattr(self, self.PageMeta.parent_page_field)
+        return self.parent_page
+
+    def _get_or_create_url_node(self) -> UrlNode:
+        if not self.url_node:
+            self.url_node = UrlNode.objects.create(
+                related_name=URL_NODE_RELATED_NAME % self.model_info
+            )
+        return self.url_node
+
+    def _update_url_node(self, force=False):
+        self.url_node = self._get_or_create_url_node()
+        for _ in activate_languages():
+            old_permalink = self.permalink
+            new_permalink = self.generate_permalink()
+            force = force or old_permalink != new_permalink
+            set_nofallbacks(self.url_node, "permalink", new_permalink)
+        if force:
+            self.url_node.save()
             self.update_childs()
-        return self.safe_url_node
+        return self.url_node
 
     def generate_permalink(self):
-        permalink = slugify(self.slug or "", allow_unicode=True)
-        if self.parent_page:
-            permalink = f"{self.parent_page.permalink}/{permalink}"
+        slug = get_nofallbacks(self, "slug")
+        if slug is None:
+            slug = slugify(self.title or uuid4(), allow_unicode=True)
+            set_nofallbacks(self, "slug", slug)
+        permalink = "/%s" % slugify(slug, allow_unicode=True)
+        if self.parent:
+            permalink = f"{self.parent.permalink}{permalink}"
         return permalink
 
     def update_childs(self):
-        for child in getattr(self, PAGE_CHILD_RELATED_NAME % self.model_info).all():
+        for child in self.childs.all():
             child.save()
 
     def save(self, *args, **kwargs):
-        old_permalink = self.permalink
-        new_permalink = self.generate_permalink()
-        if old_permalink != new_permalink:
-            self.update_url_node(new_permalink)
-        return super().save(*args, **kwargs)
+        with transaction.atomic():
+            self._update_url_node()
+            return super().save(*args, **kwargs)
 
     class Meta:
         abstract = True
@@ -156,4 +178,4 @@ class Page(AbstractPage):
 @receiver(post_delete)
 def auto_delete_url_node(sender, instance, **kwargs):
     if issubclass(sender, AbstractPage):
-        instance.url_node.delete()
+        instance.url_node and instance.url_node.delete()

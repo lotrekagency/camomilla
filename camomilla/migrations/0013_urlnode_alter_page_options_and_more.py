@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             name='UrlNode',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('permalink', models.CharField(max_length=400, unique=True)),
+                ('permalink', models.CharField(max_length=400, null=True, unique=True)),
                 ('permalink_it', models.CharField(max_length=400, null=True, unique=True)),
                 ('permalink_en', models.CharField(max_length=400, null=True, unique=True)),
                 ('related_name', models.CharField(max_length=200)),
@@ -226,7 +226,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='article',
             name='slug',
-            field=models.SlugField(allow_unicode=True, blank=True, max_length=150),
+            field=models.SlugField(allow_unicode=True, blank=True, null=True, max_length=150),
         ),
         migrations.AddField(
             model_name='page',
@@ -282,7 +282,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='page',
             name='slug',
-            field=models.SlugField(allow_unicode=True, blank=True, max_length=150),
+            field=models.SlugField(allow_unicode=True, blank=True, null=True, max_length=150),
         ),
         migrations.AddField(
             model_name='page',
@@ -417,7 +417,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='article',
             name='tags',
-            field=models.ManyToManyField(to='camomilla.tag'),
+            field=models.ManyToManyField(to='camomilla.tag', blank=True),
         ),
         migrations.AlterField(
             model_name='article',

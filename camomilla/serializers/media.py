@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from ..models import Media, MediaFolder
-from ..storages import OverwriteStorage
-from .base import BaseModelSerializer
+from camomilla.models import Media, MediaFolder
+from camomilla.serializers.base import BaseModelSerializer
+from camomilla.storages import OverwriteStorage
 
 
 class MediaListSerializer(BaseModelSerializer):

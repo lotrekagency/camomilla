@@ -1,5 +1,5 @@
 from django.forms import ValidationError
-from .base import BaseModelSerializer
+from camomilla.serializers.base import BaseModelSerializer
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.models import Permission
 from rest_framework import serializers

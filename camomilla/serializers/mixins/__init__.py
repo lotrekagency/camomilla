@@ -3,13 +3,16 @@ from django.conf import settings
 from django.db.models.aggregates import Max
 from django.db.models.functions import Coalesce
 from django.utils import translation
+from modeltranslation.settings import AVAILABLE_LANGUAGES, ENABLE_REGISTRATIONS
+from modeltranslation.utils import build_localized_fieldname
 from rest_framework import serializers
 from rest_framework.utils import model_meta
 
-from ...fields import ORDERING_ACCEPTED_FIELDS
-from ...utils import dict_merge
-from ..fields import FieldsOverrideMixin
-from ..fields.related import RelatedField
+from camomilla.fields import ORDERING_ACCEPTED_FIELDS
+from camomilla.serializers.fields import FieldsOverrideMixin
+from camomilla.serializers.fields.related import RelatedField
+from camomilla.serializers.validators import UniquePermalinkValidator
+from camomilla.utils import dict_merge
 
 if django.VERSION >= (4, 0):
     from django.db.models import JSONField as DjangoJSONField
@@ -38,7 +41,6 @@ class LangInfoMixin(metaclass=serializers.SerializerMetaclass):
         if self.action != "retrieve":
             return [f for f in field_names if f != "lang_info"]
         return field_names
-
 
 
 class SetupEagerLoadingMixin:
@@ -133,3 +135,33 @@ class NestMixin:
                 )
             },
         )
+
+
+class AbstractPageMixin:
+    LANG_PERMALINK_FIELDS = [
+        build_localized_fieldname("permalink", lang)
+        for lang in AVAILABLE_LANGUAGES
+        if ENABLE_REGISTRATIONS
+    ]
+
+    @property
+    def translation_fields(self):
+        return super().translation_fields + ["permalink"]
+
+    def get_default_field_names(self, *args):
+        return (
+            [f for f in super().get_default_field_names(*args) if f != "url_node"]
+            + self.LANG_PERMALINK_FIELDS
+            + ["permalink"]
+        )
+
+    def build_field(self, field_name, info, model_class, nested_depth):
+        if field_name in self.LANG_PERMALINK_FIELDS + ["permalink"]:
+            return serializers.CharField, {
+                "source": "url_node.%s" % field_name,
+                "read_only": True,
+            }
+        return super().build_field(field_name, info, model_class, nested_depth)
+
+    def get_validators(self):
+        return super().get_validators() + [UniquePermalinkValidator()]

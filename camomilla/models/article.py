@@ -18,7 +18,7 @@ class AbstractArticle(AbstractPage):
         on_delete=models.SET_NULL,
         related_name="%(app_label)s_%(class)s_highlight_images",
     )
-    tags = models.ManyToManyField("Tag")
+    tags = models.ManyToManyField("Tag", blank=True)
 
     class Meta:
         abstract = True
