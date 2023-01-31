@@ -1,6 +1,6 @@
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django import forms
-from django.conf import settings
+from camomilla.settings import PROJECT_TITLE
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
@@ -84,6 +84,4 @@ admin.site.register(Content, ContentAdmin)
 admin.site.register(Media, MediaAdmin)
 admin.site.register(Page, PageAdmin)
 
-admin.site.index_title = "{0} {1}".format(
-    _("Administration panel for"), getattr(settings, "PROJECT_TITLE", "Camomilla")
-)
+admin.site.index_title = "{0} {1}".format(_("Administration panel for"), PROJECT_TITLE)

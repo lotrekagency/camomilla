@@ -4,6 +4,7 @@ from io import BytesIO
 
 import magic
 from django.conf import settings
+from camomilla.settings import THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, THUMBNAIL_FOLDER
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage as storage
@@ -69,7 +70,7 @@ class Media(models.Model):
 
     file = models.FileField()
     thumbnail = models.ImageField(
-        upload_to=getattr(settings, "THUMB_FOLDER", "thumbnails"),
+        upload_to=THUMBNAIL_FOLDER,
         max_length=500,
         null=True,
         blank=True,
@@ -151,13 +152,7 @@ class Media(models.Model):
             return False
 
         try:
-            image.thumbnail(
-                (
-                    getattr(settings, "CAMOMILLA_THUMBNAIL_WIDTH", 50),
-                    getattr(settings, "CAMOMILLA_THUMBNAIL_HEIGHT", 50),
-                ),
-                Image.ANTIALIAS,
-            )
+            image.thumbnail((THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT), Image.ANTIALIAS)
             fh.close()
 
             # Path to save to, name, and extension
