@@ -1,23 +1,20 @@
-from .base import BaseModelViewset
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.models import Permission
-
 from django.db.models import Q
-
 from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from ..serializers import (
+from camomilla.permissions import CamomillaBasePermissions, CamomillaSuperUser, ReadOnly
+from camomilla.serializers import (
+    PermissionSerializer,
     UserProfileSerializer,
     UserSerializer,
-    PermissionSerializer,
 )
-from ..permissions import CamomillaSuperUser, CamomillaBasePermissions, ReadOnly
-from django.contrib.auth import login, logout
-from rest_framework.views import APIView
+from camomilla.views.base import BaseModelViewset
 
 
 class CamomillaObtainAuthToken(ObtainAuthToken):

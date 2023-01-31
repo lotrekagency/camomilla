@@ -1,8 +1,8 @@
-from .base import BaseModelViewset
-from .mixins import GetUserLanguageMixin, BulkDeleteMixin
-from ..models import Tag
-from ..serializers import TagSerializer
-from ..permissions import CamomillaBasePermissions
+from camomilla.models import Tag
+from camomilla.permissions import CamomillaBasePermissions
+from camomilla.serializers import TagSerializer
+from camomilla.views.base import BaseModelViewset
+from camomilla.views.mixins import BulkDeleteMixin, GetUserLanguageMixin
 
 
 class TagViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):

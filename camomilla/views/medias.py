@@ -1,14 +1,20 @@
-from .base import BaseModelViewset
-from .mixins import BulkDeleteMixin, GetUserLanguageMixin, TrigramSearchMixin
-from ..parsers import MultipartJsonParser
-from ..permissions import CamomillaBasePermissions
-
-
-from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
+from rest_framework.response import Response
 
-from ..models import Media, MediaFolder
-from ..serializers import MediaSerializer, MediaFolderSerializer, MediaListSerializer
+from camomilla.models import Media, MediaFolder
+from camomilla.parsers import MultipartJsonParser
+from camomilla.permissions import CamomillaBasePermissions
+from camomilla.serializers import (
+    MediaFolderSerializer,
+    MediaListSerializer,
+    MediaSerializer,
+)
+from camomilla.views.base import BaseModelViewset
+from camomilla.views.mixins import (
+    BulkDeleteMixin,
+    GetUserLanguageMixin,
+    TrigramSearchMixin,
+)
 
 
 class ParseMimeMixin(object):

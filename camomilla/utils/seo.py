@@ -3,10 +3,10 @@ import urllib.parse
 from django.apps import apps
 from django.conf import settings
 from django.http import Http404
-from django.utils.translation import activate, get_language
 from django.urls import resolve, reverse
+from django.utils.translation import activate, get_language
 
-from ..exceptions import NeedARedirect
+from camomilla.exceptions import NeedARedirect
 
 
 def get_host_url(request):
@@ -92,4 +92,3 @@ def find_or_redirect(request, obj_class, **kwargs):
                 pass
         activate(cur_language)
         raise Http404()
-

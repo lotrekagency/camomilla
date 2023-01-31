@@ -1,21 +1,22 @@
 import json
 import os
-import magic
 from io import BytesIO
 
-from django.utils.text import slugify
+import magic
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage as storage
 from django.db import models
 from django.db.models.fields.related import ForeignObjectRel
-from ..fields import JSONField
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.safestring import mark_safe
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
+
+from camomilla.fields import JSONField
 
 
 class AbstractMediaFolder(models.Model):
@@ -54,18 +55,18 @@ class AbstractMediaFolder(models.Model):
     def __str__(self):
         return "[%s] %s" % (self.__class__.__name__, self.name)
 
+
 class MediaFolder(AbstractMediaFolder):
     pass
 
 
 class Media(models.Model):
-    
+
     # Seo Attributes
     alt_tag = models.CharField(max_length=200, blank=True, null=True)
     title_tag = models.CharField(max_length=200, blank=True, null=True)
     description_tag = models.TextField(blank=True, null=True)
-    
-    
+
     file = models.FileField()
     thumbnail = models.ImageField(
         upload_to=getattr(settings, "THUMB_FOLDER", "thumbnails"),

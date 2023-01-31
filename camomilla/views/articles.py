@@ -1,9 +1,8 @@
-from .base import BaseModelViewset
-from .mixins import GetUserLanguageMixin, BulkDeleteMixin
-
-from ..models import Article
-from ..serializers import ArticleSerializer
-from ..permissions import CamomillaBasePermissions
+from camomilla.models import Article
+from camomilla.permissions import CamomillaBasePermissions
+from camomilla.serializers import ArticleSerializer
+from camomilla.views.base import BaseModelViewset
+from camomilla.views.mixins import BulkDeleteMixin, GetUserLanguageMixin
 
 
 class ArticleViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):

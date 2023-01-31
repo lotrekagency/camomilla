@@ -1,17 +1,21 @@
-from .views import (
-    ArticleViewSet,
-    CamomillaObtainAuthToken,
-    CamomillaAuthLogout,
-    CamomillaAuthLogin,
-    MediaFolderViewSet,
-)
-from .views import TagViewSet, ContentViewSet, MediaViewSet, PermissionViewSet
-from .views import PageViewSet, LanguageViewSet, UserViewSet
-
-from django.urls import include, path
 from django.shortcuts import redirect
-
+from django.urls import include, path
 from rest_framework import routers
+
+from camomilla.views import (
+    ArticleViewSet,
+    CamomillaAuthLogin,
+    CamomillaAuthLogout,
+    CamomillaObtainAuthToken,
+    ContentViewSet,
+    LanguageViewSet,
+    MediaFolderViewSet,
+    MediaViewSet,
+    PageViewSet,
+    PermissionViewSet,
+    TagViewSet,
+    UserViewSet,
+)
 
 router = routers.DefaultRouter()
 

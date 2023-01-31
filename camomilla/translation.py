@@ -1,5 +1,6 @@
-from modeltranslation.translator import register, TranslationOptions
-from .models import UrlNode, Article, Tag, Content, Media, Page
+from modeltranslation.translator import TranslationOptions, register
+
+from camomilla.models import Article, Content, Media, Page, Tag, UrlNode
 
 
 class SeoMixinTranslationOptions(TranslationOptions):
@@ -39,6 +40,7 @@ class MediaTranslationOptions(TranslationOptions):
 @register(Page)
 class PageTranslationOptions(SeoMixinTranslationOptions):
     fields = ("breadcrumbs_title", "slug", "status", "indexable")
+
 
 @register(UrlNode)
 class UrlNodeTranslationOptions(TranslationOptions):

@@ -1,17 +1,13 @@
-from django.contrib import admin
-
-from django import forms
-from django.http import HttpResponse
-
-from .models import Article, Tag, Content, Media, Page, MediaFolder
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
-
-
+from django import forms
+from django.conf import settings
+from django.contrib import admin
+from django.http import HttpResponse
+from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 from modeltranslation.forms import TranslationModelForm
 
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
+from camomilla.models import Article, Content, Media, MediaFolder, Page, Tag
 
 
 class UserProfileAdmin(admin.ModelAdmin):

@@ -1,14 +1,13 @@
-from .base import BaseModelViewset
 import json
 
 from django.http import JsonResponse
-from django.utils.translation import get_language
 from rest_framework.decorators import action
 
-from ..models import Content
-from ..permissions import CamomillaBasePermissions
-from ..serializers import ContentSerializer
-from .mixins import BulkDeleteMixin, GetUserLanguageMixin
+from camomilla.models import Content
+from camomilla.permissions import CamomillaBasePermissions
+from camomilla.serializers import ContentSerializer
+from camomilla.views.base import BaseModelViewset
+from camomilla.views.mixins import BulkDeleteMixin, GetUserLanguageMixin
 
 
 class ContentViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):

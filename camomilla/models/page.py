@@ -7,9 +7,8 @@ from django.dispatch import receiver
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
+from camomilla.models.mixins import MetaMixin, SeoMixin
 from camomilla.utils import activate_languages, get_nofallbacks, set_nofallbacks
-
-from .mixins import MetaMixin, SeoMixin
 
 
 class UrlNodeManager(models.Manager):

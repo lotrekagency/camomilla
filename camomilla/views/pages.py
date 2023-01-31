@@ -1,8 +1,8 @@
-from .base import BaseModelViewset
-from .mixins import GetUserLanguageMixin, BulkDeleteMixin
-from ..models import Page
-from ..serializers import PageSerializer
-from ..permissions import CamomillaBasePermissions
+from camomilla.models import Page
+from camomilla.permissions import CamomillaBasePermissions
+from camomilla.serializers import PageSerializer
+from camomilla.views.base import BaseModelViewset
+from camomilla.views.mixins import BulkDeleteMixin, GetUserLanguageMixin
 
 
 class PageViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
