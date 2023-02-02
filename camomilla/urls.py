@@ -15,6 +15,7 @@ from camomilla.views import (
     PermissionViewSet,
     TagViewSet,
     UserViewSet,
+    MenuViewSet
 )
 
 router = routers.DefaultRouter()
@@ -28,7 +29,7 @@ router.register(r"pages", PageViewSet, "camomilla-pages")
 router.register(r"sitemap", PageViewSet, "camomilla-sitemap")
 router.register(r"users", UserViewSet, "camomilla-users")
 router.register(r"permissions", PermissionViewSet, "camomilla-permissions")
-
+router.register(r"menus", MenuViewSet, "camomilla-menus")
 
 urlpatterns = [
     path("", include(router.urls)),

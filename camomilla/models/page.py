@@ -89,7 +89,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
     )
 
     def __str__(self):
-        return "(%s) %s" % (self.__class__.__name__, self.title)
+        return "(%s) %s" % (self.__class__.__name__, self.title or self.permalink)
 
     @property
     def model_name(self):

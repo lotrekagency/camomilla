@@ -5,3 +5,4 @@ from .medias import *
 from .pages import *
 from .tags import *
 from .users import *
+from .menus import *
