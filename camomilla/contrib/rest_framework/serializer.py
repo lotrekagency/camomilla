@@ -31,6 +31,9 @@ def nest_to_plain(data, fields, accessor=TRANS_ACCESSOR):
         for k in fields:
             data.pop(k, None)  # this removes all trans field without lang
             if k in nest_trans:
+                # this saves on the default field the default language value
+                if lang == mt_settings.DEFAULT_LANGUAGE:
+                    data[k] = nest_trans[k]
                 data["%s_%s" % (k, lang)] = nest_trans[k]
     return data
 
@@ -42,6 +45,12 @@ class TranslationsMixin(serializers.ModelSerializer):
             return translator.get_options_for_model(self.Meta.model).get_field_names()
         except NotRegistered:
             return []
+        
+    @property
+    def _writable_fields(self):
+        for field in super()._writable_fields:
+            if not field.field_name in self.translation_fields:
+                yield field
 
     def to_internal_value(self, data):
         if self.translation_fields:
