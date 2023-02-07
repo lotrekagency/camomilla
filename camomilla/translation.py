@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, register
 
-from camomilla.models import Article, Content, Media, Page, Tag, UrlNode
+from camomilla.models import Article, Content, Media, Page, Tag, UrlNode, Menu
 
 
 class SeoMixinTranslationOptions(TranslationOptions):
@@ -45,3 +45,7 @@ class PageTranslationOptions(SeoMixinTranslationOptions):
 @register(UrlNode)
 class UrlNodeTranslationOptions(TranslationOptions):
     fields = ("permalink",)
+
+@register(Menu)
+class MenuTranslationOptions(TranslationOptions):
+    fields = ("nodes",)
