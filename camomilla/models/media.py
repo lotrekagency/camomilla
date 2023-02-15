@@ -21,7 +21,7 @@ from camomilla.fields import JSONField
 
 
 class AbstractMediaFolder(models.Model):
-    name = models.CharField(max_length=200)
+    title = models.CharField(max_length=200)
     slug = models.SlugField(editable=False, max_length=200, blank=True, null=True)
     creation_date = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
@@ -64,9 +64,9 @@ class MediaFolder(AbstractMediaFolder):
 class Media(models.Model):
 
     # Seo Attributes
-    alt_tag = models.CharField(max_length=200, blank=True, null=True)
-    title_tag = models.CharField(max_length=200, blank=True, null=True)
-    description_tag = models.TextField(blank=True, null=True)
+    alt_text = models.CharField(max_length=200, blank=True, null=True)
+    title = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
 
     file = models.FileField()
     thumbnail = models.ImageField(

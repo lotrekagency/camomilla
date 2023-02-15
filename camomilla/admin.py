@@ -56,7 +56,7 @@ class MediaAdmin(TranslationAdmin):
     readonly_fields = ("image_preview", "image_thumb_preview")
     list_display = (
         "__str__",
-        "title_tag",
+        "title",
         "image_thumb_preview",
     )
 

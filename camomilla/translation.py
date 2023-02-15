@@ -34,7 +34,7 @@ class ContentTranslationOptions(TranslationOptions):
 
 @register(Media)
 class MediaTranslationOptions(TranslationOptions):
-    fields = ("title_tag", "alt_tag", "description_tag")
+    fields = ("title", "alt_text", "description")
 
 
 @register(Page)

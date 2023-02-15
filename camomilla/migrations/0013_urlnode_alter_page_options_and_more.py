@@ -10,9 +10,9 @@ import django.utils.timezone
 def forwards_func(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     MediaFolder = apps.get_model("camomilla", "MediaFolder")
-    for folder in MediaFolder.objects.using(db_alias).filter(Q(name__isnull=True) | Q(name="")):
-        folder.name = folder.title_en or folder.title_it or "folder_%s" % folder.pk
-        folder.save(update_fields=["name"])
+    for folder in MediaFolder.objects.using(db_alias).filter(Q(title__isnull=True) | Q(title="")):
+        folder.title = folder.title_en or folder.title_it or "folder_%s" % folder.pk
+        folder.save(update_fields=["title"])
     Tag = apps.get_model("camomilla", "Tag")
     for tag in Tag.objects.using(db_alias).filter(Q(name__isnull=True) | Q(name="")):
             tag.name = "tag_%s" % tag.pk
@@ -46,56 +46,6 @@ class Migration(migrations.Migration):
             new_name='date_updated_at',
         ),
         migrations.RenameField(
-            model_name='mediafolder',
-            old_name='title',
-            new_name='name',
-        ),
-        migrations.RenameField(
-            model_name='media',
-            old_name='alt_text',
-            new_name='alt_tag',
-        ),
-        migrations.RenameField(
-            model_name='media',
-            old_name='alt_text_en',
-            new_name='alt_tag_en',
-        ),
-        migrations.RenameField(
-            model_name='media',
-            old_name='alt_text_it',
-            new_name='alt_tag_it',
-        ),
-        migrations.RenameField(
-            model_name='media',
-            old_name='description',
-            new_name='description_tag',
-        ),
-        migrations.RenameField(
-            model_name='media',
-            old_name='description_en',
-            new_name='description_tag_en',
-        ),
-        migrations.RenameField(
-            model_name='media',
-            old_name='description_it',
-            new_name='description_tag_it',
-        ),
-        migrations.RenameField(
-            model_name='media',
-            old_name='name',
-            new_name='title_tag',
-        ),
-        migrations.RenameField(
-            model_name='media',
-            old_name='title',
-            new_name='title_tag_en',
-        ),
-        migrations.RenameField(
-            model_name='media',
-            old_name='title_en',
-            new_name='title_tag_it',
-        ),
-        migrations.RenameField(
             model_name='tag',
             old_name='title',
             new_name='name',
@@ -114,10 +64,10 @@ class Migration(migrations.Migration):
             model_name='article',
             name='categories',
         ),
-        migrations.RemoveField(
-            model_name='article',
-            name='identifier',
-        ),
+        # migrations.RemoveField(
+        #     model_name='article',
+        #     name='identifier',
+        # ),
         migrations.RemoveField(
             model_name='article',
             name='permalink',
@@ -167,10 +117,6 @@ class Migration(migrations.Migration):
             name='title_it',
         ),
         migrations.RemoveField(
-            model_name='media',
-            name='title_it',
-        ),
-        migrations.RemoveField(
             model_name='mediafolder',
             name='description',
         ),
@@ -186,10 +132,10 @@ class Migration(migrations.Migration):
             model_name='mediafolder',
             name='icon',
         ),
-        migrations.RemoveField(
-            model_name='page',
-            name='identifier',
-        ),
+        # migrations.RemoveField(
+        #     model_name='page',
+        #     name='identifier',
+        # ),
         migrations.RemoveField(
             model_name='page',
             name='permalink',
@@ -583,7 +529,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='mediafolder',
-            name='name',
+            name='title',
             field=models.CharField(max_length=200),
         ),
         migrations.AlterField(
