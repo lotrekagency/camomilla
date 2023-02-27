@@ -37,6 +37,6 @@ class MenuViewSet(BaseModelViewset):
         return Response(
             [
                 {"id": obj.pk, "name": str(obj), "url_node_id": obj.url_node.pk}
-                for obj in content_type.model_class().objects.all()
+                for obj in content_type.model_class().objects.exclude(url_node__isnull=True)
             ]
         )
