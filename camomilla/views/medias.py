@@ -35,7 +35,7 @@ class MediaFolderViewSet(
     serializer_class = MediaFolderSerializer
     permission_classes = (CamomillaBasePermissions,)
     items_per_page = 18
-    search_fields = ["name", "title", "alt_text"]
+    search_fields = ["title", "alt_text", "file"]
 
     def get_queryset(self):
         return self.model.objects.all()
@@ -44,13 +44,17 @@ class MediaFolderViewSet(
         return {**super().get_serializer_context(), "action": "list"}
 
     def get_mixed_response(self, request, *args, **kwargs):
-        updir = kwargs.get("pk", None)
+        search = self.request.GET.get("search", None)
+        all = self.request.GET.get("all", "false").lower() == 'true'
+        updir = None if all else kwargs.get("pk", None)
+        if not search and all:
+            self.search_fields = []
 
         parent_folder = MediaFolderSerializer(
             self.model.objects.filter(pk=updir).first()
         ).data
         folder_queryset = self.model.objects.filter(updir__pk=updir)
-        media_queryset = Media.objects.filter(folder__pk=updir)
+        media_queryset = Media.objects.filter(**({} if all else {"folder__pk": updir}))
 
         folder_data = MediaFolderSerializer(
             folder_queryset, many=True, context={"request": request}
