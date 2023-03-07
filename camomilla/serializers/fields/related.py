@@ -15,9 +15,10 @@ class RelatedField(serializers.PrimaryKeyRelatedField):
             ), 'Class {serializer_class} missing "Meta.model" attribute'.format(
                 serializer_class=self.serializer.__class__.__name__
             )
-            kwargs["queryset"] = kwargs.get(
-                "queryset", self.serializer.Meta.model.objects.all()
-            )
+            if not kwargs.get("read_only", False):
+                kwargs["queryset"] = kwargs.get(
+                    "queryset", self.serializer.Meta.model.objects.all()
+                )
             self.allow_insert = kwargs.pop("allow_insert", False)
             # kwargs["allow_null"] = kwargs.get("allow_null", self.serializer.Meta.model._meta.get_field(self.source).null)
         super().__init__(**kwargs)
