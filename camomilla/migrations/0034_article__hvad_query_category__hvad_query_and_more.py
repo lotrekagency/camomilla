@@ -8,7 +8,7 @@ import hvad.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camomilla', '0008_auto_20220309_1616'),
+        ('camomilla', '0033_auto_20220309_1616'),
     ]
 
     operations = [
