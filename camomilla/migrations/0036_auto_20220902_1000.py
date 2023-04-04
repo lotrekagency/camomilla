@@ -7,7 +7,7 @@ from django.contrib.postgres.operations import TrigramExtension
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camomilla', '0010_auto_20220802_1406'),
+        ('camomilla', '0035_auto_20220802_1406'),
     ]
 
     operations = [
