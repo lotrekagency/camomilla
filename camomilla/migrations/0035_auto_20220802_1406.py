@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camomilla', '0035_auto_20220802_1406'),
+        ('camomilla', '0034_article__hvad_query_category__hvad_query_and_more'),
     ]
 
     operations = [
