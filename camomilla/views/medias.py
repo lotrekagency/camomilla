@@ -1,9 +1,11 @@
 from .base import BaseModelViewset
 from .mixins import BulkDeleteMixin, GetUserLanguageMixin, TrigramSearchMixin
 from ..parsers import MultipartJsonParser
+from ..permissions import CamomillaBasePermissions
 
 
 from rest_framework.response import Response
+from rest_framework.parsers import JSONParser
 
 from ..models import Media, MediaFolder
 from ..serializers import MediaSerializer, MediaFolderSerializer, MediaListSerializer
@@ -25,6 +27,7 @@ class MediaFolderViewSet(
 ):
     model = MediaFolder
     serializer_class = MediaFolderSerializer
+    permission_classes = (CamomillaBasePermissions,)
     items_per_page = 18
     search_fields = ["name", "title", "alt_text"]
 
@@ -40,9 +43,9 @@ class MediaFolderViewSet(
         parent_folder = MediaFolderSerializer(
             self.model.objects.filter(pk=updir).first()
         ).data
-        folder_queryset = self.model.objects.filter(updir__pk=updir)
+        folder_queryset = self.model.objects.language(self.active_language).fallbacks().filter(updir__pk=updir)
         media_queryset = (
-            Media.objects.language(self.active_language)
+            Media.objects.language(self.active_language).fallbacks()
             if request.GET.get("search", None)
             else Media.objects.all()
         ).filter(folder__pk=updir)
@@ -77,5 +80,6 @@ class MediaViewSet(
 
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
+    permission_classes = (CamomillaBasePermissions,)
     model = Media
-    parser_classes = [MultipartJsonParser]
+    parser_classes = [MultipartJsonParser, JSONParser]

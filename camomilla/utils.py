@@ -39,15 +39,10 @@ def get_page(
         lang = get_language()
     kwargs = {attr_page: identifier}
     try:
-        page = (
-            model_page.objects.language(get_language())
-            .prefetch_related("contents")
-            .get(**kwargs)
-        )
+        page = model_page.objects.prefetch_related("contents").get(**kwargs)
     except model_page.DoesNotExist:
         page, _ = model_page.objects.get_or_create(**kwargs)
-        page.translate(get_language())
-        page.save()
+    page.translate(lang)
     page = compile_seo(request, page, lang)
     return page
 
@@ -98,3 +93,12 @@ def find_or_redirect(request, obj_class, **kwargs):
                 pass
         activate(cur_language)
         raise Http404()
+
+
+def dict_merge(dct, merge_dct):
+    for k, v in merge_dct.items():
+        if k in dct and isinstance(dct[k], dict) and isinstance(v, dict):  # noqa
+            dict_merge(dct[k], v)
+        else:
+            dct[k] = v
+    return dct

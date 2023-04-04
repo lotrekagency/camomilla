@@ -1,10 +1,9 @@
 from django.forms import ValidationError
-from .fields.related import RelatedField
 from .base import BaseModelSerializer
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.models import Permission
 from rest_framework import serializers
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class PermissionSerializer(BaseModelSerializer):
@@ -14,8 +13,9 @@ class PermissionSerializer(BaseModelSerializer):
 
 
 class UserProfileSerializer(BaseModelSerializer):
-
     user_permissions = PermissionSerializer(read_only=True, many=True)
+    group_permissions = serializers.SerializerMethodField()
+    all_permissions = serializers.SerializerMethodField()
     password = serializers.CharField(
         write_only=True, required=False, allow_null=True, allow_blank=True
     )
@@ -26,6 +26,24 @@ class UserProfileSerializer(BaseModelSerializer):
     class Meta:
         model = get_user_model()
         fields = "__all__"
+
+    def get_group_permissions(self, instance):
+        return PermissionSerializer(
+            Permission.objects.filter(
+                group__pk__in=instance.groups.values_list("pk", flat=True)
+            ),
+            context=self.context,
+            many=True,
+        ).data
+
+    def get_all_permissions(self, instance):
+        return PermissionSerializer(
+            Permission.objects.filter(
+                group__pk__in=instance.groups.values_list("pk", flat=True)
+            ).union(instance.user_permissions.all()),
+            context=self.context,
+            many=True,
+        ).data
 
     def validate_password(self, value):
         password_validation.validate_password(value)
@@ -55,9 +73,6 @@ class UserSerializer(BaseModelSerializer):
     )
     level = serializers.CharField(required=False)
     has_token = serializers.SerializerMethodField("get_token", read_only=True)
-    user_permissions = RelatedField(
-        serializer=PermissionSerializer, many=True, required=False, allow_null=True
-    )
 
     def get_token(self, obj):
         return hasattr(obj, "auth_token")

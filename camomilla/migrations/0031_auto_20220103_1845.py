@@ -6,7 +6,8 @@ from ..models import Media
 
 def forwards_func(apps, schema_editor):
     db_alias = schema_editor.connection.alias
-    for m in Media.objects.using(db_alias).all():
+    defer = ["_hvad_query_id"] if hasattr(Media, "_hvad_query_id") else []
+    for m in Media.objects.using(db_alias).defer(*defer).all():
         m.save()
 
 

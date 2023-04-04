@@ -2,6 +2,132 @@
 
 <!--next-version-placeholder-->
 
+## v5.8.5 (2023-03-07)
+### Fix
+* **related:** Nest mixing now is taking depth directly from constructor ([`63c5ae5`](https://github.com/lotrekagency/camomilla/commit/63c5ae5d1c8444bec8b68afac20e2e57fb3b944e))
+* **related:** Fix related serializer trying to set queryset on readonly models ([`bd2eb4f`](https://github.com/lotrekagency/camomilla/commit/bd2eb4f9ce2eee5d9807ff656acee6e2c1584170))
+
+## v5.8.4 (2022-12-21)
+### Fix
+* Fix jsonPatch mixin for trans jsons ([`e0c9236`](https://github.com/lotrekagency/camomilla/commit/e0c9236994fa2a776702c83f14db7496fdcc6450))
+
+## v5.8.3 (2022-12-21)
+### Fix
+* Fix potential recursion error in NestMixin and take nesting depth from settings ([`647114c`](https://github.com/lotrekagency/camomilla/commit/647114c0b32a556773fe657929a9e3d86254b295))
+* Fix recursive nestmixin functions ([`e83586e`](https://github.com/lotrekagency/camomilla/commit/e83586eba127e970b714d78b2cb0ff353731d6fc))
+
+## v5.8.2 (2022-12-21)
+### Fix
+* Fix nested translations mixins ([`2c17ed8`](https://github.com/lotrekagency/camomilla/commit/2c17ed86d2169df67f2e14b37518e8dc16b6a121))
+
+## v5.8.1 (2022-12-20)
+### Fix
+* Fix potential recursion error in NestMixin ([`f337155`](https://github.com/lotrekagency/camomilla/commit/f33715549ecb2555eba07ddc2a676e314e48c235))
+* **media:** Allow json parser in media for patch requests without files ([`b117229`](https://github.com/lotrekagency/camomilla/commit/b1172297f22cf032c41efefe6a58b206c34d5e2b))
+* Show all permissions on profile serializer ([`fb1dc5e`](https://github.com/lotrekagency/camomilla/commit/fb1dc5ee3e27dec4d382e6a06a60599ab82cff1e))
+* **media:** Allow json parser in media for patch requests without files ([`00b1d24`](https://github.com/lotrekagency/camomilla/commit/00b1d24a0de19c3a4cfb0bbeafba9e48e06c46ce))
+* Show all permissions on profile serializer ([`e2a0116`](https://github.com/lotrekagency/camomilla/commit/e2a011602520945c9835091797d3d7ca508f0f52))
+
+## v5.8.0 (2022-12-20)
+### Feature
+* **rest_framework:** Go down in nested relation with updatable serializers, DEFAULT_NEST_DEPTH = 10 ([`d22ea66`](https://github.com/lotrekagency/camomilla/commit/d22ea664820e8b5843435aaa7c279502888992f0))
+* Optimize many related field to fetch all existing objects ([`8ba3982`](https://github.com/lotrekagency/camomilla/commit/8ba39828c3dbf3c16c5cc89c38e69fb939c8a062))
+
+### Fix
+* Fallback media api translations ([`e279f7a`](https://github.com/lotrekagency/camomilla/commit/e279f7ad4eec933ddb4f43b85f0498d1fbf3d17b))
+* Fix patch method overriding json field ([`faf7e4b`](https://github.com/lotrekagency/camomilla/commit/faf7e4b5586801639d3633e6db37c0d1e95d9d15))
+* Handle ints in many related fields ([`eb7140a`](https://github.com/lotrekagency/camomilla/commit/eb7140a03d0b933939fd6b163744420bc8f9cf59))
+* **serializers:** Added BaseModelSerializer to default serializers of RelatedFields ([`e9a37b5`](https://github.com/lotrekagency/camomilla/commit/e9a37b54c0e15acdd7c95ed008b6b5b9722d13c5))
+* **page:** Added safe page translation getter in get_page ([`bea64d7`](https://github.com/lotrekagency/camomilla/commit/bea64d7890d9713f1d9043902b9dd9cfe30f7ce9))
+* **db:** Added trigram extension in migrations ([`bdadea1`](https://github.com/lotrekagency/camomilla/commit/bdadea19f56bfe1a518f020ec18615e448a3df2d))
+
+## v5.7.7 (2022-08-12)
+### Fix
+* Fix bad typechecking in BaseModelSerializer ([`5063abf`](https://github.com/lotrekagency/camomilla/commit/5063abfddb47e79cd7ec7b16ce43536021138f55))
+
+## v5.7.6 (2022-08-12)
+### Fix
+* Fix BaseModelSerializer related field injectig serializer kwargs in wrong class ([`a212c2f`](https://github.com/lotrekagency/camomilla/commit/a212c2fa5fd611fb63899a05026a78ff5f3d4d02))
+
+## v5.7.5 (2022-08-11)
+### Fix
+* Explicit default_auto_field in app config to prevent unwanted migrations ([`ec33de8`](https://github.com/lotrekagency/camomilla/commit/ec33de87be8f7fc7fc466070e8fe20b7e75ef438))
+
+## v5.7.4 (2022-08-02)
+### Fix
+* Added missing migrations ([`e57989e`](https://github.com/lotrekagency/camomilla/commit/e57989e7174374bdcff19d042956327e12b65fe4))
+* Fix media migration to be compliant with hvad ([`dc5e83a`](https://github.com/lotrekagency/camomilla/commit/dc5e83ad0d639024319a49ac00b01f8845fbe9f1))
+* Fix makefile ([`925a270`](https://github.com/lotrekagency/camomilla/commit/925a2706f00c2b6ab5cc9055a557192a4bbd8d4a))
+* Added missing migrations for django 4 ([`8a79998`](https://github.com/lotrekagency/camomilla/commit/8a79998e39c9555385ab0d9e87f299b0ede2883d))
+
+## v5.7.3 (2022-05-16)
+### Fix
+* Fix Arrayfield import ([`2cfdaca`](https://github.com/lotrekagency/camomilla/commit/2cfdacacb63d59cea79ae59f0c3d9839efe56088))
+* Fix jsonfield imports ([`be4b566`](https://github.com/lotrekagency/camomilla/commit/be4b56622df269ee5d200dc5666536b39e7fe0cc))
+
+## v5.7.2 (2022-05-13)
+### Fix
+* Fix get page to work with new hvad ([`2cd8b89`](https://github.com/lotrekagency/camomilla/commit/2cd8b8948df44fd82c214835770e92b10a3f5512))
+* Fix camomilla filter content to work with new hvad ([`0193509`](https://github.com/lotrekagency/camomilla/commit/019350929c19cccdfedbdfc2b493039484a08400))
+* Update camomilla template to support new django admin static ([`92afbc0`](https://github.com/lotrekagency/camomilla/commit/92afbc07a1345cf19ed4a5a83317f7658b008804))
+* Fix gettext_lazy import deprecated in django4 ([`626dfe1`](https://github.com/lotrekagency/camomilla/commit/626dfe16a9fb6457e463ac995eb9d4d809c51e22))
+
+## v5.7.1 (2022-03-30)
+### Fix
+* Fix circular import error ([`8b3f6ff`](https://github.com/lotrekagency/camomilla/commit/8b3f6ff2d7a01a2f138506ef4ad94fe78b691521))
+* Fix session login urls ([`2688c1a`](https://github.com/lotrekagency/camomilla/commit/2688c1aae082654bebd84f3bfd8f2b74104fa930))
+* Fix drf session authentication ([`538e709`](https://github.com/lotrekagency/camomilla/commit/538e709dcc8fd2799b4063c265687b2e0315c076))
+
+## v5.7.0 (2022-03-14)
+### Feature
+* Added ordering to Articles Categories and Pages ([`8cb6d75`](https://github.com/lotrekagency/camomilla/commit/8cb6d752e462462c37add877c056827fddb491cc))
+* Added meta to Articles Categories and Pages ([`f859c37`](https://github.com/lotrekagency/camomilla/commit/f859c370add3b34c081edccc4925c0cd99064d42))
+* Meta mixin for models 🦹 ([`88c4b4a`](https://github.com/lotrekagency/camomilla/commit/88c4b4afbfc042ea024c9f4ab6090ccb5b73b272))
+* Added ordering mixin for rest framework inspired by django adminsortable2 ([`cb619bc`](https://github.com/lotrekagency/camomilla/commit/cb619bcb10650174d8e01835fdb9ecf44ece81a7))
+
+### Fix
+* Fix meta mixin methods ([`7d7e3a8`](https://github.com/lotrekagency/camomilla/commit/7d7e3a80bda93a5faec92ebe52ed7be28635790d))
+* Fixed reverse ordering in update_order endpoint ([`b8ae096`](https://github.com/lotrekagency/camomilla/commit/b8ae0962bdb75895945b0cc696fb64647e079b31))
+* Fix pagination ordering without default order field ([`ca07303`](https://github.com/lotrekagency/camomilla/commit/ca07303c951fe4e6142a8af74ff282d0f90c67c2))
+
+## v5.6.1 (2022-03-01)
+### Fix
+* Fix pagination mixin to provide order filter and search also for unpaginated queries ([`62e8b01`](https://github.com/lotrekagency/camomilla/commit/62e8b01433aac97a5b70de6197f7bb957e5abf46))
+
+## v5.6.0 (2022-02-26)
+### Feature
+* Added permission classes to media api ([`558cac2`](https://github.com/lotrekagency/camomilla/commit/558cac2a2b852dcd76d2ad20ce1ab14b4ccb01b0))
+* Auto-order pagination mixins ([`125dd71`](https://github.com/lotrekagency/camomilla/commit/125dd71b05faa6554a9def76bd664b837ca8d8fe))
+* **serializers:** Automagically 🧙 create nested serializers at runtime avoiding the need of declaring RelatedField classes ([`4748786`](https://github.com/lotrekagency/camomilla/commit/47487860494b56f5fdbff11b4bcc1790e2f9581a))
+
+### Fix
+* Fix paginate stack oredering ([`685cf8d`](https://github.com/lotrekagency/camomilla/commit/685cf8dbca2aae00fd2536ed1e1dca6696e88734))
+
+## v5.5.2 (2022-02-14)
+### Fix
+* Fix djsuperadmin reverse url ([`035d377`](https://github.com/lotrekagency/camomilla/commit/035d377ef9c4dfc25516103542c0aea28a0445a6))
+
+## v5.5.1 (2022-02-14)
+### Fix
+* Fix RelatedField allow_insert condition ([`90ba04f`](https://github.com/lotrekagency/camomilla/commit/90ba04f2520bf131c95145121362984535f367e2))
+* Fix serarchfield for article viewset ([`2c9cda4`](https://github.com/lotrekagency/camomilla/commit/2c9cda4f387bc4bbc5909f7f40ebd484591cb402))
+* Added missing migration ([`a018f0f`](https://github.com/lotrekagency/camomilla/commit/a018f0f125e68548492d3fd74a5cd8bddda61293))
+* Refactor filefield and fix bad return value ([`1f1a36a`](https://github.com/lotrekagency/camomilla/commit/1f1a36aaa2fad7e43a348ef2513e1aaabdddaae3))
+* Fix related field trying to insert new values all the time ([`2465598`](https://github.com/lotrekagency/camomilla/commit/246559814ef351d2cd010fd6f7385777dd075cf2))
+
+## v5.5.0 (2022-02-12)
+### Feature
+* **api:** Brand new serializators views and permissions for users endpoint ([`0f5b824`](https://github.com/lotrekagency/camomilla/commit/0f5b824c0c614d9ec8fbb1ffd04644e3d30e774c))
+* **api:** Added trigram search mixin to medias ([`0002c8b`](https://github.com/lotrekagency/camomilla/commit/0002c8b40a317b3d6bae64c1c12764e31e59cb6c))
+
+### Fix
+* Fix File fields imports ([`3a0af76`](https://github.com/lotrekagency/camomilla/commit/3a0af764afefc88336bcb0646e13dc3c9deee609))
+* Added creation logics for Related fields ([`56f20a5`](https://github.com/lotrekagency/camomilla/commit/56f20a5df522035ef5bbdca6e8c67bfa40daf274))
+* Integrate Camomilla fields in Base model serializers ([`3556d33`](https://github.com/lotrekagency/camomilla/commit/3556d33c7343208b9f7b0e380bb1614c24298169))
+* Added FileField and ImageField to fix drf Fields ([`7fc3160`](https://github.com/lotrekagency/camomilla/commit/7fc3160b493cc102ffa1be029e651bc3196266cc))
+* Article permalink is now slugfield to prevent bad inputs ([`aafd92c`](https://github.com/lotrekagency/camomilla/commit/aafd92cb518fe5e768ad3fd6f515af0c8599747a))
+* Fix article serializer missing categories ([`93b4284`](https://github.com/lotrekagency/camomilla/commit/93b42840980da194dd6b40646d7d5685c7da930a))
+
 ## v5.4.2 (2022-01-18)
 ### Fix
 * Fix versioning ([`39b5226`](https://github.com/lotrekagency/camomilla/commit/39b522637ff79c7ff05237d1ad85e1cae26d2a94))

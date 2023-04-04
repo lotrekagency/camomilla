@@ -26,6 +26,12 @@ class TrigramSearchMixin:
 
 
 class PaginateStackMixin:
+    def get_model(self, list_handler=None):
+        list_handler = list_handler if list_handler is not None else self.get_queryset()
+        return getattr(
+            list_handler, "shared_model", getattr(list_handler, "model", None)
+        )
+
     def parse_qs_value(self, string: str):
         if string and string.startswith("[") and string.endswith("]"):
             string = [self.parse_qs_value(substr) for substr in string[1:-1].split(",")]
@@ -66,11 +72,11 @@ class PaginateStackMixin:
     def handle_ordering(self, list_handler=None):
         list_handler = list_handler if list_handler is not None else self.get_queryset()
         sort = [p for p in self.request.GET.get("sort", "").split(",") if p]
+        sort += list(self.get_model()._meta.ordering) + ["-pk"]
         order = self.request.GET.get("order", "asc")
-        if sort:
-            list_handler.order_by(*sort)
+        list_handler = list_handler.order_by(*sort)
         if order == "desc":
-            list_handler.reverse()
+            list_handler = list_handler.reverse()
         return list_handler
 
     def handle_filters(self, list_handler=None):
@@ -125,10 +131,17 @@ class PaginateStackMixin:
         active = getattr(self, "force_active", False) or (
             self.request.GET.get("items", -1) != -1
         )
-        return (
-            Response(
+        if active:
+            return Response(
                 self.format_output(*self.handle_pagination_stack(self.get_queryset()))
             )
-            if active
-            else super().list(*args, **kwargs)
-        )
+        else:
+            return Response(
+                self.get_serializer_class()(
+                    self.handle_ordering(
+                        self.handle_filters(self.handle_search(self.get_queryset()))
+                    ),
+                    many=True,
+                    context=self.get_serializer_context(),
+                ).data
+            )
