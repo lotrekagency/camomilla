@@ -9,6 +9,14 @@ from django.utils.translation import activate, get_language
 from camomilla.exceptions import NeedARedirect
 
 
+def is_page(model):
+    from camomilla.models import AbstractPage
+
+    return next(
+        (True for base in model.__bases__ if issubclass(base, AbstractPage)), False
+    )
+
+
 def get_host_url(request):
     if request:
         return "{0}://{1}".format(request.scheme, request.META["HTTP_HOST"])

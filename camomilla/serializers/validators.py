@@ -2,8 +2,8 @@ from django.utils.translation import gettext_lazy as _
 from modeltranslation.utils import build_localized_fieldname
 from rest_framework.exceptions import ValidationError
 
-from camomilla.models.page import AbstractPage, UrlNode
-from camomilla.utils import activate_languages
+from camomilla.models.page import UrlNode
+from camomilla.utils import activate_languages, is_page
 from camomilla.utils.translation import get_nofallbacks, set_nofallbacks
 
 
@@ -13,8 +13,7 @@ class UniquePermalinkValidator:
     requires_context = True
 
     def __call__(self, value, serializer):
-
-        if AbstractPage not in serializer.Meta.model.__bases__:
+        if not is_page(serializer.Meta.model):
             return
         errors = {}
         instance = serializer.instance
