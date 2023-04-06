@@ -1,4 +1,5 @@
 from django.db import models
+from ...fields import JSONField
 from hvad.models import TranslatableModel, TranslatedFields
 
 from django.utils.translation import ugettext_lazy as _
@@ -56,3 +57,21 @@ class SlugMixin(object):
     def save(self, *args, **kwargs):
         self.slug = slugify(getattr(self, self.slug_attr))
         super(SlugMixin, self).save(*args, **kwargs)
+
+
+class MetaMixin(models.Model):
+    meta = JSONField(default=dict)
+
+    def get_meta(self, key, default=None):
+        return self.meta.get(key, default)
+
+    def update_meta(self, key, value):
+        self.meta[key] = value
+        super(MetaMixin, self).save(update_fields=["meta"])
+
+    def delete_meta(self, key):
+        del self.meta[key]
+        super(MetaMixin, self).save(update_fields=["meta"])
+
+    class Meta:
+        abstract = True

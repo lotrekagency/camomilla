@@ -18,6 +18,7 @@ class RelatedField(serializers.PrimaryKeyRelatedField):
             kwargs["queryset"] = kwargs.get(
                 "queryset", self.serializer.Meta.model.objects.all()
             )
+            self.allow_insert = kwargs.pop("allow_insert", False)
             # kwargs["allow_null"] = kwargs.get("allow_null", self.serializer.Meta.model._meta.get_field(self.source).null)
         super().__init__(**kwargs)
 
@@ -31,7 +32,18 @@ class RelatedField(serializers.PrimaryKeyRelatedField):
 
     def to_internal_value(self, data):
         if isinstance(data, dict):
-            return self.get_queryset().get(**{self.lookup: data.get(self.lookup, None)})
+            instance = (
+                self.get_queryset()
+                .filter(**{self.lookup: data.get(self.lookup, None)})
+                .first()
+            )
+            if self.allow_insert is True and len(data.keys()) and self.serializer:
+                serialized_data = self.serializer(
+                    instance=instance, data=data, context=self.context
+                )
+                if serialized_data.is_valid(raise_exception=ValueError):
+                    instance = serialized_data.save()
+            return instance
         return super().to_internal_value(data)
 
     def get_choices(self, cutoff=None):

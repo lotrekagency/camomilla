@@ -16,6 +16,8 @@ from ..serializers import (
     PermissionSerializer,
 )
 from ..permissions import CamomillaSuperUser, CamomillaBasePermissions, ReadOnly
+from django.contrib.auth import login, logout
+from rest_framework.views import APIView
 
 
 class CamomillaObtainAuthToken(ObtainAuthToken):
@@ -71,3 +73,19 @@ class PermissionViewSet(BaseModelViewset):
             | Q(content_type__model="user")
         )
         return permissions
+
+
+class CamomillaAuthLogin(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        login(request, user)
+        return Response({"detail": "Logged in"})
+
+
+class CamomillaAuthLogout(APIView):
+    def get(self, request, *args, **kwargs):
+        if request.user:
+            logout(request)
+        return Response({"detail": "Logged out"})

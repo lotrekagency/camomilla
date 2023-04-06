@@ -1,6 +1,8 @@
-from ..mixins import OptimViewMixin, PaginateStackMixin
+from ..mixins import OptimViewMixin, PaginateStackMixin, OrderingMixin
 from rest_framework import viewsets
 
 
-class BaseModelViewset(OptimViewMixin, PaginateStackMixin, viewsets.ModelViewSet):
+class BaseModelViewset(
+    OptimViewMixin, OrderingMixin, PaginateStackMixin, viewsets.ModelViewSet
+):
     pass

@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from hvad.models import TranslatedFields
 
-from .mixins import SeoMixin
+from .mixins import SeoMixin, MetaMixin
 
 
 CONTENT_STATUS = (
@@ -16,7 +16,7 @@ CONTENT_STATUS = (
 )
 
 
-class BaseArticle(SeoMixin):
+class BaseArticle(SeoMixin, MetaMixin):
 
     seo_attr = "permalink"
 
@@ -40,10 +40,12 @@ class BaseArticle(SeoMixin):
     pubblication_date = models.DateTimeField(null=True, blank=True)
     tags = models.ManyToManyField("camomilla.Tag", blank=True)
     categories = models.ManyToManyField("camomilla.Category", blank=True)
+    ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     class Meta:
         abstract = True
         unique_together = [("permalink", "language_code")]
+        ordering = ["ordering"]
 
     def save(self, *args, **kwargs):
         import uuid

@@ -59,14 +59,14 @@ def test_crud_tag():
     ## Get the tags in 🇮🇹
     response = client.get("/api/camomilla/tags/")
 
-    assert response.json()[1]["title"] == "Secondo tag"
-    assert response.json()[1]["language_code"] == "it"
+    assert response.json()[0]["title"] == "Secondo tag"
+    assert response.json()[0]["language_code"] == "it"
 
     ## Get the tags in 🇬🇧 with fallbacks!
     response = client.get("/api/camomilla/tags/?language=en")
 
-    assert response.json()[1]["title"] == "Second tag"
-    assert response.json()[1]["language_code"] == "en"
+    assert response.json()[0]["title"] == "Second tag"
+    assert response.json()[0]["language_code"] == "en"
 
     ## Delete the tag
     response = client.delete("/api/camomilla/tags/2/")
