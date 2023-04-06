@@ -14,11 +14,13 @@ class SeoMixinTranslationOptions(TranslationOptions):
         "canonical",
     )
 
+class AbstractPageTranslationOptions(SeoMixinTranslationOptions):
+    fields = ("breadcrumbs_title", "slug", "status", "indexable")
+    
 
 @register(Article)
-class ArticleTranslationOptions(SeoMixinTranslationOptions):
+class ArticleTranslationOptions(AbstractPageTranslationOptions):
     fields = ("content",)
-    empty_values = {"permalink": None}
 
 
 @register(Tag)
@@ -38,8 +40,8 @@ class MediaTranslationOptions(TranslationOptions):
 
 
 @register(Page)
-class PageTranslationOptions(SeoMixinTranslationOptions):
-    fields = ("breadcrumbs_title", "slug", "status", "indexable")
+class PageTranslationOptions(AbstractPageTranslationOptions):
+    pass
 
 
 @register(UrlNode)
