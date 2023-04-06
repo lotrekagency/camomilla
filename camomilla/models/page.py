@@ -155,8 +155,10 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
         return permalink
 
     def update_childs(self):
-        for child in self.childs.all():
-            child.save()
+        # without pk, no childs there
+        if self.pk is not None:
+            for child in self.childs.all():
+                child.save()
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
