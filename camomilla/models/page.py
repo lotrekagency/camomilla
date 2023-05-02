@@ -1,14 +1,22 @@
 from typing import Iterable
 from uuid import uuid4
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import ProgrammingError, models, transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.http import Http404
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from camomilla.models.mixins import MetaMixin, SeoMixin
-from camomilla.utils import activate_languages, get_nofallbacks, set_nofallbacks
+from camomilla.utils import (
+    activate_languages,
+    get_field_translations,
+    get_nofallbacks,
+    set_nofallbacks,
+    url_lang_decompose,
+)
 
 
 class UrlNodeManager(models.Manager):
@@ -23,14 +31,13 @@ class UrlNodeManager(models.Manager):
 
     def _annotate_fields(self, qs: models.QuerySet, field_names: Iterable[str]):
         for field_name in field_names:
-            whens = []
-            for related_name in self.related_names:
-                whens.append(
-                    models.When(
-                        related_name=related_name,
-                        then=models.F("__".join([related_name, field_name])),
-                    )
+            whens = [
+                models.When(
+                    related_name=related_name,
+                    then=models.F("__".join([related_name, field_name])),
                 )
+                for related_name in self.related_names
+            ]
             qs = qs.annotate(**{field_name: models.Case(*whens)})
         return qs
 
@@ -77,6 +84,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
         choices=PAGE_STATUS,
         default="DRF",
     )
+    identifier = models.CharField(max_length=200, null=True, unique=True)
     pubblication_date = models.DateTimeField(null=True, blank=True)
     indexable = models.BooleanField(default=True)
     ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
@@ -164,6 +172,40 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
         with transaction.atomic():
             self._update_url_node()
             return super().save(*args, **kwargs)
+
+    @classmethod
+    def get(cls, request, *args, **kwargs):
+        bypass_type_check = kwargs.pop("bypass_type_check", False)
+        if len(kwargs.keys()) > 0:
+            page = cls.objects.get(**kwargs)
+        else:
+            page = UrlNode.objects.get(
+                permalink=url_lang_decompose(request.path)["permalink"]
+            ).page
+        if not bypass_type_check and not isinstance(page, cls):
+            raise cls.DoesNotExist(
+                "%s matching query does not exist." % cls._meta.object_name
+            )
+        return page
+
+    @classmethod
+    def get_or_create(cls, request, *args, **kwargs):
+        try:
+            return cls.get(request, *args, **kwargs), False
+        except ObjectDoesNotExist:
+            if len(kwargs.keys()) > 0:
+                return cls.objects.get_or_create(**kwargs)
+        return (None, False)
+
+    @classmethod
+    def get_or_404(cls, request, *args, **kwargs):
+        try:
+            return cls.get(request, *args, **kwargs)
+        except ObjectDoesNotExist:
+            raise Http404("No %s matches the given query." % cls._meta.object_name)
+
+    def alternate_urls(self, *args, **kwargs):
+        return get_field_translations(self.url_node or object, "permalink", None)
 
     class Meta:
         abstract = True
