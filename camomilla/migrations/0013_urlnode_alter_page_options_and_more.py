@@ -64,10 +64,6 @@ class Migration(migrations.Migration):
             model_name='article',
             name='categories',
         ),
-        # migrations.RemoveField(
-        #     model_name='article',
-        #     name='identifier',
-        # ),
         migrations.RemoveField(
             model_name='article',
             name='permalink',
@@ -132,10 +128,6 @@ class Migration(migrations.Migration):
             model_name='mediafolder',
             name='icon',
         ),
-        # migrations.RemoveField(
-        #     model_name='page',
-        #     name='identifier',
-        # ),
         migrations.RemoveField(
             model_name='page',
             name='permalink',
@@ -536,5 +528,54 @@ class Migration(migrations.Migration):
             model_name='tag',
             name='name',
             field=models.CharField(max_length=200, unique=True),
+        ),
+        migrations.AlterField(
+            model_name='article',
+            name='identifier',
+            field=models.CharField(max_length=200, null=True, unique=True),
+        ),
+        migrations.AddField(
+            model_name='article',
+            name='breadcrumbs_title_en',
+            field=models.CharField(blank=True, max_length=128, null=True),
+        ),
+        migrations.AddField(
+            model_name='article',
+            name='breadcrumbs_title_it',
+            field=models.CharField(blank=True, max_length=128, null=True),
+        ),
+        migrations.AddField(
+            model_name='article',
+            name='indexable_en',
+            field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='article',
+            name='indexable_it',
+            field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='article',
+            name='slug_en',
+            field=models.SlugField(allow_unicode=True, blank=True, max_length=150, null=True),
+        ),
+        migrations.AddField(
+            model_name='article',
+            name='slug_it',
+            field=models.SlugField(allow_unicode=True, blank=True, max_length=150, null=True),
+        ),
+        migrations.AddField(
+            model_name='article',
+            name='status_en',
+            field=models.CharField(choices=[('PUB', 'Published'), ('DRF', 'Draft'), ('TRS', 'Trash'), ('PLA', 'Planned')], default='DRF', max_length=3, null=True),
+        ),
+        migrations.AddField(
+            model_name='article',
+            name='status_it',
+            field=models.CharField(choices=[('PUB', 'Published'), ('DRF', 'Draft'), ('TRS', 'Trash'), ('PLA', 'Planned')], default='DRF', max_length=3, null=True),
+        ),
+        migrations.RemoveField(
+            model_name='media',
+            name='name',
         ),
     ]
