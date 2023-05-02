@@ -19,6 +19,7 @@ if django.VERSION >= (4, 0):
 else:
     from django.contrib.postgres.fields import JSONField as DjangoJSONField
 
+
 # TODO: decide what to do with LangInfoMixin mixin!
 class LangInfoMixin(metaclass=serializers.SerializerMetaclass):
     lang_info = serializers.SerializerMethodField("get_lang_info", read_only=True)
@@ -137,7 +138,7 @@ class NestMixin:
         )
 
 
-class AbstractPageMixin:
+class AbstractPageMixin(serializers.ModelSerializer):
     LANG_PERMALINK_FIELDS = [
         build_localized_fieldname("permalink", lang)
         for lang in AVAILABLE_LANGUAGES
