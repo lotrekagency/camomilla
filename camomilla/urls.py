@@ -1,6 +1,7 @@
 from django.shortcuts import redirect
 from django.urls import include, path
 from rest_framework import routers
+from importlib.util import find_spec
 
 from camomilla.views import (
     ArticleViewSet,
@@ -15,7 +16,7 @@ from camomilla.views import (
     PermissionViewSet,
     TagViewSet,
     UserViewSet,
-    MenuViewSet
+    MenuViewSet,
 )
 
 router = routers.DefaultRouter()
@@ -41,3 +42,8 @@ urlpatterns = [
     path("auth/logout/", CamomillaAuthLogout.as_view(), name="logout"),
     path("languages/", LanguageViewSet.as_view(), name="get_languages"),
 ]
+
+if find_spec("djsuperadmin.urls") is not None:
+    urlpatterns += [
+        path("djsuperadmin/", include("djsuperadmin.urls")),
+    ]
