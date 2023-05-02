@@ -84,6 +84,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
         choices=PAGE_STATUS,
         default="DRF",
     )
+    template = models.CharField(max_length=500, null=True, blank=True)
     identifier = models.CharField(max_length=200, null=True, unique=True)
     pubblication_date = models.DateTimeField(null=True, blank=True)
     indexable = models.BooleanField(default=True)
@@ -121,6 +122,10 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
             return self.parent.breadcrumbs + [breadcrumb]
         return [breadcrumb]
 
+    @property
+    def template_name(self):
+        return self.template or "camomilla/pages/default.html"
+    
     @property
     def childs(self):
         if hasattr(self, "PageMeta") and hasattr(self.PageMeta, "child_page_field"):

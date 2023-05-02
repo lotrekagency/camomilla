@@ -1,0 +1,65 @@
+{% load i18n %}
+
+<div>
+    <style>
+        .language-switch {
+            font-family: monospace;
+            border-top: solid 1px;
+            border-right: solid 1px;
+            border-left: solid 1px;
+        }
+        .language-switch div {
+            border-bottom: solid 1px;
+            padding: 0.3rem 1rem;
+            cursor: pointer;
+        }
+    </style>
+    <form id="form_change_language" action="{% url 'set_language' %}" method="post" style='display: none;'>
+        {% csrf_token %}
+        <input id="next_form_change_language" name="next" type="hidden" value="{{ request.path }}" />
+        <select id="select_change_language" name="language">
+            {% get_current_language as LANGUAGE_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            {% get_language_info_list for LANGUAGES as languages %}
+            {% for language in languages %}
+            <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %} selected="selected" {% endif %}>
+                {{ language.name_local }} ({{ language.code }})
+            </option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Go" style='display: none;' />
+    </form>
+
+    <div class="language-switch">
+        {% get_current_language as LANGUAGE_CODE %}
+        {% get_available_languages as LANGUAGES %}
+        {% get_language_info_list for LANGUAGES as languages %}
+        {% get_language_info for LANGUAGE_CODE as current_lang %}
+
+        {% for lang_code, lang_name in LANGUAGES %}
+        
+        <div class="language-switch--btn" data-lang="{{lang_code}}" onclick="submitLanguageWithoutRedirect('{{lang_code}}');">
+             <a>{{ lang_name }} {% if current_lang.code == lang_code %} 👾 {% endif %}</a> 
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+
+    window.submitLanguage = function (langCode, redirect) {
+        document.getElementById('select_change_language').value = langCode;
+        document.getElementById('next_form_change_language').value = redirect;
+        setTimeout(function () {
+            document.getElementById('form_change_language').submit();
+        }, 300);
+    };
+
+    window.submitLanguageWithoutRedirect = function (langCode) {
+        document.getElementById('select_change_language').value = langCode;
+        setTimeout(function () {
+            document.getElementById('form_change_language').submit();
+        }, 300);
+    };
+
+</script>

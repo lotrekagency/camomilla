@@ -578,4 +578,14 @@ class Migration(migrations.Migration):
             model_name='media',
             name='name',
         ),
+        migrations.AddField(
+            model_name='article',
+            name='template',
+            field=models.CharField(blank=True, max_length=500, null=True),
+        ),
+        migrations.AddField(
+            model_name='page',
+            name='template',
+            field=models.CharField(blank=True, max_length=500, null=True),
+        ),
     ]
