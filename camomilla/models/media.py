@@ -196,8 +196,6 @@ class Media(models.Model):
                 return 0
 
     def __str__(self):
-        if self.name:
-            return self.name
         return self.file.name
 
 
