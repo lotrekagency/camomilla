@@ -29,7 +29,7 @@ class UrlNodeManager(models.Manager):
         )
         return self._related_names
 
-    def _annotate_fields(self, qs: models.QuerySet, field_names: Iterable[Tuple[str, models.Field]]):
+    def _annotate_fields(self, qs: models.QuerySet, field_names: Iterable[Tuple[str, models.Field, models.Value]]):
         for field_name, output_field in field_names:
             whens = [
                 models.When(
@@ -44,7 +44,7 @@ class UrlNodeManager(models.Manager):
     def get_queryset(self):
         try:
             return self._annotate_fields(
-                super().get_queryset(), [("indexable", models.BooleanField()), ("status", models.BooleanField())]
+                super().get_queryset(), [("indexable", models.BooleanField(), models.Value(False)), ("status", models.BooleanField(), models.Value(False))]
             )
         except ProgrammingError:
             return super().get_queryset()
