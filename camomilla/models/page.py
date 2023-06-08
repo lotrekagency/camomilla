@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Tuple
 from uuid import uuid4
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -29,8 +29,8 @@ class UrlNodeManager(models.Manager):
         )
         return self._related_names
 
-    def _annotate_fields(self, qs: models.QuerySet, field_names: Iterable[str]):
-        for field_name in field_names:
+    def _annotate_fields(self, qs: models.QuerySet, field_names: Iterable[Tuple[str, models.Field]]):
+        for field_name, output_field in field_names:
             whens = [
                 models.When(
                     related_name=related_name,
@@ -38,13 +38,13 @@ class UrlNodeManager(models.Manager):
                 )
                 for related_name in self.related_names
             ]
-            qs = qs.annotate(**{field_name: models.Case(*whens)})
+            qs = qs.annotate(**{field_name: models.Case(*whens, output_field=output_field)})
         return qs
 
     def get_queryset(self):
         try:
             return self._annotate_fields(
-                super().get_queryset(), ["indexable", "status"]
+                super().get_queryset(), [("indexable", models.BooleanField()), ("status", models.BooleanField())]
             )
         except ProgrammingError:
             return super().get_queryset()
