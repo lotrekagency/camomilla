@@ -100,12 +100,17 @@ DEFAULT_NESTING_DEPTH = getattr(settings, "CAMOMILLA_DRF_NESTING_DEPTH", 10)
 
 
 class NestMixin:
+    def __init__(self, *args, **kwargs):
+        self._depth = kwargs.pop("depth", None)
+        return super().__init__(*args, **kwargs)
+
     def build_nested_field(self, field_name, relation_info, nested_depth):
         return self.build_relational_field(field_name, relation_info, nested_depth)
 
     def build_relational_field(
         self, field_name, relation_info, nested_depth=DEFAULT_NESTING_DEPTH + 1
     ):
+        nested_depth = nested_depth if self._depth is None else self._depth
         field_class, field_kwargs = super().build_relational_field(
             field_name, relation_info
         )

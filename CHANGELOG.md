@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v5.8.5 (2023-03-07)
+### Fix
+* **related:** Nest mixing now is taking depth directly from constructor ([`63c5ae5`](https://github.com/lotrekagency/camomilla/commit/63c5ae5d1c8444bec8b68afac20e2e57fb3b944e))
+* **related:** Fix related serializer trying to set queryset on readonly models ([`bd2eb4f`](https://github.com/lotrekagency/camomilla/commit/bd2eb4f9ce2eee5d9807ff656acee6e2c1584170))
+
 ## v5.8.4 (2022-12-21)
 ### Fix
 * Fix jsonPatch mixin for trans jsons ([`e0c9236`](https://github.com/lotrekagency/camomilla/commit/e0c9236994fa2a776702c83f14db7496fdcc6450))
