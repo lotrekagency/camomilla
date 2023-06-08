@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.urls import path
 
-from .models import Page
+from .models import Page, UrlNode
 
 
 def fetch(request, *args, **kwargs):
@@ -10,7 +10,7 @@ def fetch(request, *args, **kwargs):
     else:
         try:
             page = Page.get(request, bypass_type_check=True)
-        except Page.DoesNotExist:
+        except UrlNode.DoesNotExist:
             page, _ = Page.get_or_create(request, slug="")
     return render(request, page.template_name, {"page": page, "page_extra": {"class": page.__class__.__name__, "module": page.__module__} })
 

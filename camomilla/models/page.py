@@ -29,8 +29,12 @@ class UrlNodeManager(models.Manager):
         )
         return self._related_names
 
-    def _annotate_fields(self, qs: models.QuerySet, field_names: Iterable[Tuple[str, models.Field, models.Value]]):
-        for field_name, output_field in field_names:
+    def _annotate_fields(
+        self,
+        qs: models.QuerySet,
+        field_names: Iterable[Tuple[str, models.Field, models.Value]],
+    ):
+        for field_name, output_field, default in field_names:
             whens = [
                 models.When(
                     related_name=related_name,
@@ -38,13 +42,23 @@ class UrlNodeManager(models.Manager):
                 )
                 for related_name in self.related_names
             ]
-            qs = qs.annotate(**{field_name: models.Case(*whens, output_field=output_field)})
+            qs = qs.annotate(
+                **{
+                    field_name: models.Case(
+                        *whens, output_field=output_field, default=default
+                    )
+                }
+            )
         return qs
 
     def get_queryset(self):
         try:
             return self._annotate_fields(
-                super().get_queryset(), [("indexable", models.BooleanField(), models.Value(False)), ("status", models.BooleanField(), models.Value(False))]
+                super().get_queryset(),
+                [
+                    ("indexable", models.BooleanField(), models.Value(False)),
+                    ("status", models.BooleanField(), models.Value(False)),
+                ],
             )
         except ProgrammingError:
             return super().get_queryset()
@@ -125,7 +139,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
     @property
     def template_name(self):
         return self.template or "camomilla/pages/default.html"
-    
+
     @property
     def childs(self):
         if hasattr(self, "PageMeta") and hasattr(self.PageMeta, "child_page_field"):
