@@ -6,6 +6,7 @@ from django.db import ProgrammingError, models, transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.http import Http404
+from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
@@ -57,8 +58,9 @@ class UrlNodeManager(models.Manager):
             return self._annotate_fields(
                 super().get_queryset(),
                 [
-                    ("indexable", models.BooleanField(), models.Value(None)),
-                    ("status", models.BooleanField(), models.Value(None)),
+                    ("indexable", models.BooleanField(), models.Value(None, models.BooleanField())),
+                    ("status", models.BooleanField(), models.Value(None, models.BooleanField())),
+                    ("pubblication_date", models.DateTimeField(), models.Value(timezone.now(), models.DateTimeField())),
                 ],
             )
         except ProgrammingError:
@@ -136,10 +138,18 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
         if self.parent:
             return self.parent.breadcrumbs + [breadcrumb]
         return [breadcrumb]
+    
+    @property
+    def is_public(self):
+        if self.status == "PUB":
+            return True
+        if self.status == "PLA":
+            return bool(self.pubblication_date) and timezone.now() > self.pubblication_date
+        return False
 
     @property
     def template_name(self):
-        return self.template or "camomilla/pages/default.html"
+        return self.template or "defaults/pages/default.html"
 
     @property
     def childs(self):
@@ -207,6 +217,8 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
     @classmethod
     def get(cls, request, *args, **kwargs):
         bypass_type_check = kwargs.pop("bypass_type_check", False)
+        bypass_public_check = kwargs.pop("bypass_public_check", False)
+        
         if len(kwargs.keys()) > 0:
             page = cls.objects.get(**kwargs)
         else:
@@ -214,9 +226,14 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
                 permalink=url_lang_decompose(request.path)["permalink"]
             ).first()
             page = node and node.page
-        if not page or (not bypass_type_check and not isinstance(page, cls)):
+        type_error = not bypass_type_check and not isinstance(page, cls)
+        public_error = not bypass_public_check and not getattr(page or object, "is_public", False)
+        if not page or type_error or public_error:
+            bases = (UrlNode.DoesNotExist,)
+            if hasattr(cls, "DoesNotExist"):
+                bases += (cls.DoesNotExist)
             raise type(
-                "PageDoesNotExist", (cls.DoesNotExist, UrlNode.DoesNotExist), {}
+                "PageDoesNotExist", bases, {}
             )("%s matching query does not exist." % cls._meta.object_name)
         return page
 
