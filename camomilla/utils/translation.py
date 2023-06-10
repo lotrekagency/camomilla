@@ -1,7 +1,7 @@
 import re
 from typing import Any, Iterable, Iterator
 
-from django.db.models import Model
+from django.db.models import Model, Q
 from django.utils.translation.trans_real import activate, get_language
 from modeltranslation.settings import AVAILABLE_LANGUAGES, DEFAULT_LANGUAGE
 from modeltranslation.utils import build_localized_fieldname
@@ -45,3 +45,14 @@ def get_field_translations(instance: Model, field_name: str, *args, **kwargs):
         lang: get_nofallbacks(instance, field_name, language=lang, *args, **kwargs)
         for lang in AVAILABLE_LANGUAGES
     }
+
+
+def lang_fallback_query(**kwargs):
+    current_lang = get_language()
+    query = Q()
+    for lang in AVAILABLE_LANGUAGES:
+        query |= Q(**{f"{key}_{lang}": value for key, value in kwargs.items()})
+    if current_lang:
+        query = (query & Q(**{f"{key}_{current_lang}__isnull": True for key in kwargs.keys()}))
+        query |= Q(**{f"{key}_{current_lang}": value for key, value in kwargs.items()})
+    return query
