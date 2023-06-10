@@ -11,11 +11,12 @@ from django.utils.translation import gettext_lazy as _
 
 from camomilla.models.mixins import MetaMixin, SeoMixin
 from camomilla.utils import (
-    activate_languages,
     get_field_translations,
     get_nofallbacks,
     set_nofallbacks,
     url_lang_decompose,
+    lang_fallback_query,
+    activate_languages,
 )
 
 
@@ -56,8 +57,8 @@ class UrlNodeManager(models.Manager):
             return self._annotate_fields(
                 super().get_queryset(),
                 [
-                    ("indexable", models.BooleanField(), models.Value(False)),
-                    ("status", models.BooleanField(), models.Value(False)),
+                    ("indexable", models.BooleanField(), models.Value(None)),
+                    ("status", models.BooleanField(), models.Value(None)),
                 ],
             )
         except ProgrammingError:
@@ -174,11 +175,22 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
     def generate_permalink(self):
         slug = get_nofallbacks(self, "slug")
         if slug is None:
-            slug = slugify(self.title or uuid4(), allow_unicode=True)
+            translations = get_field_translations(self, "slug").values()
+            fallback_slug = next((t for t in translations if t is not None), None)
+            slug = (
+                slugify(self.title or uuid4(), allow_unicode=True)
+                if fallback_slug is None
+                else fallback_slug
+            )
             set_nofallbacks(self, "slug", slug)
         permalink = "/%s" % slugify(slug, allow_unicode=True)
         if self.parent:
             permalink = f"{self.parent.permalink}{permalink}"
+        qs = UrlNode.objects.exclude(pk=getattr(self.url_node or object, "pk", None))
+        if qs.filter(permalink=permalink).exists():
+            permalink = "/".join(
+                permalink.split("/")[:-1] + [slugify(uuid4(), allow_unicode=True)]
+            )
         return permalink
 
     def update_childs(self):
@@ -198,13 +210,14 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
         if len(kwargs.keys()) > 0:
             page = cls.objects.get(**kwargs)
         else:
-            page = UrlNode.objects.get(
+            node = UrlNode.objects.filter(
                 permalink=url_lang_decompose(request.path)["permalink"]
-            ).page
-        if not bypass_type_check and not isinstance(page, cls):
-            raise cls.DoesNotExist(
-                "%s matching query does not exist." % cls._meta.object_name
-            )
+            ).first()
+            page = node and node.page
+        if not page or (not bypass_type_check and not isinstance(page, cls)):
+            raise type(
+                "PageDoesNotExist", (cls.DoesNotExist, UrlNode.DoesNotExist), {}
+            )("%s matching query does not exist." % cls._meta.object_name)
         return page
 
     @classmethod
@@ -215,6 +228,14 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
             if len(kwargs.keys()) > 0:
                 return cls.objects.get_or_create(**kwargs)
         return (None, False)
+
+    @classmethod
+    def get_or_create_homepage(cls):
+        try:
+            node = UrlNode.objects.get(lang_fallback_query(permalink="/"))
+            return node.page, False
+        except UrlNode.DoesNotExist:
+            return cls.get_or_create(None, slug="")
 
     @classmethod
     def get_or_404(cls, request, *args, **kwargs):

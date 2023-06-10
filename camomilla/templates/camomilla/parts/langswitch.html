@@ -36,10 +36,18 @@
         {% get_language_info_list for LANGUAGES as languages %}
         {% get_language_info for LANGUAGE_CODE as current_lang %}
 
-        {% for lang_code, lang_name in LANGUAGES %}
-        
-        <div class="language-switch--btn" data-lang="{{lang_code}}" onclick="submitLanguageWithoutRedirect('{{lang_code}}');">
-             <a>{{ lang_name }} {% if current_lang.code == lang_code %} 👾 {% endif %}</a> 
+        {% for lang_code, redirect in page.alternate_urls.items %}
+        <div class="language-switch--btn" data-lang="{{lang_code}}" 
+            {% if current_lang.code != lang_code %} 
+                {% if redirect is None %}
+                    onclick="submitLanguageWithoutRedirect('{{lang_code}}');"
+                {% else %}
+                    onclick="submitLanguage('{{lang_code}}', '{{redirect}}');"
+                {% endif %}
+            {% endif %}
+        >
+            {% get_language_info for lang_code as lang %}
+             <a>{{ lang.name_translated }} {% if current_lang.code == lang_code %} 👾 {% endif %}</a> 
         </div>
         {% endfor %}
     </div>
@@ -50,6 +58,7 @@
     window.submitLanguage = function (langCode, redirect) {
         document.getElementById('select_change_language').value = langCode;
         document.getElementById('next_form_change_language').value = redirect;
+        document.getElementById('next_form_change_language').disabled = false;
         setTimeout(function () {
             document.getElementById('form_change_language').submit();
         }, 300);
@@ -57,6 +66,7 @@
 
     window.submitLanguageWithoutRedirect = function (langCode) {
         document.getElementById('select_change_language').value = langCode;
+        document.getElementById('next_form_change_language').disabled = true;
         setTimeout(function () {
             document.getElementById('form_change_language').submit();
         }, 300);
