@@ -4,8 +4,14 @@ from camomilla.settings import PROJECT_TITLE
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
-from modeltranslation.admin import TranslationAdmin
-from modeltranslation.forms import TranslationModelForm
+from modeltranslation.settings import ENABLE_REGISTRATIONS
+if ENABLE_REGISTRATIONS:
+    from modeltranslation.admin import TranslationAdmin as TranslationAwareModel
+    from modeltranslation.forms import TranslationModelForm as TranslationAwareModelForm
+else:
+    from django.contrib.admin import ModelAdmin as TranslationAwareModel
+    from django.forms import ModelForm as TranslationAwareModelForm
+    
 
 from camomilla.models import Article, Content, Media, MediaFolder, Page, Tag
 
@@ -14,7 +20,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     pass
 
 
-class ArticleAdminForm(TranslationModelForm):
+class ArticleAdminForm(TranslationAwareModelForm):
     content = forms.CharField(widget=CKEditorUploadingWidget())
 
     class Meta:
@@ -22,12 +28,12 @@ class ArticleAdminForm(TranslationModelForm):
         exclude = ("slug",)
 
 
-class ArticleAdmin(TranslationAdmin):
+class ArticleAdmin(TranslationAwareModel):
     filter_horizontal = ("tags",)
     form = ArticleAdminForm
 
 
-class TagAdmin(TranslationAdmin):
+class TagAdmin(TranslationAwareModel):
     pass
 
 
@@ -35,7 +41,7 @@ class MediaFolderAdmin(admin.ModelAdmin):
     pass
 
 
-class ContentAdminForm(TranslationModelForm):
+class ContentAdminForm(TranslationAwareModelForm):
     content = forms.CharField(widget=CKEditorUploadingWidget())
 
     class Meta:
@@ -43,11 +49,11 @@ class ContentAdminForm(TranslationModelForm):
         fields = "__all__"
 
 
-class ContentAdmin(TranslationAdmin):
+class ContentAdmin(TranslationAwareModel):
     form = ContentAdminForm
 
 
-class MediaAdmin(TranslationAdmin):
+class MediaAdmin(TranslationAwareModel):
     exclude = (
         "thumbnail",
         "size",
@@ -73,7 +79,7 @@ class MediaAdmin(TranslationAdmin):
             return super(MediaAdmin, self).response_add(request, obj)
 
 
-class PageAdmin(TranslationAdmin):
+class PageAdmin(TranslationAwareModel):
     exclude = ("permalink",)
 
 

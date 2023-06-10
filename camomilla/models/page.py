@@ -20,6 +20,8 @@ from camomilla.utils import (
     activate_languages,
 )
 
+from modeltranslation.settings import ENABLE_REGISTRATIONS
+
 
 class UrlNodeManager(models.Manager):
     @property
@@ -249,7 +251,10 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
     @classmethod
     def get_or_create_homepage(cls):
         try:
-            node = UrlNode.objects.get(lang_fallback_query(permalink="/"))
+            if ENABLE_REGISTRATIONS:
+                node = UrlNode.objects.get(lang_fallback_query(permalink="/"))
+            else:
+                node = UrlNode.objects.get(permalink="/")
             return node.page, False
         except UrlNode.DoesNotExist:
             return cls.get_or_create(None, slug="")

@@ -1,4 +1,5 @@
 {% load menus %}
+{% if menu.nodes|length %}
 <ul>
   {% for item in menu.nodes %}
   <li>
@@ -8,8 +9,9 @@
         {% else %}
             <span>{{item.title}}</span>
         {% endif %}
-        {% if item.nodes|length %} {% include 'defaults/parts/menu.html' with menu=item %} {% endif %}
+        {% include 'defaults/parts/menu.html' with menu=item %} 
     {%endwith%}
   </li>
   {% endfor %}
 </ul>
+{% endif %}
