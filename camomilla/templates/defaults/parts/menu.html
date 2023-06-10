@@ -4,7 +4,7 @@
   <li>
     {% with url=item|node_url %}
         {% if url %}
-            <a href="{{ item|node_url }}">{{ item.title }}</a>
+            <a href="{{ url }}">{{ item.title }}</a>
         {% else %}
             <span>{{item.title}}</span>
         {% endif %}
