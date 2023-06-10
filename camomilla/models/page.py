@@ -149,7 +149,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
 
     @property
     def template_name(self):
-        return self.template or "camomilla/pages/default.html"
+        return self.template or "defaults/pages/default.html"
 
     @property
     def childs(self):

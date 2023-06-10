@@ -1,3 +1,7 @@
+{% load menus %}
+{% get_menus as menus %}
+
+
 <html>
 
 <head>
@@ -44,6 +48,15 @@
 </head>
 
 <body>
+    <header >
+        {% block main_menu %}
+            {{menus.main_menu.render}}
+        {% endblock %}
+        {% block language_switch %}
+            {% include "defaults/parts/langswitch.html" %}
+        {% endblock %}
+    </header>
+
     <a href="https://camomilla.lotrek.io" target="_blank">
         <svg width="300" height="300" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd"
@@ -79,9 +92,6 @@
         </svg>
 
     </a>
-    {% block language_switch %}
-        {% include "camomilla/parts/langswitch.html" %}
-    {% endblock %}
     <h1>DEFAULT TEMPLATE</h1>
     <code>
         - <b>Class:</b> {{page_extra.class}} <br>
