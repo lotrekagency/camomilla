@@ -233,7 +233,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
         if not page or type_error or public_error:
             bases = (UrlNode.DoesNotExist,)
             if hasattr(cls, "DoesNotExist"):
-                bases += (cls.DoesNotExist)
+                bases += (cls.DoesNotExist,)
             raise type(
                 "PageDoesNotExist", bases, {}
             )("%s matching query does not exist." % cls._meta.object_name)

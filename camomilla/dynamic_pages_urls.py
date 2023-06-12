@@ -1,14 +1,14 @@
 from django.shortcuts import render
 from django.urls import path
 
-from .models import AbstractPage
+from .models import Page
 
 
 def fetch(request, *args, **kwargs):
     if "permalink" in kwargs:
-        page = AbstractPage.get_or_404(request)
+        page = Page.get_or_404(request, bypass_type_check=True)
     else:
-        page, _ = AbstractPage.get_or_create_homepage()
+        page, _ = Page.get_or_create_homepage()
     return render(request, page.template_name, {"page": page, "page_extra": {"class": page.__class__.__name__, "module": page.__module__} })
 
 
