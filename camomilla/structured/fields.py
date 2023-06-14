@@ -6,7 +6,9 @@ from django.db import models
 from django.utils.dateparse import parse_duration
 from django.utils.duration import duration_string
 from jsonmodels import fields
+from jsonmodels.validators import ValidationError
 from camomilla.utils.getters import pointed_getter
+
 
 __all__ = [
     "CharField",
@@ -164,7 +166,34 @@ class URLField(CharField):
 
 
 class ListField(fields.ListField, Field):
-    pass
+    
+    def parse_value(self, values):
+        """Cast value to proper collection."""
+        result = self.get_default_value()
+        if not values:
+            return result
+        if not isinstance(values, list):
+            return values
+        parent = self.parent
+        return [self._cast_value(value, parent) for value in values]
+    
+    def _cast_value(self, value, parent):
+        if isinstance(value, self.items_types):
+            return value
+        else:
+            if len(self.items_types) != 1:
+                tpl = 'Cannot decide which type to choose from "{types}".'
+                raise ValidationError(
+                    tpl.format(types=", ".join([t.__name__ for t in self.items_types]))
+                )
+            from camomilla.structured.models import Model
+            if issubclass(self.items_types[0], Model):
+                instance = self.items_types[0]()
+                relations = instance.prepopulate(**value)
+                instance.bind(parent)
+                instance.populate(**relations)
+                return instance
+            return self.items_types[0](**value)
 
 
 class DictField(fields.DictField, Field):

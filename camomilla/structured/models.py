@@ -1,6 +1,8 @@
 from collections import defaultdict
 from jsonmodels.models import Base
-from camomilla.structured.fields import ForeignKey, ForeignKeyList, EmbeddedField
+from jsonmodels.fields import _LazyType
+from jsonmodels.validators import ValidationError
+from camomilla.structured.fields import ForeignKey, ForeignKeyList, EmbeddedField, ListField
 from camomilla.utils.getters import pointed_getter
 
 __all__ = ["Model"]
@@ -48,7 +50,7 @@ class Model(Base):
         relations = {}
         for _, struct_name, field in self.iterate_with_name():
             if struct_name in kwargs and isinstance(
-                field, (ForeignKey, ForeignKeyList, EmbeddedField)
+                field, (ForeignKey, ForeignKeyList, EmbeddedField, ListField)
             ):
                 relations[struct_name] = kwargs.pop(struct_name)
         super(Model, self).populate(**kwargs)
@@ -71,6 +73,25 @@ class Model(Base):
                 if isinstance(value, list):
                     model = getattr(field, "inner_model", None)
                     relateds[model].update([i for i in value if i])
+            elif isinstance(field, ListField):
+                values = pointed_getter(struct, struct_name, [])
+                if isinstance(values, list):
+                    items_types = getattr(field, "items_types", None)
+                    for val in values:
+                        if isinstance(val, Model):
+                            inner_type = val.__class__
+                            val = val.to_struct()
+                        else:
+                            if len(items_types) != 1:
+                                tpl = 'Cannot decide which type to choose from "{types}".'
+                                raise ValidationError(
+                                    tpl.format(types=", ".join([t.__name__ for t in items_types]))
+                                )
+                            inner_type = items_types[0]
+                            if isinstance(inner_type, _LazyType):
+                                inner_type = inner_type.evaluate(cls)
+                        for model, pks in inner_type.get_all_relateds(val).items():
+                            relateds[model].update(pks)
             elif isinstance(field, EmbeddedField):
                 value = struct.get(struct_name, None)
                 if isinstance(value, Model):
@@ -97,7 +118,6 @@ class Model(Base):
 
 
 def build_model_cache(model, values):
-    # TODO: improve this split loop performances
     models = []
     pks = []
     for value in values:
