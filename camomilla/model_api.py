@@ -51,7 +51,7 @@ def register(
             f"{model.__name__}ViewSet",
             (base_viewset,),
             {
-                "queryset": model.objects.all() if filters is None else model.objects.filter(**filters),
+                "get_queryset": lambda self: model.objects.all() if filters is None else model.objects.filter(**filters),
                 "serializer_class": serializer,
                 **viewset_attrs,
             },
