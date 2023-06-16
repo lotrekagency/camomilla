@@ -1,4 +1,5 @@
 import json
+import base64
 import os
 from io import BytesIO
 import cv2
@@ -12,7 +13,8 @@ from camomilla.settings import (
     THUMBNAIL_FOLDER,
     MEDIA_MAX_WIDTH,
     MEDIA_MAX_HEIGHT,
-    DPI,
+    MEDIA_DPI,
+    MEDIA_BREAKPOINTS,
 )
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
@@ -87,6 +89,7 @@ class Media(models.Model):
     size = models.IntegerField(default=0, blank=True, null=True)
     mime_type = models.CharField(max_length=128, blank=True, null=True)
     image_props = JSONField(default=dict, blank=True)
+    image_sourceset = JSONField(default=dict, blank=True)
     folder = models.ForeignKey(
         MediaFolder,
         null=True,
@@ -157,14 +160,14 @@ class Media(models.Model):
         
         return {"center_x": f"{center_x}%", "center_y": f"{center_y}%"}
 
-    def _resize(self, thumbnail=False):
+    def _resize(self, thumbnail=False, breakpoint=None):
         try:
             fh = storage.open(self.file.name, "rb")
             self.mime_type = magic.from_buffer(fh.read(2048), mime=True)
         except FileNotFoundError as ex:
             self.image_props = {}
             self.mime_type = ""
-            return False
+            return False, {}
         try:
             image = Image.open(fh)
             self.image_props = {
@@ -175,12 +178,12 @@ class Media(models.Model):
             }
         except Exception as ex:
             print(ex)
-            return False
+            return False, {}
 
         try:
+            image_sourceset = {}
             if thumbnail:
                 image.thumbnail((THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT), Image.ANTIALIAS)
-
                 # Path to save to, name, and extension
                 thumb_name, thumb_extension = os.path.splitext(self.file.name)
                 thumb_extension = thumb_extension.lower()
@@ -200,29 +203,43 @@ class Media(models.Model):
             else:
                 width, height = image.size
 
-                if (
-                    width <= MEDIA_MAX_WIDTH and height <= MEDIA_MAX_HEIGHT
-                ) and image.info["dpi"][0] <= DPI:
-                    return True
 
                 if width <= height:
-                    max_width = int((MEDIA_MAX_HEIGHT / height) * width)
-                    max_height = MEDIA_MAX_HEIGHT
+                    selected_width = int((MEDIA_MAX_HEIGHT / height) * width)
+                    selected_height = MEDIA_MAX_HEIGHT
                 else:
-                    max_height = int((MEDIA_MAX_WIDTH / width) * height)
-                    max_width = MEDIA_MAX_WIDTH
+                    selected_height = int((MEDIA_MAX_WIDTH / width) * height)
+                    selected_width = MEDIA_MAX_WIDTH
 
-                image = image.resize([max_width, max_height])  # reducing_gap=3.0
+                image = image.resize([selected_width, selected_height], resample=Image.LANCZOS)
 
-                image.info["dpi"] = (DPI, DPI)
+                image.info["dpi"] = (MEDIA_DPI, MEDIA_DPI)
                 self.image_props = {
                     "width": image.width,
                     "height": image.height,
                     "format": image.format,
                     "mode": image.mode,
                 }
+
+                for breakpoint_name, breakpoint in MEDIA_BREAKPOINTS.items():
+                    if width <= height:
+                        breakpoint_selected_width = int((breakpoint / height) * width)
+                        breakpoint_selected_height = breakpoint
+                    else:
+                        breakpoint_selected_height = int((breakpoint / width) * height)
+                        breakpoint_selected_width = breakpoint
+                    breakpoint_image = image.copy()
+                    breakpoint_image = breakpoint_image.resize([breakpoint_selected_width, breakpoint_selected_height], resample=Image.LANCZOS) 
+                    path = "/".join(self.file.path.split("/")[:-1])
+                    file_name, file_extension = os.path.splitext(self.file.name)
+                    new_file_name = f"{file_name}-{breakpoint_name}{file_extension}"                    
+                    file_path = f"{path}/{file_name}-{breakpoint_name}{file_extension}"
+                    breakpoint_image.save(file_path, "PNG", dpi=(MEDIA_DPI, MEDIA_DPI), optimize=True)
+                    image_sourceset[breakpoint_name] = self.file.storage.url(new_file_name)
+
+                self.image_sourceset.update(image_sourceset)
                 temp_img = BytesIO()
-                image.save(temp_img, "PNG", dpi=(DPI, DPI), optimize=True)
+                image.save(temp_img, "PNG", dpi=(MEDIA_DPI, MEDIA_DPI), optimize=True)
                 temp_img.seek(0)
                 self.file.storage.delete(self.file.name)
                 self.file.save(self.file.name, ContentFile(temp_img.read()), save=False)
@@ -230,12 +247,12 @@ class Media(models.Model):
                 temp_img.close()
 
             fh.close()
+            return True, image_sourceset
 
         except Exception as e:
             print(e)
-            return False
+            return False, {}
 
-        return True
 
     def _remove_file(self):
         if self.file:
@@ -265,10 +282,9 @@ class Media(models.Model):
 def update_media(sender, instance, **kwargs):
     center_x, center_y = instance.image_props.get("center_x", None), instance.image_props.get("center_y", None)
     instance._remove_thumbnail()
-    instance._resize(thumbnail=False)
+    _, image_sourceset = instance._resize(thumbnail=False)
     instance._make_thumbnail()
     center_coordinates = {}
-
     if center_x and center_y:
         center_coordinates['center_x'] = center_x
         center_coordinates['center_y'] = center_y
@@ -281,6 +297,7 @@ def update_media(sender, instance, **kwargs):
         thumbnail=instance.thumbnail,
         mime_type=instance.mime_type,
         image_props=props,
+        image_sourceset=image_sourceset,
     )
 
 
