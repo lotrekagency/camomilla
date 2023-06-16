@@ -1,0 +1,93 @@
+<div style='position: relative;'>
+    <img src='{{ self.file.url }}' style='position: relative; z-index: 1;' id="image">
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="crosshair-box" id="crosshairBox">
+        <div class="crosshair" id="crosshair"></div>
+    </div>
+</div>
+
+<script>
+
+    console.log(document.querySelector('#id_image_props'))
+
+    var imageProps = document.querySelector('#id_image_props');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        var crosshairBox = document.getElementById('crosshairBox');
+        var crosshair = document.getElementById('crosshair');
+        var overlay = document.getElementById('overlay');
+        var image = document.getElementById('image');
+
+        var xCoordinate = "" + {{ self.image_props.center_x }} + "";
+        var yCoordinate = "" + {{ self.image_props.center_y }} + "";
+
+        crosshairBox.style.top = yCoordinate;
+        crosshairBox.style.left = xCoordinate;
+
+        overlay.addEventListener('click', function(event) {
+            var rect = image.getBoundingClientRect();
+            var mouseX = event.clientX - rect.left;
+            var mouseY = event.clientY - rect.top;            
+            crosshairBox.style.top = mouseY + 'px';
+            crosshairBox.style.left = mouseX + 'px';
+            console.log(mouseX, mouseY);
+            xCoordinate = Math.round((mouseX / image.width) * 100);
+            yCoordinate = Math.round((mouseY / image.height) * 100);
+            let tempValue = JSON.parse(imageProps.value);
+            tempValue.center_x = `${xCoordinate}%`;
+            tempValue.center_y = `${yCoordinate}%`;
+            imageProps.value = JSON.stringify(tempValue);
+        });
+    });
+</script>
+
+<style>
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        z-index: 2;
+    }
+
+    .crosshair-box {
+        position: absolute;
+        top: {{self.image_props.center_y}};
+        left: {{self.image_props.center_x}};
+        z-index: 3;
+    }
+
+    .crosshair {
+        width: 20px;
+        height: 20px;
+        position: relative;
+        border: solid 1px;
+        border-radius: 50%;
+        z-index: 4;
+    }
+
+    .crosshair::before,
+    .crosshair::after {
+        content: "";
+        position: absolute;
+        background-color: black;
+    }
+
+    .crosshair::before {
+        left: 50%;
+        top: 0;
+        height: 100%;
+        width: 2px;
+    }
+
+    .crosshair::after {
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 2px;
+    }
+</style>

@@ -14,7 +14,7 @@ else:
     
 
 from camomilla.models import Article, Content, Media, MediaFolder, Page, Tag
-
+from camomilla.forms import MediaModelForm
 
 class UserProfileAdmin(admin.ModelAdmin):
     pass
@@ -54,12 +54,13 @@ class ContentAdmin(TranslationAwareModel):
 
 
 class MediaAdmin(TranslationAwareModel):
+    form = MediaModelForm
+    
     exclude = (
         "thumbnail",
         "size",
-        "image_props",
     )
-    readonly_fields = ("image_preview", "image_thumb_preview")
+    readonly_fields = ("image_thumb_preview",)
     list_display = (
         "__str__",
         "title",

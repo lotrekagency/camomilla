@@ -1,10 +1,19 @@
 import json
 import os
 from io import BytesIO
+import cv2
+from django.template import Template, Context
 
 import magic
 from django.conf import settings
-from camomilla.settings import THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, THUMBNAIL_FOLDER
+from camomilla.settings import (
+    THUMBNAIL_WIDTH,
+    THUMBNAIL_HEIGHT,
+    THUMBNAIL_FOLDER,
+    MEDIA_MAX_WIDTH,
+    MEDIA_MAX_HEIGHT,
+    DPI,
+)
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage as storage
@@ -62,7 +71,6 @@ class MediaFolder(AbstractMediaFolder):
 
 
 class Media(models.Model):
-
     # Seo Attributes
     alt_text = models.CharField(max_length=200, blank=True, null=True)
     title = models.CharField(max_length=200, blank=True, null=True)
@@ -95,15 +103,11 @@ class Media(models.Model):
     def is_image(self):
         return self.mime_type and self.mime_type.startswith("image")
 
-    def image_preview(self):
-        if self.file:
-            return mark_safe('<img src="{0}" />'.format(self.file.url))
 
     def image_thumb_preview(self):
         if self.thumbnail:
             return mark_safe('<img src="{0}" />'.format(self.thumbnail.url))
 
-    image_preview.short_description = _("Preview")
     image_thumb_preview.short_description = _("Thumbnail")
 
     class Meta:
@@ -130,47 +134,105 @@ class Media(models.Model):
         return json.dumps(json_r)
 
     def _make_thumbnail(self):
+        return self._resize(thumbnail=True)
+
+    def _identify_relevant_area(self):
+        image = cv2.imread(self.file.path)
+        gray_scale_version = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        _, threshold = cv2.threshold(
+            gray_scale_version, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
+        )
+
+        contours, _ = cv2.findContours(
+            threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        )
+        largest_contour = max(contours, key=cv2.contourArea)
+
+        x, y, w, h = cv2.boundingRect(largest_contour)
+
+        center_x = x + w // 2
+        center_y = y + h // 2
+        center_x = int(center_x / image.shape[1]*100)
+        center_y = int(center_y / image.shape[0]*100)
+        
+        return {"center_x": f"{center_x}%", "center_y": f"{center_y}%"}
+
+    def _resize(self, thumbnail=False):
         try:
             fh = storage.open(self.file.name, "rb")
             self.mime_type = magic.from_buffer(fh.read(2048), mime=True)
         except FileNotFoundError as ex:
-            print(ex)
             self.image_props = {}
             self.mime_type = ""
             return False
         try:
-            orig_image = Image.open(fh)
-            image = orig_image.copy()
+            image = Image.open(fh)
             self.image_props = {
-                "width": orig_image.width,
-                "height": orig_image.height,
-                "format": orig_image.format,
-                "mode": orig_image.mode,
+                "width": image.width,
+                "height": image.height,
+                "format": image.format,
+                "mode": image.mode,
             }
         except Exception as ex:
             print(ex)
             return False
 
         try:
-            image.thumbnail((THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT), Image.ANTIALIAS)
+            if thumbnail:
+                image.thumbnail((THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT), Image.ANTIALIAS)
+
+                # Path to save to, name, and extension
+                thumb_name, thumb_extension = os.path.splitext(self.file.name)
+                thumb_extension = thumb_extension.lower()
+
+                thumb_filename = thumb_name + "_thumb" + thumb_extension
+
+                temp_thumb = BytesIO()
+                image.save(temp_thumb, "PNG", optimize=True)
+                temp_thumb.seek(0)
+
+                # Load a ContentFile into the thumbnail field so it gets saved
+                self.thumbnail.save(
+                    thumb_filename, ContentFile(temp_thumb.read()), save=False
+                )
+                temp_thumb.close()
+
+            else:
+                width, height = image.size
+
+                if (
+                    width <= MEDIA_MAX_WIDTH and height <= MEDIA_MAX_HEIGHT
+                ) and image.info["dpi"][0] <= DPI:
+                    return True
+
+                if width <= height:
+                    max_width = int((MEDIA_MAX_HEIGHT / height) * width)
+                    max_height = MEDIA_MAX_HEIGHT
+                else:
+                    max_height = int((MEDIA_MAX_WIDTH / width) * height)
+                    max_width = MEDIA_MAX_WIDTH
+
+                image = image.resize([max_width, max_height])  # reducing_gap=3.0
+
+                image.info["dpi"] = (DPI, DPI)
+                self.image_props = {
+                    "width": image.width,
+                    "height": image.height,
+                    "format": image.format,
+                    "mode": image.mode,
+                }
+                temp_img = BytesIO()
+                image.save(temp_img, "PNG", dpi=(DPI, DPI), optimize=True)
+                temp_img.seek(0)
+                self.file.storage.delete(self.file.name)
+                self.file.save(self.file.name, ContentFile(temp_img.read()), save=False)
+
+                temp_img.close()
+
             fh.close()
 
-            # Path to save to, name, and extension
-            thumb_name, thumb_extension = os.path.splitext(self.file.name)
-            thumb_extension = thumb_extension.lower()
-
-            thumb_filename = thumb_name + "_thumb" + thumb_extension
-
-            temp_thumb = BytesIO()
-            image.save(temp_thumb, "PNG", optimize=True)
-            temp_thumb.seek(0)
-
-            # Load a ContentFile into the thumbnail field so it gets saved
-            self.thumbnail.save(
-                thumb_filename, ContentFile(temp_thumb.read()), save=False
-            )
-            temp_thumb.close()
-        except Exception:
+        except Exception as e:
+            print(e)
             return False
 
         return True
@@ -201,13 +263,24 @@ class Media(models.Model):
 
 @receiver(post_save, sender=Media, dispatch_uid="make thumbnails")
 def update_media(sender, instance, **kwargs):
+    center_x, center_y = instance.image_props.get("center_x", None), instance.image_props.get("center_y", None)
     instance._remove_thumbnail()
+    instance._resize(thumbnail=False)
     instance._make_thumbnail()
+    center_coordinates = {}
+
+    if center_x and center_y:
+        center_coordinates['center_x'] = center_x
+        center_coordinates['center_y'] = center_y
+    else:
+        center_coordinates = instance._identify_relevant_area()
+    props = {**instance.image_props, **center_coordinates}
+
     Media.objects.filter(pk=instance.pk).update(
         size=instance._get_file_size(),
         thumbnail=instance.thumbnail,
         mime_type=instance.mime_type,
-        image_props=instance.image_props,
+        image_props=props,
     )
 
 
