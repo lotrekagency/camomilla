@@ -4,7 +4,7 @@ from .widgets import ImagePreviewWidget
 
 class MediaModelForm(forms.ModelForm):
 
-    image_preview = forms.Field(widget=ImagePreviewWidget())
+    image_preview = forms.Field(widget=ImagePreviewWidget(), required=False)
     
     class Meta:
         model = Media
