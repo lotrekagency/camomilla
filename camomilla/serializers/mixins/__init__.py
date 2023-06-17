@@ -9,8 +9,8 @@ from rest_framework import serializers
 from rest_framework.utils import model_meta
 
 from camomilla.fields import ORDERING_ACCEPTED_FIELDS
-from camomilla.serializers.fields import FieldsOverrideMixin
 from camomilla.serializers.fields.related import RelatedField
+from camomilla.serializers.utils import build_standard_model_serializer
 from camomilla.serializers.validators import UniquePermalinkValidator
 from camomilla.utils import dict_merge
 
@@ -117,30 +117,11 @@ class NestMixin:
         if (
             field_class is RelatedField and nested_depth > 1
         ):  # stop recursion one step before the jump :P
-            field_kwargs["serializer"] = self.build_standard_model_serializer(
+            field_kwargs["serializer"] = build_standard_model_serializer(
                 relation_info[1], nested_depth - 1
             )
         return field_class, field_kwargs
 
-    def build_standard_model_serializer(self, model, depth):
-        return type(
-            f"{model.__name__}StandardSerializer",
-            (
-                NestMixin,
-                FieldsOverrideMixin,
-                JSONFieldPatchMixin,
-                OrderingMixin,
-                SetupEagerLoadingMixin,
-                serializers.ModelSerializer,
-            ),
-            {
-                "Meta": type(
-                    "Meta",
-                    (object,),
-                    {"model": model, "depth": depth, "fields": "__all__"},
-                )
-            },
-        )
 
 
 class AbstractPageMixin(serializers.ModelSerializer):
@@ -171,3 +152,4 @@ class AbstractPageMixin(serializers.ModelSerializer):
 
     def get_validators(self):
         return super().get_validators() + [UniquePermalinkValidator()]
+ 

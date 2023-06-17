@@ -1,6 +1,7 @@
 from django import template
 from camomilla.models import Menu
-from django.contrib.contenttypes.models import ContentType
+
+from camomilla.models.menu import MenuNode
 
 register = template.Library()
 
@@ -16,15 +17,5 @@ def get_menus(context, *args):
 
 
 @register.filter(name="node_url")
-def get_menu_node_url(node):
-    link = node.get("link", {})
-    link_type = link.get("link_type", None)
-    if link_type == "RE":
-        # TODO: increase performances of this:
-        rel = link.get("relational")
-        c_type = ContentType.objects.filter(pk=rel["content_type"]).first()
-        model = c_type and c_type.model_class()
-        page = model and model.objects.filter(pk=rel.get("page_id")).first()
-        return getattr(page, "permalink", None)
-    elif link_type == "ST":
-        return link.get("static", None)
+def get_menu_node_url(node: MenuNode):
+    return node.link.url

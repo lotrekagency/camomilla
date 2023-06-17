@@ -70,6 +70,14 @@ class Field(fields.BaseField):
 
     def bind(self, parent):
         self.parent = parent
+    
+    @classmethod
+    def to_db_transform(cls, data):
+        return data
+
+    @classmethod
+    def from_db_transform(cls, data):
+        return data
 
 
 class CharField(fields.StringField, Field):
@@ -181,21 +189,25 @@ class ListField(fields.ListField, Field):
         if isinstance(value, self.items_types):
             return value
         else:
-            if len(self.items_types) != 1:
-                tpl = 'Cannot decide which type to choose from "{types}".'
-                raise ValidationError(
-                    tpl.format(types=", ".join([t.__name__ for t in self.items_types]))
-                )
+            main_type = self._get_main_type()
             from camomilla.structured.models import Model
-            if issubclass(self.items_types[0], Model):
-                instance = self.items_types[0]()
+            if issubclass(main_type, Model):
+                instance = main_type()
                 relations = instance.prepopulate(**value)
                 instance.bind(parent)
                 instance.populate(**relations)
                 return instance
-            return self.items_types[0](**value)
+            return main_type(**value)
 
-
+    def _get_main_type(self):
+        if len(self.items_types) != 1:
+            raise ValidationError(
+                'Cannot decide which type to choose from "{items_types}".'.format(
+                    items_types=", ".join([t.__name__ for t in self.items_types])
+                )
+            )
+        return self.items_types[0]
+    
 class DictField(fields.DictField, Field):
     pass
 

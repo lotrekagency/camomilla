@@ -22,7 +22,7 @@ class StructuredDescriptior(DeferredAttribute):
                     v = self.field.populate_schema(v)
                 elif not isinstance(v, self.field.schema):
                     raise TypeError(
-                        f"{type(value)} is not a valid type for the given schema."
+                        f"{type(v)} is not a valid type for the given schema ({self.field.schema})."
                     )
                 v.validate()
                 _stack.append(v)
@@ -30,7 +30,9 @@ class StructuredDescriptior(DeferredAttribute):
         elif isinstance(value, self.field.schema):
             value.validate()
         else:
-            raise TypeError(f"{type(value)} is not a valid type for the given schema.")
+            raise TypeError(
+                f"{type(value)} is not a valid type for the given schema ({self.field.schema})."
+            )
         instance.__dict__[self.field.attname] = value
 
 
@@ -60,14 +62,19 @@ class StructuredJSONField(JSONField):
                 (v if isinstance(v, self.schema) else self.populate_schema(v))
                 for v in value
             ]
-            value = [v.to_struct() for v in value]
+            value = [self.schema.to_db_transform(v.to_struct()) for v in value]
         elif isinstance(value, dict):
-            value = self.populate_schema(value).to_struct()
+            value = self.schema.to_db_transform(self.populate_schema(value).to_struct())
         elif isinstance(value, self.schema):
-            value = value.to_struct()
+            value = self.schema.to_db_transform(value.to_struct())
         else:
             raise TypeError(f"{type(value)} is not a valid type for the given schema.")
         return super().get_prep_value(value)
+
+    def from_db_value(self, value, expression, connection):
+        return self.schema.from_db_transform(
+            super().from_db_value(value, expression, connection)
+        )
 
     def get_prefetched_data(self):
         return self._cache.get_prefetched_data()

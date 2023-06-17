@@ -2,7 +2,12 @@ from collections import defaultdict
 from jsonmodels.models import Base
 from jsonmodels.fields import _LazyType
 from jsonmodels.validators import ValidationError
-from camomilla.structured.fields import ForeignKey, ForeignKeyList, EmbeddedField, ListField
+from camomilla.structured.fields import (
+    ForeignKey,
+    ForeignKeyList,
+    EmbeddedField,
+    ListField,
+)
 from camomilla.utils.getters import pointed_getter
 
 __all__ = ["Model"]
@@ -60,13 +65,21 @@ class Model(Base):
         self._cache.parent = parent
 
     @classmethod
+    def to_db_transform(cls, data):
+        return data
+
+    @classmethod
+    def from_db_transform(cls, data):
+        return data
+    
+    @classmethod
     def get_all_relateds(cls, struct):
         relateds = defaultdict(set)
         for _, struct_name, field in cls.iterate_with_name():
             if isinstance(field, ForeignKey):
                 value = struct.get(struct_name, None)
                 model = getattr(field, "model", None)
-                if value and not isinstance(value, model):
+                if value:
                     relateds[model].add(value)
             elif isinstance(field, ForeignKeyList):
                 value = pointed_getter(struct, struct_name, [])
@@ -76,22 +89,17 @@ class Model(Base):
             elif isinstance(field, ListField):
                 values = pointed_getter(struct, struct_name, [])
                 if isinstance(values, list):
-                    items_types = getattr(field, "items_types", None)
                     for val in values:
                         if isinstance(val, Model):
-                            inner_type = val.__class__
+                            main_type = val.__class__
                             val = val.to_struct()
                         else:
-                            if len(items_types) != 1:
-                                tpl = 'Cannot decide which type to choose from "{types}".'
-                                raise ValidationError(
-                                    tpl.format(types=", ".join([t.__name__ for t in items_types]))
-                                )
-                            inner_type = items_types[0]
-                            if isinstance(inner_type, _LazyType):
-                                inner_type = inner_type.evaluate(cls)
-                        for model, pks in inner_type.get_all_relateds(val).items():
-                            relateds[model].update(pks)
+                            main_type = field._get_main_type()
+                            if isinstance(main_type, _LazyType):
+                                main_type = main_type.evaluate(cls)
+                        if issubclass(main_type, Model):
+                            for model, pks in main_type.get_all_relateds(val).items():
+                                relateds[model].update(pks)
             elif isinstance(field, EmbeddedField):
                 value = struct.get(struct_name, None)
                 if isinstance(value, Model):
