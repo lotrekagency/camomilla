@@ -119,6 +119,13 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
     def __str__(self):
         return "(%s) %s" % (self.__class__.__name__, self.title or self.permalink)
 
+    def get_context(self, request=None):
+        return {
+            "page": self,
+            "page_model": {"class": self.__class__.__name__, "module": self.__module__},
+            "request": request,
+        }
+
     @property
     def model_name(self):
         return self._meta.app_label + "." + self._meta.model_name
@@ -140,7 +147,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
         if self.parent:
             return self.parent.breadcrumbs + [breadcrumb]
         return [breadcrumb]
-    
+
     @property
     def is_public(self):
         if self.status == "PUB":
@@ -220,7 +227,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
     def get(cls, request, *args, **kwargs):
         bypass_type_check = kwargs.pop("bypass_type_check", False)
         bypass_public_check = kwargs.pop("bypass_public_check", False)
-        
+
         if len(kwargs.keys()) > 0:
             page = cls.objects.get(**kwargs)
         else:
@@ -234,9 +241,9 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
             bases = (UrlNode.DoesNotExist,)
             if hasattr(cls, "DoesNotExist"):
                 bases += (cls.DoesNotExist,)
-            raise type(
-                "PageDoesNotExist", bases, {}
-            )("%s matching query does not exist." % cls._meta.object_name)
+            raise type("PageDoesNotExist", bases, {})(
+                "%s matching query does not exist." % cls._meta.object_name
+            )
         return page
 
     @classmethod
