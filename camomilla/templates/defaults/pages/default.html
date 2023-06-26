@@ -1,6 +1,5 @@
 {% load menus %}
 {% load i18n %}
-{% get_menus as menus %}
 {% get_current_language as current_lang %}
 
 
@@ -52,7 +51,7 @@
 <body>
     <header >
         {% block main_menu %}
-            {{menus.main_menu.render}}
+            {% render_menu "main_menu" %}
         {% endblock %}
         {% block language_switch %}
             {% include "defaults/parts/langswitch.html" %}

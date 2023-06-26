@@ -2,9 +2,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.template.loader import render_to_string
+from django.template import RequestContext
 from django.utils.safestring import mark_safe
 from camomilla import structured
 from camomilla.models.page import UrlNode
+from typing import Union
 
 
 class MenuNodeLink(structured.Model):
@@ -13,7 +15,7 @@ class MenuNodeLink(structured.Model):
     url_node = structured.ForeignKey(UrlNode)
     content_type = structured.IntegerField()
     page_id = structured.IntegerField()
-    
+
     @classmethod
     def to_db_transform(cls, data):
         if data.get("link_type", None) == "RE":
@@ -52,6 +54,7 @@ class MenuNode(structured.Model):
         link = data.pop("link", {})
         return {**data, "link": MenuNodeLink.to_db_transform(link)}
 
+
 class Menu(models.Model):
     key = models.CharField(max_length=200, unique=True)
     available_classes = models.JSONField(default=dict)
@@ -62,10 +65,16 @@ class Menu(models.Model):
         verbose_name = _("menu")
         verbose_name_plural = _("menus")
 
-    def render(self, request=None):
-        return mark_safe(
-            render_to_string("defaults/parts/menu.html", {"menu": self}, request)
-        )
+    def render(
+        self,
+        template_path:str,
+        request=None,
+        context: Union[dict, RequestContext] = {},
+    ):
+        if isinstance(context, RequestContext):
+            context = context.flatten()
+        context.update({"menu": self})
+        return mark_safe(render_to_string(template_path, context, request))
 
     class defaultdict(dict):
         def __missing__(self, key):
