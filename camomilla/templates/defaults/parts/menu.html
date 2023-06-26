@@ -3,14 +3,12 @@
 <ul>
   {% for item in menu.nodes %}
   <li>
-    {% with url=item|node_url %}
-        {% if url %}
-            <a href="{{ url }}">{{ item.title }}</a>
-        {% else %}
-            <span>{{item.title}}</span>
-        {% endif %}
-        {% include 'defaults/parts/menu.html' with menu=item %} 
-    {%endwith%}
+    {% if item.link.url %}
+      <a href="{{ item.link.url }}">{{ item.title }}</a>
+    {% else %}
+      <span>{{item.title}}</span>
+    {% endif %}
+    {% include 'defaults/parts/menu.html' with menu=item %} 
   </li>
   {% endfor %}
 </ul>

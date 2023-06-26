@@ -6,7 +6,9 @@ from django.db import models
 from django.utils.dateparse import parse_duration
 from django.utils.duration import duration_string
 from jsonmodels import fields
+from jsonmodels.validators import ValidationError
 from camomilla.utils.getters import pointed_getter
+
 
 __all__ = [
     "CharField",
@@ -68,6 +70,14 @@ class Field(fields.BaseField):
 
     def bind(self, parent):
         self.parent = parent
+    
+    @classmethod
+    def to_db_transform(cls, data):
+        return data
+
+    @classmethod
+    def from_db_transform(cls, data):
+        return data
 
 
 class CharField(fields.StringField, Field):
@@ -164,9 +174,40 @@ class URLField(CharField):
 
 
 class ListField(fields.ListField, Field):
-    pass
+    
+    def parse_value(self, values):
+        """Cast value to proper collection."""
+        result = self.get_default_value()
+        if not values:
+            return result
+        if not isinstance(values, list):
+            return values
+        parent = self.parent
+        return [self._cast_value(value, parent) for value in values]
+    
+    def _cast_value(self, value, parent):
+        if isinstance(value, self.items_types):
+            return value
+        else:
+            main_type = self._get_main_type()
+            from camomilla.structured.models import Model
+            if issubclass(main_type, Model):
+                instance = main_type()
+                relations = instance.prepopulate(**value)
+                instance.bind(parent)
+                instance.populate(**relations)
+                return instance
+            return main_type(**value)
 
-
+    def _get_main_type(self):
+        if len(self.items_types) != 1:
+            raise ValidationError(
+                'Cannot decide which type to choose from "{items_types}".'.format(
+                    items_types=", ".join([t.__name__ for t in self.items_types])
+                )
+            )
+        return self.items_types[0]
+    
 class DictField(fields.DictField, Field):
     pass
 
