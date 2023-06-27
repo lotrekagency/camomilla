@@ -9,18 +9,18 @@ from django.http import Http404
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.settings import ENABLE_REGISTRATIONS
 
 from camomilla.models.mixins import MetaMixin, SeoMixin
 from camomilla.utils import (
+    activate_languages,
     get_field_translations,
     get_nofallbacks,
+    lang_fallback_query,
     set_nofallbacks,
     url_lang_decompose,
-    lang_fallback_query,
-    activate_languages,
 )
-
-from modeltranslation.settings import ENABLE_REGISTRATIONS
+from camomilla.utils.getters import pointed_getter
 
 
 class UrlNodeManager(models.Manager):
@@ -90,7 +90,21 @@ PAGE_STATUS = (
 )
 
 
-class AbstractPage(SeoMixin, MetaMixin, models.Model):
+class PageBase(models.base.ModelBase):
+    def __new__(cls, name, bases, attrs, **kwargs):
+        attr_meta = attrs.pop("PageMeta", None)
+        new_class = super().__new__(cls, name, bases, attrs, **kwargs)
+        page_meta = attr_meta or getattr(new_class, "PageMeta", None)
+        base_page_meta = getattr(new_class, "_page_meta", None)
+        if page_meta:
+            for name, value in getattr(base_page_meta, "__dict__", {}).items():
+                if name not in page_meta.__dict__:
+                    setattr(page_meta, name, value)
+            setattr(new_class, "_page_meta", page_meta)
+        return new_class
+
+
+class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated_at = models.DateTimeField(auto_now=True)
     url_node = models.OneToOneField(
@@ -156,21 +170,18 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
             return bool(self.pubblication_date) and timezone.now() > self.pubblication_date
         return False
 
-    @property
-    def template_name(self):
-        return self.template or "defaults/pages/default.html"
+    def get_template_path(self, request=None):
+        return self.template or pointed_getter(self, "_page_meta.default_template")
 
     @property
     def childs(self):
-        if hasattr(self, "PageMeta") and hasattr(self.PageMeta, "child_page_field"):
-            return getattr(self, self.PageMeta.child_page_field)
+        if hasattr(self._page_meta, "child_page_field"):
+            return getattr(self, self._page_meta.child_page_field)
         return getattr(self, PAGE_CHILD_RELATED_NAME % self.model_info)
 
     @property
     def parent(self):
-        if hasattr(self, "PageMeta") and hasattr(self.PageMeta, "parent_page_field"):
-            return getattr(self, self.PageMeta.parent_page_field)
-        return self.parent_page
+        return getattr(self, self._page_meta.parent_page_field)
 
     def _get_or_create_url_node(self) -> UrlNode:
         if not self.url_node:
@@ -281,6 +292,10 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model):
         ordering = ("ordering",)
         verbose_name = _("Page")
         verbose_name_plural = _("Pages")
+
+    class PageMeta:
+        parent_page_field = "parent_page"
+        default_template = "defaults/pages/default.html"
 
 
 class Page(AbstractPage):

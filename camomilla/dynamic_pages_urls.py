@@ -9,7 +9,7 @@ def fetch(request, *args, **kwargs):
         page = Page.get_or_404(request, bypass_type_check=True)
     else:
         page, _ = Page.get_or_create_homepage()
-    return render(request, page.template_name, page.get_context(request))
+    return render(request, page.get_template_path(request), page.get_context(request))
 
 
 urlpatterns = [
