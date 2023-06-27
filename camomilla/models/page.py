@@ -75,7 +75,7 @@ class UrlNode(models.Model):
     objects = UrlNodeManager()
 
     @property
-    def page(self):
+    def page(self) -> "AbstractPage":
         return getattr(self, self.related_name)
 
 
@@ -130,7 +130,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         on_delete=models.CASCADE,
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "(%s) %s" % (self.__class__.__name__, self.title or self.permalink)
 
     def get_context(self, request=None):
@@ -141,19 +141,19 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         }
 
     @property
-    def model_name(self):
+    def model_name(self) -> str:
         return self._meta.app_label + "." + self._meta.model_name
 
     @property
-    def model_info(self):
+    def model_info(self) -> dict:
         return {"app_label": self._meta.app_label, "class": self._meta.model_name}
 
     @property
-    def permalink(self):
+    def permalink(self) -> str:
         return self.url_node and self.url_node.permalink
 
     @property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> Iterable[dict]:
         breadcrumb = {
             "permalink": self.permalink,
             "title": self.breadcrumbs_title or self.title or self.slug,
@@ -163,24 +163,24 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         return [breadcrumb]
 
     @property
-    def is_public(self):
+    def is_public(self) -> bool:
         if self.status == "PUB":
             return True
         if self.status == "PLA":
             return bool(self.pubblication_date) and timezone.now() > self.pubblication_date
         return False
 
-    def get_template_path(self, request=None):
+    def get_template_path(self, request=None) -> str:
         return self.template or pointed_getter(self, "_page_meta.default_template")
 
     @property
-    def childs(self):
+    def childs(self) -> models.Manager:
         if hasattr(self._page_meta, "child_page_field"):
             return getattr(self, self._page_meta.child_page_field)
         return getattr(self, PAGE_CHILD_RELATED_NAME % self.model_info)
 
     @property
-    def parent(self):
+    def parent(self) -> models.Model:
         return getattr(self, self._page_meta.parent_page_field)
 
     def _get_or_create_url_node(self) -> UrlNode:
@@ -190,7 +190,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             )
         return self.url_node
 
-    def _update_url_node(self, force=False):
+    def _update_url_node(self, force: bool = False) -> UrlNode:
         self.url_node = self._get_or_create_url_node()
         for _ in activate_languages():
             old_permalink = self.permalink
@@ -202,7 +202,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             self.update_childs()
         return self.url_node
 
-    def generate_permalink(self):
+    def generate_permalink(self) -> str:
         slug = get_nofallbacks(self, "slug")
         if slug is None:
             translations = get_field_translations(self, "slug").values()
@@ -223,19 +223,19 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             )
         return permalink
 
-    def update_childs(self):
+    def update_childs(self) -> None:
         # without pk, no childs there
         if self.pk is not None:
             for child in self.childs.all():
                 child.save()
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         with transaction.atomic():
             self._update_url_node()
             return super().save(*args, **kwargs)
 
     @classmethod
-    def get(cls, request, *args, **kwargs):
+    def get(cls, request, *args, **kwargs) -> "AbstractPage":
         bypass_type_check = kwargs.pop("bypass_type_check", False)
         bypass_public_check = kwargs.pop("bypass_public_check", False)
 
@@ -258,7 +258,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         return page
 
     @classmethod
-    def get_or_create(cls, request, *args, **kwargs):
+    def get_or_create(cls, request, *args, **kwargs) -> Tuple["AbstractPage", bool]:
         try:
             return cls.get(request, *args, **kwargs), False
         except ObjectDoesNotExist:
@@ -267,7 +267,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         return (None, False)
 
     @classmethod
-    def get_or_create_homepage(cls):
+    def get_or_create_homepage(cls) -> Tuple["AbstractPage", bool]:
         try:
             if ENABLE_REGISTRATIONS:
                 node = UrlNode.objects.get(lang_fallback_query(permalink="/"))
@@ -278,13 +278,13 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             return cls.get_or_create(None, slug="")
 
     @classmethod
-    def get_or_404(cls, request, *args, **kwargs):
+    def get_or_404(cls, request, *args, **kwargs) -> "AbstractPage":
         try:
             return cls.get(request, *args, **kwargs)
         except ObjectDoesNotExist:
             raise Http404("No %s matches the given query." % cls._meta.object_name)
 
-    def alternate_urls(self, *args, **kwargs):
+    def alternate_urls(self, *args, **kwargs) -> dict:
         return get_field_translations(self.url_node or object, "permalink", None)
 
     class Meta:
