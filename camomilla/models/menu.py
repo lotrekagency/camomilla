@@ -52,7 +52,12 @@ class MenuNode(structured.Model):
     @classmethod
     def to_db_transform(cls, data):
         link = data.pop("link", {})
-        return {**data, "link": MenuNodeLink.to_db_transform(link)}
+        nodes = data.pop("nodes", {})
+        return {
+            "link": MenuNodeLink.to_db_transform(link),
+            "nodes": [cls.to_db_transform(n) for n in nodes],
+            **data,
+        }
 
 
 class Menu(models.Model):
@@ -67,7 +72,7 @@ class Menu(models.Model):
 
     def render(
         self,
-        template_path:str,
+        template_path: str,
         request=None,
         context: Union[dict, RequestContext] = {},
     ):
