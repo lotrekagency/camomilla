@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.models import Permission
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Q
 
 
 class PermissionSerializer(BaseModelSerializer):
@@ -39,8 +40,9 @@ class UserProfileSerializer(BaseModelSerializer):
     def get_all_permissions(self, instance):
         return PermissionSerializer(
             Permission.objects.filter(
-                group__pk__in=instance.groups.values_list("pk", flat=True)
-            ).union(instance.user_permissions.all()),
+                Q(group__pk__in=instance.groups.values_list("pk", flat=True)) |
+                Q(pk__in=instance.user_permissions.values_list("pk", flat=True))
+            ),
             context=self.context,
             many=True,
         ).data
