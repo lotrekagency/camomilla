@@ -35,3 +35,10 @@ error_logs.log
 dist/
 build/
 *.egg-info
+
+
+# vuepress
+node_modules
+.temp
+.cache
+!docs/media

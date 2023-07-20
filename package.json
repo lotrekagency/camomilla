@@ -1,0 +1,17 @@
+{
+  "name": "camomilla-docs",
+  "version": "1.0.0",
+  "description": "Camomilla documentation build with Vuepress",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs",
+    "docs:publish": "./docs/.vuepress/publishDOCS.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vuepress": "^1.9.9",
+    "vuepress-theme-succinct": "^1.7.2"
+  }
+}
