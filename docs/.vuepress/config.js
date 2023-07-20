@@ -1,7 +1,7 @@
 const sidebar = require('./compose-sidenav')
 
 module.exports = {
-  title: "Camomilla DOC",
+  title: "Camomilla",
   description: "Just playing around with flowers",
   theme: 'vuepress-theme-succinct',
   globalUIComponents: [
@@ -15,10 +15,8 @@ module.exports = {
     repo: 'lotrekagency/camomilla',
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Components', link: '/components/' },
-      { text: 'Core Services', link: '/core/' },
-
-
+      { text: 'How to', link: '/How%20To/' },
+      { text: 'Demo', link: 'https://camomilla.lotrek.io/' },
     ],
     sidebar: sidebar.getSidebar()
   },

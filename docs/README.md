@@ -34,3 +34,73 @@
 </div>
 <h3 style="text-align: center;">Our beloved Django CMS</h3>
 
+
+## ⭐️ Features
+
+<!-- Highlight some of the features your module provide here -->
+- 🧘‍♀️ &nbsp;Built on top of the django framework
+- 🥨 &nbsp;Beaked page abstract model to let you manage everything you need as a page.
+- 🏞️ &nbsp;Optimized media management with autoresize
+- 👯 &nbsp;Enable relations inside django JSONFields
+- ⚡️ &nbsp;AutoCreate api endpoints from models
+- 🚧 &nbsp;Enable JsonSchema directly in models endpoints
+
+
+## 📦 Quick Setup
+
+### Install 
+
+
+```bash
+$ pip install django-camomilla-cms
+```
+
+### Setup 
+
+
+```bash
+$ mkdir -p camomilla_migrations
+$ touch camomilla_migrations.__init__.py
+$ python manage.py makemigrations camomilla
+$ python manage.py migrate camomilla
+```
+
+
+## 🔨 Settings
+
+
+Camomilla brings a lot of default settings you can include in your project's ones
+
+```python
+from camomilla.defaults import *
+```
+
+Remember to add all the required applications in your project
+
+
+```python
+INSTALLED_APPS = [
+    ...
+    'camomilla',
+    'camomilla.theme',
+    'djsuperadmin',
+    'modeltranslation',
+    'djlotrek',
+    'rest_framework',
+    'rest_framework.authtoken',
+    ...
+]
+```
+
+### Run the server
+
+```bash
+$ python manage.py runserver
+```
+
+## 💻 Development
+
+```bash
+$ pip install -r requirements-dev.txt
+$ make test
+```

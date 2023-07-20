@@ -41,4 +41,4 @@ build/
 node_modules
 .temp
 .cache
-!docs/media
+!docs/features/media
