@@ -2,7 +2,7 @@ from typing import Iterable, Tuple
 from uuid import uuid4
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import ProgrammingError, models, transaction
+from django.db import ProgrammingError, OperationalError, models, transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.http import Http404
@@ -65,7 +65,7 @@ class UrlNodeManager(models.Manager):
                     ("pubblication_date", models.DateTimeField(), models.Value(timezone.now(), models.DateTimeField())),
                 ],
             )
-        except ProgrammingError:
+        except (ProgrammingError, OperationalError):
             return super().get_queryset()
 
 
