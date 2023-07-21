@@ -4,7 +4,7 @@ from djsuperadmin.mixins import DjSuperAdminMixin
 
 
 class AbstractContent(DjSuperAdminMixin, models.Model):
-    identifier = models.TextField(unique=True)
+    identifier = models.TextField()
     content = models.TextField(default="")
     page = models.ForeignKey(
         "camomilla.Page",
@@ -24,6 +24,7 @@ class AbstractContent(DjSuperAdminMixin, models.Model):
 
     class Meta:
         abstract = True
+        unique_together = ["identifier", "page"]
 
     def __str__(self):
         if len(self.identifier) > 40:
