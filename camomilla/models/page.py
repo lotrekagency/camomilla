@@ -6,6 +6,7 @@ from django.db import ProgrammingError, OperationalError, models, transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.http import Http404
+from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -77,6 +78,15 @@ class UrlNode(models.Model):
     @property
     def page(self) -> "AbstractPage":
         return getattr(self, self.related_name)
+    
+    @property
+    def routerlink(self) -> str:
+        try:
+            if self.permalink == '/':
+                return reverse('camomilla-homepage')
+            return reverse('camomilla-permalink', args=(self.permalink.lstrip("/"),))
+        except NoReverseMatch:
+            return self.permalink
 
 
 PAGE_CHILD_RELATED_NAME = "%(app_label)s_%(class)s_child_pages"
@@ -118,7 +128,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         default="DRF",
     )
     template = models.CharField(max_length=500, null=True, blank=True)
-    template_data = models.JSONField(default={})
+    template_data = models.JSONField(default=dict)
     identifier = models.CharField(max_length=200, null=True, unique=True)
     pubblication_date = models.DateTimeField(null=True, blank=True)
     indexable = models.BooleanField(default=True)
@@ -158,7 +168,11 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
     @property
     def permalink(self) -> str:
         return self.url_node and self.url_node.permalink
-
+    
+    @property
+    def routerlink(self) -> str:
+        return self.url_node and self.url_node.routerlink
+        
     @property
     def breadcrumbs(self) -> Iterable[dict]:
         breadcrumb = {

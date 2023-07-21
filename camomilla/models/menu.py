@@ -33,7 +33,7 @@ class MenuNodeLink(structured.Model):
 
     def get_url(self, request=None):
         if self.link_type == "RE":
-            return self.url_node and self.url_node.permalink
+            return self.url_node and self.url_node.routerlink
         elif self.link_type == "ST":
             return self.static
 
