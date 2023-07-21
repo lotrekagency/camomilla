@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db.models.aggregates import Max
 from django.db.models.functions import Coalesce
 from django.utils import translation
-from modeltranslation.settings import AVAILABLE_LANGUAGES, ENABLE_REGISTRATIONS
+from modeltranslation.settings import AVAILABLE_LANGUAGES
 from modeltranslation.utils import build_localized_fieldname
 from rest_framework import serializers
 from rest_framework.utils import model_meta
@@ -13,6 +13,7 @@ from camomilla.serializers.fields.related import RelatedField
 from camomilla.serializers.utils import build_standard_model_serializer
 from camomilla.serializers.validators import UniquePermalinkValidator
 from camomilla.utils import dict_merge
+from camomilla.settings import ENABLE_TRANSLATIONS
 
 if django.VERSION >= (4, 0):
     from django.db.models import JSONField as DjangoJSONField
@@ -128,7 +129,7 @@ class AbstractPageMixin(serializers.ModelSerializer):
     LANG_PERMALINK_FIELDS = [
         build_localized_fieldname("permalink", lang)
         for lang in AVAILABLE_LANGUAGES
-        if ENABLE_REGISTRATIONS
+        if ENABLE_TRANSLATIONS
     ]
 
     @property

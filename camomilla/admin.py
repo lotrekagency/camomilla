@@ -4,8 +4,8 @@ from camomilla.settings import PROJECT_TITLE
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
-from modeltranslation.settings import ENABLE_REGISTRATIONS
-if ENABLE_REGISTRATIONS:
+from camomilla.settings import ENABLE_TRANSLATIONS
+if ENABLE_TRANSLATIONS:
     from modeltranslation.admin import TranslationAdmin as TranslationAwareModel
     from modeltranslation.forms import TranslationModelForm as TranslationAwareModelForm
 else:

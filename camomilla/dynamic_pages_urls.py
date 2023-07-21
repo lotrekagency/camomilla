@@ -14,5 +14,5 @@ def fetch(request, *args, **kwargs):
 
 urlpatterns = [
     path("", fetch, name="camomilla-homepage"),
-    path("<path:permalink>", fetch, name="camomilla-catch-em-all"),
+    path("<path:permalink>", fetch, name="camomilla-permalink"),
 ]

@@ -5,6 +5,7 @@ from django.db.models import Model, Q
 from django.utils.translation.trans_real import activate, get_language
 from modeltranslation.settings import AVAILABLE_LANGUAGES, DEFAULT_LANGUAGE
 from modeltranslation.utils import build_localized_fieldname
+from camomilla.settings import BASE_URL
 
 
 def activate_languages(languages: Iterable[str] = AVAILABLE_LANGUAGES) -> Iterator[str]:
@@ -32,11 +33,14 @@ def get_nofallbacks(instance: Model, attr: str, *args, **kwargs) -> Any:
 
 
 def url_lang_decompose(url):
+    if BASE_URL and url.startswith(BASE_URL):
+        url = url[len(BASE_URL):]
     data = {"url": url, "permalink": url, "language": DEFAULT_LANGUAGE}
-    result = re.match(f"^\/?({'|'.join(AVAILABLE_LANGUAGES)})?\/(.*)", url).groups()
-    if result and len(result) == 2:
-        data["language"] = result[0]
-        data["permalink"] = "/%s" % result[1]
+    result = re.match(f"^\/?({'|'.join(AVAILABLE_LANGUAGES)})?\/(.*)", url)
+    groups = result and result.groups()
+    if groups and len(groups) == 2:
+        data["language"] = groups[0]
+        data["permalink"] = "/%s" % groups[1]
     return data
 
 

@@ -9,7 +9,6 @@ from django.http import Http404
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
-from modeltranslation.settings import ENABLE_REGISTRATIONS
 
 from camomilla.models.mixins import MetaMixin, SeoMixin
 from camomilla.utils import (
@@ -21,6 +20,7 @@ from camomilla.utils import (
     url_lang_decompose,
 )
 from camomilla.utils.getters import pointed_getter
+from camomilla import settings
 
 
 class UrlNodeManager(models.Manager):
@@ -134,11 +134,17 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         return "(%s) %s" % (self.__class__.__name__, self.title or self.permalink)
 
     def get_context(self, request=None):
-        return {
+        context={
             "page": self,
             "page_model": {"class": self.__class__.__name__, "module": self.__module__},
             "request": request,
         }
+        inject_func = pointed_getter(self, "_page_meta.inject_context_func")
+        if inject_func and callable(inject_func):
+            new_ctx = inject_func(request=request, super_ctx=context)
+            if isinstance(new_ctx, dict):
+                context.update(new_ctx)
+        return context
 
     @property
     def model_name(self) -> str:
@@ -269,7 +275,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
     @classmethod
     def get_or_create_homepage(cls) -> Tuple["AbstractPage", bool]:
         try:
-            if ENABLE_REGISTRATIONS:
+            if settings.ENABLE_TRANSLATIONS:
                 node = UrlNode.objects.get(lang_fallback_query(permalink="/"))
             else:
                 node = UrlNode.objects.get(permalink="/")
@@ -295,7 +301,8 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
 
     class PageMeta:
         parent_page_field = "parent_page"
-        default_template = "defaults/pages/default.html"
+        default_template = settings.PAGE_DEFAULT_TEMPLATE
+        inject_context_func = settings.PAGE_INJECT_CONTEXT_FUNC
 
 
 class Page(AbstractPage):
