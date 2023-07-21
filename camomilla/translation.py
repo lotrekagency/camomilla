@@ -15,7 +15,7 @@ class SeoMixinTranslationOptions(TranslationOptions):
     )
 
 class AbstractPageTranslationOptions(SeoMixinTranslationOptions):
-    fields = ("breadcrumbs_title", "slug", "status", "indexable")
+    fields = ("breadcrumbs_title", "slug", "status", "indexable", "template_data")
     
 
 @register(Article)
