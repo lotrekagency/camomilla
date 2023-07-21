@@ -118,6 +118,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         default="DRF",
     )
     template = models.CharField(max_length=500, null=True, blank=True)
+    template_data = models.JSONField(default={})
     identifier = models.CharField(max_length=200, null=True, unique=True)
     pubblication_date = models.DateTimeField(null=True, blank=True)
     indexable = models.BooleanField(default=True)
