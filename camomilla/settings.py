@@ -1,60 +1,76 @@
-from django.conf import settings as dj_settings
-from camomilla.utils.getters import pointed_getter
+from django.conf import settings as django_settings
 from modeltranslation.settings import ENABLE_REGISTRATIONS
 
+from camomilla.utils.getters import pointed_getter
 
 PROJECT_TITLE = pointed_getter(
-    dj_settings,
+    django_settings,
     "CAMOMILLA.PROJECT_TITLE",
-    pointed_getter(dj_settings, "CAMOMILLA_PROJECT_TITLE", "Camomilla"),
+    pointed_getter(django_settings, "CAMOMILLA_PROJECT_TITLE", "Camomilla"),
 )
 
 THUMBNAIL_FOLDER = pointed_getter(
-    dj_settings,
+    django_settings,
     "CAMOMILLA.MEDIA.THUMBNAIL.FOLDER",
-    pointed_getter(dj_settings, "CAMOMILLA_THUMBTHUMBNAIL_FOLDER", "thumbnails"),
+    pointed_getter(django_settings, "CAMOMILLA_THUMBTHUMBNAIL_FOLDER", "thumbnails"),
 )
 THUMBNAIL_WIDTH = pointed_getter(
-    dj_settings,
+    django_settings,
     "CAMOMILLA.MEDIA.THUMBNAIL.WIDTH",
-    pointed_getter(dj_settings, "CAMOMILLA_THUMBNAIL_WIDTH", 50),
+    pointed_getter(django_settings, "CAMOMILLA_THUMBNAIL_WIDTH", 50),
 )
 THUMBNAIL_HEIGHT = pointed_getter(
-    dj_settings,
+    django_settings,
     "CAMOMILLA.MEDIA.THUMBNAIL.HEIGHT",
-    pointed_getter(dj_settings, "CAMOMILLA_THUMBNAIL_HEIGHT", 50),
+    pointed_getter(django_settings, "CAMOMILLA_THUMBNAIL_HEIGHT", 50),
 )
 BASE_URL = pointed_getter(
-    dj_settings,
+    django_settings,
     "CAMOMILLA.ROUTER.BASE_URL",
-    pointed_getter(dj_settings, "FORCE_SCRIPT_NAME", None),
+    pointed_getter(django_settings, "FORCE_SCRIPT_NAME", None),
 )
 BASE_URL = BASE_URL and "/" + BASE_URL.strip("/")
 
 
 ARTICLE_DEFAULT_TEMPLATE = pointed_getter(
-    dj_settings, "CAMOMILLA.RENDER.ARTICLE.DEFAULT_TEMPLATE", "defaults/articles/default.html"
+    django_settings,
+    "CAMOMILLA.RENDER.ARTICLE.DEFAULT_TEMPLATE",
+    "defaults/articles/default.html",
 )
 PAGE_DEFAULT_TEMPLATE = pointed_getter(
-    dj_settings, "CAMOMILLA.RENDER.PAGE.DEFAULT_TEMPLATE", "defaults/pages/default.html"
+    django_settings, "CAMOMILLA.RENDER.PAGE.DEFAULT_TEMPLATE", "defaults/pages/default.html"
 )
 ARTICLE_INJECT_CONTEXT_FUNC = pointed_getter(
-    dj_settings, "CAMOMILLA.RENDER.ARTICLE.INJECT_CONTEXT", None
+    django_settings, "CAMOMILLA.RENDER.ARTICLE.INJECT_CONTEXT", None
 )
 PAGE_INJECT_CONTEXT_FUNC = pointed_getter(
-    dj_settings, "CAMOMILLA.RENDER.PAGE.INJECT_CONTEXT", None
+    django_settings, "CAMOMILLA.RENDER.PAGE.INJECT_CONTEXT", None
 )
 
-ENABLE_TRANSLATIONS = ENABLE_REGISTRATIONS and "modeltranslation" in dj_settings.INSTALLED_APPS
+ENABLE_TRANSLATIONS = (
+    ENABLE_REGISTRATIONS and "modeltranslation" in django_settings.INSTALLED_APPS
+)
 
-# dj_settings example
+MEDIA_OPTIMIZE_MAX_WIDTH = pointed_getter(
+    django_settings, "CAMOMILLA.MEDIA.OPTIMIZE.MAX_WIDTH", 1980
+)
+MEDIA_OPTIMIZE_MAX_HEIGHT = pointed_getter(
+    django_settings, "CAMOMILLA.MEDIA.OPTIMIZE.MAX_HEIGHT", 1400
+)
+MEDIA_OPTIMIZE_DPI = pointed_getter(django_settings, "CAMOMILLA.MEDIA.OPTIMIZE.DPI", 30)
+
+ENABLE_MEDIA_OPTIMIZATION = pointed_getter(
+    django_settings, "CAMOMILLA.MEDIA.OPTIMIZE.ENABLE", True
+)
+
+# camomilla settings example
 # CAMOMILLA = {
 #     "PROJECT_TITLE": "",
 #     "ROUTER": {
 #         "BASE_URL": ""
 #     },
 #     "MEDIA": {
-#         "OPTIMIZE": {"WIDTH": 50, "HEIGHT": 50},
+#         "OPTIMIZE": {"MAX_WIDTH": 1980, "MAX_HEIGHT": 1400, "DPI": 30, "ENABLE": True},
 #         "THUMBNAIL": {"FOLDER": "", "WIDTH": 50, "HEIGHT": 50}
 #     },
 #     "RENDER": {

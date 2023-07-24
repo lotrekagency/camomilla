@@ -3,8 +3,6 @@ import os
 from io import BytesIO
 
 import magic
-from django.conf import settings
-from camomilla.settings import THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, THUMBNAIL_FOLDER
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage as storage
@@ -18,6 +16,8 @@ from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
 from camomilla.fields import JSONField
+from camomilla.settings import THUMBNAIL_FOLDER, THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH
+from camomilla.storages.optimize import OptimizedStorage
 
 
 class AbstractMediaFolder(models.Model):
@@ -62,13 +62,12 @@ class MediaFolder(AbstractMediaFolder):
 
 
 class Media(models.Model):
-
     # Seo Attributes
     alt_text = models.CharField(max_length=200, blank=True, null=True)
     title = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
-    file = models.FileField()
+    file = models.FileField(storage=OptimizedStorage())
     thumbnail = models.ImageField(
         upload_to=THUMBNAIL_FOLDER,
         max_length=500,
@@ -110,6 +109,7 @@ class Media(models.Model):
         ordering = ["-pk"]
 
     def regenerate_thumbnail(self):
+        self._remove_thumbnail()
         if self.file:
             self._make_thumbnail()
 
@@ -129,47 +129,42 @@ class Media(models.Model):
         }
         return json.dumps(json_r)
 
-    def _make_thumbnail(self):
+    def _update_file_info(self, img_bytes=None):
         try:
-            fh = storage.open(self.file.name, "rb")
-            self.mime_type = magic.from_buffer(fh.read(2048), mime=True)
-        except FileNotFoundError as ex:
-            print(ex)
-            self.image_props = {}
-            self.mime_type = ""
-            return False
-        try:
-            orig_image = Image.open(fh)
-            image = orig_image.copy()
-            self.image_props = {
-                "width": orig_image.width,
-                "height": orig_image.height,
-                "format": orig_image.format,
-                "mode": orig_image.mode,
-            }
+            if not img_bytes:
+                img_bytes = self.file.storage.open(self.file.name, "rb")
+            self.mime_type = magic.from_buffer(img_bytes.read(2048), mime=True)
+            with Image.open(img_bytes) as image:
+                self.image_props = {
+                    "width": image.width,
+                    "height": image.height,
+                    "format": image.format,
+                    "mode": image.mode,
+                }
         except Exception as ex:
             print(ex)
             return False
 
+    def _make_thumbnail(self, img_bytes=None):
         try:
-            image.thumbnail((THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT), Image.ANTIALIAS)
-            fh.close()
+            if not img_bytes:
+                img_bytes = self.file.storage.open(self.file.name, "rb")
+            with Image.open(img_bytes) as orig_image:
+                image = orig_image.copy()
+                image.thumbnail((THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT), Image.ANTIALIAS)
 
-            # Path to save to, name, and extension
-            thumb_name, thumb_extension = os.path.splitext(self.file.name)
-            thumb_extension = thumb_extension.lower()
-
-            thumb_filename = thumb_name + "_thumb" + thumb_extension
-
-            temp_thumb = BytesIO()
-            image.save(temp_thumb, "PNG", optimize=True)
-            temp_thumb.seek(0)
-
-            # Load a ContentFile into the thumbnail field so it gets saved
-            self.thumbnail.save(
-                thumb_filename, ContentFile(temp_thumb.read()), save=False
-            )
-            temp_thumb.close()
+                # Path to save to, name, and extension
+                thumb_name, thumb_extension = os.path.splitext(self.file.name)
+                thumb_extension = thumb_extension.lower()
+                thumb_filename = thumb_name + "_thumb" + thumb_extension
+                temp_thumb = BytesIO()
+                image.save(temp_thumb, "PNG", optimize=True)
+                temp_thumb.seek(0)
+                # Load a ContentFile into the thumbnail field so it gets saved
+                self.thumbnail.save(
+                    thumb_filename, ContentFile(temp_thumb.read()), save=False
+                )
+                temp_thumb.close()
         except Exception:
             return False
 
@@ -177,32 +172,30 @@ class Media(models.Model):
 
     def _remove_file(self):
         if self.file:
-            file_to_remove = os.path.join(settings.MEDIA_ROOT, self.file.name)
-            if os.path.isfile(file_to_remove):
-                os.remove(file_to_remove)
+            self.file.storage.delete(self.file.name)
 
     def _remove_thumbnail(self):
         if self.thumbnail:
-            file_to_remove = os.path.join(settings.MEDIA_ROOT, self.thumbnail.name)
-            if os.path.isfile(file_to_remove):
-                os.remove(file_to_remove)
+            self.thumbnail.storage.delete(self.thumbnail.name)
 
     def _get_file_size(self):
-        if self.file:
-            file_to_calc = os.path.join(settings.MEDIA_ROOT, self.file.name)
-            if os.path.isfile(file_to_calc):
-                return self.file.size
-            else:
-                return 0
+        try:
+            return self.file.storage.size(self.file.name)
+        except:
+            return 0
 
     def __str__(self):
+        if self.title:
+            return self.title
         return self.file.name
 
 
 @receiver(post_save, sender=Media, dispatch_uid="make thumbnails")
-def update_media(sender, instance, **kwargs):
+def update_media(sender, instance: Media, **kwargs):
     instance._remove_thumbnail()
-    instance._make_thumbnail()
+    image_bytes = instance.file.storage.open(instance.file.name, "rb")
+    instance._update_file_info(image_bytes)
+    instance._make_thumbnail(image_bytes)
     Media.objects.filter(pk=instance.pk).update(
         size=instance._get_file_size(),
         thumbnail=instance.thumbnail,
@@ -212,6 +205,6 @@ def update_media(sender, instance, **kwargs):
 
 
 @receiver(pre_delete, sender=Media, dispatch_uid="make thumbnails")
-def delete_media_files(sender, instance, **kwargs):
+def delete_media_files(sender, instance: Media, **kwargs):
     instance._remove_thumbnail()
     instance._remove_file()
