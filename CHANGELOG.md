@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v6.0.0 (2023-07-31)
+### Fix
+* Fix setup.cfg ([`621db85`](https://github.com/lotrekagency/camomilla/commit/621db857f20657b2b9a030283aa323b02280d48a))
+
 ## v5.8.5 (2023-03-07)
 ### Fix
 * **related:** Nest mixing now is taking depth directly from constructor ([`63c5ae5`](https://github.com/lotrekagency/camomilla/commit/63c5ae5d1c8444bec8b68afac20e2e57fb3b944e))
