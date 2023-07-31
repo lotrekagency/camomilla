@@ -3,6 +3,8 @@
 # abort on errors
 set -e
 
+./docs/.vuepress/moveCHANGELOG.sh
+
 # build
 npm run docs:build
 
