@@ -39,7 +39,7 @@ CAMOMILLA = {
 ```
 
 
-## Media API
+## 🗂️ Media API
 
 The media model has its own api methods to upload file.
 

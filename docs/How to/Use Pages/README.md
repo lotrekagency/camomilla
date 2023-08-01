@@ -127,3 +127,10 @@ class MyPageModel(AbstractPage):
 ```
 
 We suggest to always return `{ "page": self }` in the context. 
+
+### Rest Api
+
+::: warning ⚠️ Beware!
+If you need to create an api endpoint for a model inheriting from the `AbstractPage` model remember to use inside the serializer the `AbstractPageMixin`.
+:::
+
