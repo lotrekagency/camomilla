@@ -38,7 +38,9 @@ ARTICLE_DEFAULT_TEMPLATE = pointed_getter(
     "defaults/articles/default.html",
 )
 PAGE_DEFAULT_TEMPLATE = pointed_getter(
-    django_settings, "CAMOMILLA.RENDER.PAGE.DEFAULT_TEMPLATE", "defaults/pages/default.html"
+    django_settings,
+    "CAMOMILLA.RENDER.PAGE.DEFAULT_TEMPLATE",
+    "defaults/pages/default.html",
 )
 ARTICLE_INJECT_CONTEXT_FUNC = pointed_getter(
     django_settings, "CAMOMILLA.RENDER.ARTICLE.INJECT_CONTEXT", None
@@ -63,6 +65,8 @@ ENABLE_MEDIA_OPTIMIZATION = pointed_getter(
     django_settings, "CAMOMILLA.MEDIA.OPTIMIZE.ENABLE", True
 )
 
+API_NESTING_DEPTH = pointed_getter(django_settings, "CAMOMILLA.API.NESTING_DEPTH", 10)
+
 # camomilla settings example
 # CAMOMILLA = {
 #     "PROJECT_TITLE": "",
@@ -76,5 +80,6 @@ ENABLE_MEDIA_OPTIMIZATION = pointed_getter(
 #     "RENDER": {
 #         "ARTICLE": {"DEFAULT_TEMPLATE": "", "INJECT_CONTEXT": None },
 #         "PAGE": {"DEFAULT_TEMPLATE": "", "INJECT_CONTEXT": None }
-#     }
+#     },
+#     "API": {"NESTING_DEPTH": 10 }
 # }

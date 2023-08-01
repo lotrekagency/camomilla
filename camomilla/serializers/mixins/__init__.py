@@ -1,5 +1,5 @@
 import django
-from django.conf import settings
+from django.conf import settings as django_settings
 from django.db.models.aggregates import Max
 from django.db.models.functions import Coalesce
 from django.utils import translation
@@ -13,7 +13,7 @@ from camomilla.serializers.fields.related import RelatedField
 from camomilla.serializers.utils import build_standard_model_serializer
 from camomilla.serializers.validators import UniquePermalinkValidator
 from camomilla.utils import dict_merge
-from camomilla.settings import ENABLE_TRANSLATIONS
+from camomilla import settings
 
 if django.VERSION >= (4, 0):
     from django.db.models import JSONField as DjangoJSONField
@@ -27,10 +27,10 @@ class LangInfoMixin(metaclass=serializers.SerializerMetaclass):
 
     def get_lang_info(self, obj, *args, **kwargs):
         languages = []
-        for key, language in settings.LANGUAGES:
+        for key, language in django_settings.LANGUAGES:
             languages.append({"id": key, "name": language})
         return {
-            "default": settings.LANGUAGE_CODE,
+            "default": django_settings.LANGUAGE_CODE,
             "active": translation.get_language(),
             "site_languages": languages,
         }
@@ -97,9 +97,6 @@ class JSONFieldPatchMixin:
         return super().update(instance, validated_data)
 
 
-DEFAULT_NESTING_DEPTH = getattr(settings, "CAMOMILLA_DRF_NESTING_DEPTH", 10)
-
-
 class NestMixin:
     def __init__(self, *args, **kwargs):
         self._depth = kwargs.pop("depth", None)
@@ -109,7 +106,7 @@ class NestMixin:
         return self.build_relational_field(field_name, relation_info, nested_depth)
 
     def build_relational_field(
-        self, field_name, relation_info, nested_depth=DEFAULT_NESTING_DEPTH + 1
+        self, field_name, relation_info, nested_depth=settings.API_NESTING_DEPTH + 1
     ):
         nested_depth = nested_depth if self._depth is None else self._depth
         field_class, field_kwargs = super().build_relational_field(
@@ -129,7 +126,7 @@ class AbstractPageMixin(serializers.ModelSerializer):
     LANG_PERMALINK_FIELDS = [
         build_localized_fieldname("permalink", lang)
         for lang in AVAILABLE_LANGUAGES
-        if ENABLE_TRANSLATIONS
+        if settings.ENABLE_TRANSLATIONS
     ]
 
     @property
