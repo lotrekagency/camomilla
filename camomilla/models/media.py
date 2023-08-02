@@ -25,7 +25,7 @@ class AbstractMediaFolder(models.Model):
     slug = models.SlugField(editable=False, max_length=200, blank=True, null=True)
     creation_date = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
-    path = models.TextField(blank=True, null=True)
+    path = models.TextField(blank=True, null=True, editable=False)
     updir = models.ForeignKey(
         "self",
         on_delete=models.CASCADE,
@@ -54,7 +54,7 @@ class AbstractMediaFolder(models.Model):
         self.update_childs()
 
     def __str__(self):
-        return "[%s] %s" % (self.__class__.__name__, self.name)
+        return "[%s] %s" % (self.__class__.__name__, self.title)
 
 
 class MediaFolder(AbstractMediaFolder):
@@ -75,9 +75,9 @@ class Media(models.Model):
         blank=True,
     )
     created = models.DateTimeField(auto_now=True)
-    size = models.IntegerField(default=0, blank=True, null=True)
-    mime_type = models.CharField(max_length=128, blank=True, null=True)
-    image_props = JSONField(default=dict, blank=True)
+    size = models.IntegerField(default=0, blank=True, null=True, editable=False)
+    mime_type = models.CharField(max_length=128, blank=True, null=True, editable=False)
+    image_props = JSONField(default=dict, blank=True, editable=False)
     folder = models.ForeignKey(
         MediaFolder,
         null=True,

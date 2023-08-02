@@ -1,17 +1,15 @@
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django import forms
-from camomilla.settings import PROJECT_TITLE
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
-from camomilla.settings import ENABLE_TRANSLATIONS
-if ENABLE_TRANSLATIONS:
-    from modeltranslation.admin import TranslationAdmin as TranslationAwareModel
-    from modeltranslation.forms import TranslationModelForm as TranslationAwareModelForm
+
+from camomilla import settings
+
+if settings.ENABLE_TRANSLATIONS:
+    from modeltranslation.admin import TabbedTranslationAdmin as TranslationAwareModel
 else:
     from django.contrib.admin import ModelAdmin as TranslationAwareModel
-    from django.forms import ModelForm as TranslationAwareModelForm
-    
 
 from camomilla.models import Article, Content, Media, MediaFolder, Page, Tag
 
@@ -20,12 +18,11 @@ class UserProfileAdmin(admin.ModelAdmin):
     pass
 
 
-class ArticleAdminForm(TranslationAwareModelForm):
-    content = forms.CharField(widget=CKEditorUploadingWidget())
-
+class ArticleAdminForm(forms.ModelForm):
     class Meta:
         model = Article
         exclude = ("slug",)
+        widgets = {"content": CKEditorUploadingWidget}
 
 
 class ArticleAdmin(TranslationAwareModel):
@@ -38,15 +35,14 @@ class TagAdmin(TranslationAwareModel):
 
 
 class MediaFolderAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = ("path",)
 
 
-class ContentAdminForm(TranslationAwareModelForm):
-    content = forms.CharField(widget=CKEditorUploadingWidget())
-
+class ContentAdminForm(forms.ModelForm):
     class Meta:
         model = Content
         fields = "__all__"
+        widgets = {"content": CKEditorUploadingWidget}
 
 
 class ContentAdmin(TranslationAwareModel):
@@ -59,7 +55,7 @@ class MediaAdmin(TranslationAwareModel):
         "size",
         "image_props",
     )
-    readonly_fields = ("image_preview", "image_thumb_preview")
+    readonly_fields = ("image_preview", "image_thumb_preview", "mime_type")
     list_display = (
         "__str__",
         "title",
@@ -90,4 +86,3 @@ admin.site.register(Content, ContentAdmin)
 admin.site.register(Media, MediaAdmin)
 admin.site.register(Page, PageAdmin)
 
-admin.site.index_title = "{0} {1}".format(_("Administration panel for"), PROJECT_TITLE)
