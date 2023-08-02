@@ -27,6 +27,7 @@ Remember to add all the required applications in your project
 INSTALLED_APPS = [
     ...
     'camomilla', # always needed
+    'camomilla.theme', # needed to customize admin interface
     'djsuperadmin', # needed if you whant to use djsuperadmin for contents
     'modeltranslation', # needed if your website is multilanguage (can be added later)
     'rest_framework',  # always needed
