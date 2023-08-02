@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     'camomilla', # always needed
     'djsuperadmin', # needed if you whant to use djsuperadmin for contents
     'modeltranslation', # needed if your website is multilanguage (can be added later)
-    'djlotrek',  # always needed
     'rest_framework',  # always needed
     'rest_framework.authtoken',  # always needed
     ...
