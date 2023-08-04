@@ -123,7 +123,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated_at = models.DateTimeField(auto_now=True)
     url_node = models.OneToOneField(
-        UrlNode, on_delete=models.CASCADE, related_name=URL_NODE_RELATED_NAME, null=True
+        UrlNode, on_delete=models.CASCADE, related_name=URL_NODE_RELATED_NAME, null=True, editable=False
     )
     breadcrumbs_title = models.CharField(max_length=128, null=True, blank=True)
     slug = models.SlugField(max_length=150, allow_unicode=True, null=True, blank=True)
@@ -133,8 +133,8 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         default="DRF",
     )
     template = models.CharField(max_length=500, null=True, blank=True, choices=[])
-    template_data = models.JSONField(default=dict)
-    identifier = models.CharField(max_length=200, null=True, unique=True)
+    template_data = models.JSONField(default=dict, null=False, blank=True)
+    identifier = models.CharField(max_length=200, null=True, unique=True, default=uuid4)
     pubblication_date = models.DateTimeField(null=True, blank=True)
     indexable = models.BooleanField(default=True)
     ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
@@ -234,7 +234,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
 
     def generate_permalink(self) -> str:
         slug = get_nofallbacks(self, "slug")
-        if slug is None:
+        if slug is None and not self.permalink:
             translations = get_field_translations(self, "slug").values()
             fallback_slug = next((t for t in translations if t is not None), None)
             slug = (
@@ -243,7 +243,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
                 else fallback_slug
             )
             set_nofallbacks(self, "slug", slug)
-        permalink = "/%s" % slugify(slug, allow_unicode=True)
+        permalink = "/%s" % slugify(slug or "", allow_unicode=True)
         if self.parent:
             permalink = f"{self.parent.permalink}{permalink}"
         qs = UrlNode.objects.exclude(pk=getattr(self.url_node or object, "pk", None))

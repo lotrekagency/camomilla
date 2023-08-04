@@ -23,7 +23,7 @@ class SeoMixin(models.Model):
 
 
 class MetaMixin(models.Model):
-    meta = models.JSONField(default=dict)
+    meta = models.JSONField(default=dict, null=False, blank=True)
 
     def get_meta(self, key, default=None):
         return self.meta.get(key, default)
