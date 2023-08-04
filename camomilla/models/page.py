@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from django.http import Http404
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
+from django.utils.functional import lazy
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
@@ -19,9 +20,13 @@ from camomilla.utils import (
     lang_fallback_query,
     set_nofallbacks,
     url_lang_decompose,
+    get_all_templates_files
 )
 from camomilla.utils.getters import pointed_getter
 from camomilla import settings
+
+def GET_TEMPLATE_CHOICES():
+    return [(t,t)for t in get_all_templates_files()]
 
 
 class UrlNodeManager(models.Manager):
@@ -127,7 +132,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         choices=PAGE_STATUS,
         default="DRF",
     )
-    template = models.CharField(max_length=500, null=True, blank=True)
+    template = models.CharField(max_length=500, null=True, blank=True, choices=[])
     template_data = models.JSONField(default=dict)
     identifier = models.CharField(max_length=200, null=True, unique=True)
     pubblication_date = models.DateTimeField(null=True, blank=True)
@@ -140,6 +145,10 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         blank=True,
         on_delete=models.CASCADE,
     )
+    
+    def __init__(self, *args, **kwargs):
+        super(AbstractPage, self).__init__(*args, **kwargs)
+        self._meta.get_field('template').choices = lazy(GET_TEMPLATE_CHOICES,list)()
 
     def __str__(self) -> str:
         return "(%s) %s" % (self.__class__.__name__, self.title or self.permalink)
