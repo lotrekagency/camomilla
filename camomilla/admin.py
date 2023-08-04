@@ -7,13 +7,15 @@ from django.utils.translation import gettext_lazy as _
 from camomilla import settings
 
 if settings.ENABLE_TRANSLATIONS:
-    from modeltranslation.admin import TabbedTranslationAdmin as TranslationAwareModel
+    from modeltranslation.admin import TabbedTranslationAdmin as TranslationAwareModelAdmin
 else:
-    from django.contrib.admin import ModelAdmin as TranslationAwareModel
+    from django.contrib.admin import ModelAdmin as TranslationAwareModelAdmin
 
 from camomilla.models import Article, Content, Media, MediaFolder, Page, Tag
 
-
+class AbstractPageAdmin(TranslationAwareModelAdmin):
+    change_form_template = "admin/camomilla/page/change_form.html"
+    
 class UserProfileAdmin(admin.ModelAdmin):
     pass
 
@@ -25,12 +27,12 @@ class ArticleAdminForm(forms.ModelForm):
         widgets = {"content": CKEditorUploadingWidget}
 
 
-class ArticleAdmin(TranslationAwareModel):
+class ArticleAdmin(AbstractPageAdmin):
     filter_horizontal = ("tags",)
     form = ArticleAdminForm
 
 
-class TagAdmin(TranslationAwareModel):
+class TagAdmin(TranslationAwareModelAdmin):
     pass
 
 
@@ -45,11 +47,11 @@ class ContentAdminForm(forms.ModelForm):
         widgets = {"content": CKEditorUploadingWidget}
 
 
-class ContentAdmin(TranslationAwareModel):
+class ContentAdmin(TranslationAwareModelAdmin):
     form = ContentAdminForm
 
 
-class MediaAdmin(TranslationAwareModel):
+class MediaAdmin(TranslationAwareModelAdmin):
     exclude = (
         "thumbnail",
         "size",
@@ -75,8 +77,8 @@ class MediaAdmin(TranslationAwareModel):
             return super(MediaAdmin, self).response_add(request, obj)
 
 
-class PageAdmin(TranslationAwareModel):
-    exclude = ("permalink",)
+class PageAdmin(AbstractPageAdmin):
+    readonly_fields = ("permalink",)
 
 
 admin.site.register(Article, ArticleAdmin)

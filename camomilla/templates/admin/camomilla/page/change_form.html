@@ -1,0 +1,10 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+{% block object-tools-items %}
+{{block.super}}
+<li>
+  <a href="{{original.routerlink}}?preview=true" target="_blank" class="previewlink">
+    {% translate "Preview" %}
+  </a>
+</li>
+{% endblock %}
