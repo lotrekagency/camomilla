@@ -35,7 +35,7 @@ class UniquePermalinkValidator:
             set_nofallbacks(fake_instance, "slug", slug)
             if parent_page:
                 set_nofallbacks(fake_instance, parent_page_field, parent_page)
-            permalink = fake_instance.generate_permalink()
+            permalink = fake_instance.generate_permalink(safe=False)
             qs = UrlNode.objects.exclude(**exclude_kwargs)
             if qs.filter(permalink=permalink).exists():
                 errors[f_name] = self.message

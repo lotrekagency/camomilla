@@ -232,7 +232,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             self.update_childs()
         return self.url_node
 
-    def generate_permalink(self) -> str:
+    def generate_permalink(self, safe:bool=True) -> str:
         slug = get_nofallbacks(self, "slug")
         if slug is None and not self.permalink:
             translations = get_field_translations(self, "slug").values()
@@ -247,7 +247,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         if self.parent:
             permalink = f"{self.parent.permalink}{permalink}"
         qs = UrlNode.objects.exclude(pk=getattr(self.url_node or object, "pk", None))
-        if qs.filter(permalink=permalink).exists():
+        if safe and qs.filter(permalink=permalink).exists():
             permalink = "/".join(
                 permalink.split("/")[:-1] + [slugify(uuid4(), allow_unicode=True)]
             )
