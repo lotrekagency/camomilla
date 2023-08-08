@@ -2,7 +2,9 @@ from django.shortcuts import redirect
 from django.urls import include, path
 from rest_framework import routers
 from importlib.util import find_spec
+from rest_framework.schemas import get_schema_view
 
+from camomilla.openapi.schema import SchemaGenerator
 from camomilla.views import (
     ArticleViewSet,
     CamomillaAuthLogin,
@@ -41,6 +43,12 @@ urlpatterns = [
     path("auth/login/", CamomillaAuthLogin.as_view(), name="login"),
     path("auth/logout/", CamomillaAuthLogout.as_view(), name="logout"),
     path("languages/", LanguageViewSet.as_view(), name="get_languages"),
+    path('openapi', get_schema_view(
+        title="Camomilla",
+        description="API for all things …",
+        version="1.0.0",
+        generator_class=SchemaGenerator
+    ), name='openapi-schema'),
 ]
 
 if find_spec("djsuperadmin.urls") is not None:
