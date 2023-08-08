@@ -2,6 +2,28 @@
 
 <!--next-version-placeholder-->
 
+## v6.0.0-beta.2 (2023-08-08)
+### Feature
+* Added openapi schema to api ([`c242c83`](https://github.com/lotrekagency/camomilla/commit/c242c83d76835f17d74f0e5af0dcdcb448b17ea2))
+* Added is translated utils in TranslationSerializerMixin ([`472f84f`](https://github.com/lotrekagency/camomilla/commit/472f84fed902b4105357440f62fc13f7f3ecfa2a))
+* Added favicon in admin panel ([`8b17888`](https://github.com/lotrekagency/camomilla/commit/8b1788873d77c2cdcc7cbf1dec368c0e86a897da))
+* Add page preview in admin page ([`078e925`](https://github.com/lotrekagency/camomilla/commit/078e9251cbc1aa525ca738616c259183e0a98e2a))
+* Dynamically set template choices ([`23f22bc`](https://github.com/lotrekagency/camomilla/commit/23f22bc4215cfeb34f18594f98844a2d429681d3))
+* Added rosetta compatibility to admin theme ([`a3d653b`](https://github.com/lotrekagency/camomilla/commit/a3d653bd8a1bd68b01a672bda2a7962090ef3b38))
+* Update camomilla admin theme ([`9f00116`](https://github.com/lotrekagency/camomilla/commit/9f00116e2f4c4212fa4c375426da6aefac0d9586))
+
+### Fix
+* Fix unique permalink validato in api ([`3e2f856`](https://github.com/lotrekagency/camomilla/commit/3e2f856ac765b40ad2ff53d3499995fbf7731231))
+* Fix django admin permalink generation ([`1f6b60c`](https://github.com/lotrekagency/camomilla/commit/1f6b60cc85ff37bcb68ea1a8de6de5346447672e))
+
+### Documentation
+* Update docs ([`08d0564`](https://github.com/lotrekagency/camomilla/commit/08d0564e71f83363dab7c0f3276187bc973ed5cf))
+* Update media docs ([`a2fc0cc`](https://github.com/lotrekagency/camomilla/commit/a2fc0cc1e3dde91f6cb9d27892f7682e277a8765))
+* Update media docs ([`b9de34c`](https://github.com/lotrekagency/camomilla/commit/b9de34c3127ba17443ebaa86220fcc28d207d12b))
+* Update docs ([`9a2261d`](https://github.com/lotrekagency/camomilla/commit/9a2261dbf491ee8a5b1023791dd76737db5497ae))
+* Update docs ([`fda7864`](https://github.com/lotrekagency/camomilla/commit/fda7864b4979cf33ccaf9af256bda77f48eb82a8))
+* Added changelog to documentation ([`a2bafc0`](https://github.com/lotrekagency/camomilla/commit/a2bafc00e0e7d1c5b9fa2120c2e0e4405ef353d7))
+
 ## v6.0.0-beta.1 (2023-07-31)
 ### Feature
 * Added autoptimized storage for media files ([`93e02a1`](https://github.com/lotrekagency/camomilla/commit/93e02a1c189da6520d80947c53f3ae741523668c))
