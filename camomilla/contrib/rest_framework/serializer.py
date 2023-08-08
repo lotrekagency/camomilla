@@ -5,6 +5,9 @@ from modeltranslation.translator import NotRegistered, translator
 from modeltranslation.utils import build_localized_fieldname
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from camomilla.utils.getters import pointed_getter
+from camomilla.utils.translation import is_translatable
+
 
 TRANS_ACCESSOR = "translations"
 
@@ -45,7 +48,7 @@ class TranslationsMixin(serializers.ModelSerializer):
             return translator.get_options_for_model(self.Meta.model).get_field_names()
         except NotRegistered:
             return []
-        
+
     @property
     def _writable_fields(self):
         for field in super()._writable_fields:
@@ -70,3 +73,7 @@ class TranslationsMixin(serializers.ModelSerializer):
             if self.translation_fields:
                 plain_to_nest(ex.detail, self.translation_fields)
             raise ValidationError(detail=ex.detail)
+
+    @property
+    def is_translatable(self):
+        return is_translatable(pointed_getter(self, "Meta.model"))

@@ -60,3 +60,8 @@ def lang_fallback_query(**kwargs):
         query = (query & Q(**{f"{key}_{current_lang}__isnull": True for key in kwargs.keys()}))
         query |= Q(**{f"{key}_{current_lang}": value for key, value in kwargs.items()})
     return query
+
+
+def is_translatable(model:Model) -> bool:
+    from modeltranslation.translator import translator
+    return model in translator.get_registered_models()
