@@ -71,7 +71,7 @@ class Model(Base):
     @classmethod
     def from_db_transform(cls, data):
         return data
-    
+
     @classmethod
     def get_all_relateds(cls, struct):
         relateds = defaultdict(set)

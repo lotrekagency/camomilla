@@ -6,7 +6,6 @@ from camomilla.views.mixins import BulkDeleteMixin, GetUserLanguageMixin
 
 
 class TagViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
-
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (CamomillaBasePermissions,)

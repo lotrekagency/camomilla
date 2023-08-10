@@ -11,7 +11,6 @@ from camomilla.views.mixins import BulkDeleteMixin, GetUserLanguageMixin
 
 
 class ContentViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
-
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
     model = Content

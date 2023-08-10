@@ -14,9 +14,10 @@ class SeoMixinTranslationOptions(TranslationOptions):
         "canonical",
     )
 
+
 class AbstractPageTranslationOptions(SeoMixinTranslationOptions):
     fields = ("breadcrumbs_title", "slug", "status", "indexable", "template_data")
-    
+
 
 @register(Article)
 class ArticleTranslationOptions(AbstractPageTranslationOptions):
@@ -47,6 +48,7 @@ class PageTranslationOptions(AbstractPageTranslationOptions):
 @register(UrlNode)
 class UrlNodeTranslationOptions(TranslationOptions):
     fields = ("permalink",)
+
 
 @register(Menu)
 class MenuTranslationOptions(TranslationOptions):

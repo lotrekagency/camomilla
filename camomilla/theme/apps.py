@@ -23,4 +23,11 @@ class CamomillaThemeConfig(AppConfig):
             apps.apps_ready = apps.models_ready = apps.loading = apps.ready = False
             apps.clear_cache()
             apps.populate(settings.INSTALLED_APPS)
-        setattr(settings, "X_FRAME_OPTIONS", getattr(settings, "X_FRAME_OPTIONS", ))
+        setattr(
+            settings,
+            "X_FRAME_OPTIONS",
+            getattr(
+                settings,
+                "X_FRAME_OPTIONS",
+            ),
+        )

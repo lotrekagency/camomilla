@@ -6,7 +6,6 @@ from camomilla.views.mixins import BulkDeleteMixin, GetUserLanguageMixin
 
 
 class PageViewSet(GetUserLanguageMixin, BulkDeleteMixin, BaseModelViewset):
-
     queryset = Page.objects.all()
     serializer_class = PageSerializer
     permission_classes = (CamomillaBasePermissions,)

@@ -3,7 +3,6 @@ from camomilla.models import Media
 
 
 class Command(BaseCommand):
-
     help = "Regenerates all the thumbnail"
 
     def handle(self, *args, **options):

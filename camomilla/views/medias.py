@@ -45,7 +45,7 @@ class MediaFolderViewSet(
 
     def get_mixed_response(self, request, *args, **kwargs):
         search = self.request.GET.get("search", None)
-        all = self.request.GET.get("all", "false").lower() == 'true'
+        all = self.request.GET.get("all", "false").lower() == "true"
         updir = None if all else kwargs.get("pk", None)
         if not search and all:
             self.search_fields = []
@@ -83,7 +83,6 @@ class MediaViewSet(
     TrigramSearchMixin,
     BaseModelViewset,
 ):
-
     queryset = Media.objects.all()
     serializer_class = MediaSerializer
     permission_classes = (CamomillaBasePermissions,)

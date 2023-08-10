@@ -20,13 +20,14 @@ from camomilla.utils import (
     lang_fallback_query,
     set_nofallbacks,
     url_lang_decompose,
-    get_all_templates_files
+    get_all_templates_files,
 )
 from camomilla.utils.getters import pointed_getter
 from camomilla import settings
 
+
 def GET_TEMPLATE_CHOICES():
-    return [(t,t)for t in get_all_templates_files()]
+    return [(t, t) for t in get_all_templates_files()]
 
 
 class UrlNodeManager(models.Manager):
@@ -66,9 +67,21 @@ class UrlNodeManager(models.Manager):
             return self._annotate_fields(
                 super().get_queryset(),
                 [
-                    ("indexable", models.BooleanField(), models.Value(None, models.BooleanField())),
-                    ("status", models.BooleanField(), models.Value(None, models.BooleanField())),
-                    ("pubblication_date", models.DateTimeField(), models.Value(timezone.now(), models.DateTimeField())),
+                    (
+                        "indexable",
+                        models.BooleanField(),
+                        models.Value(None, models.BooleanField()),
+                    ),
+                    (
+                        "status",
+                        models.BooleanField(),
+                        models.Value(None, models.BooleanField()),
+                    ),
+                    (
+                        "pubblication_date",
+                        models.DateTimeField(),
+                        models.Value(timezone.now(), models.DateTimeField()),
+                    ),
                 ],
             )
         except (ProgrammingError, OperationalError):
@@ -83,13 +96,13 @@ class UrlNode(models.Model):
     @property
     def page(self) -> "AbstractPage":
         return getattr(self, self.related_name)
-    
+
     @property
     def routerlink(self) -> str:
         try:
-            if self.permalink == '/':
-                return reverse('camomilla-homepage')
-            return reverse('camomilla-permalink', args=(self.permalink.lstrip("/"),))
+            if self.permalink == "/":
+                return reverse("camomilla-homepage")
+            return reverse("camomilla-permalink", args=(self.permalink.lstrip("/"),))
         except NoReverseMatch:
             return self.permalink
 
@@ -123,7 +136,11 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated_at = models.DateTimeField(auto_now=True)
     url_node = models.OneToOneField(
-        UrlNode, on_delete=models.CASCADE, related_name=URL_NODE_RELATED_NAME, null=True, editable=False
+        UrlNode,
+        on_delete=models.CASCADE,
+        related_name=URL_NODE_RELATED_NAME,
+        null=True,
+        editable=False,
     )
     breadcrumbs_title = models.CharField(max_length=128, null=True, blank=True)
     slug = models.SlugField(max_length=150, allow_unicode=True, null=True, blank=True)
@@ -145,16 +162,16 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         blank=True,
         on_delete=models.CASCADE,
     )
-    
+
     def __init__(self, *args, **kwargs):
         super(AbstractPage, self).__init__(*args, **kwargs)
-        self._meta.get_field('template').choices = lazy(GET_TEMPLATE_CHOICES,list)()
+        self._meta.get_field("template").choices = lazy(GET_TEMPLATE_CHOICES, list)()
 
     def __str__(self) -> str:
         return "(%s) %s" % (self.__class__.__name__, self.title or self.permalink)
 
     def get_context(self, request=None):
-        context={
+        context = {
             "page": self,
             "page_model": {"class": self.__class__.__name__, "module": self.__module__},
             "request": request,
@@ -177,11 +194,11 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
     @property
     def permalink(self) -> str:
         return self.url_node and self.url_node.permalink
-    
+
     @property
     def routerlink(self) -> str:
         return self.url_node and self.url_node.routerlink
-        
+
     @property
     def breadcrumbs(self) -> Iterable[dict]:
         breadcrumb = {
@@ -197,7 +214,9 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         if self.status == "PUB":
             return True
         if self.status == "PLA":
-            return bool(self.pubblication_date) and timezone.now() > self.pubblication_date
+            return (
+                bool(self.pubblication_date) and timezone.now() > self.pubblication_date
+            )
         return False
 
     def get_template_path(self, request=None) -> str:
@@ -232,7 +251,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             self.update_childs()
         return self.url_node
 
-    def generate_permalink(self, safe:bool=True) -> str:
+    def generate_permalink(self, safe: bool = True) -> str:
         slug = get_nofallbacks(self, "slug")
         if slug is None and not self.permalink:
             translations = get_field_translations(self, "slug").values()
@@ -277,7 +296,9 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             ).first()
             page = node and node.page
         type_error = not bypass_type_check and not isinstance(page, cls)
-        public_error = not bypass_public_check and not getattr(page or object, "is_public", False)
+        public_error = not bypass_public_check and not getattr(
+            page or object, "is_public", False
+        )
         if not page or type_error or public_error:
             bases = (UrlNode.DoesNotExist,)
             if hasattr(cls, "DoesNotExist"):

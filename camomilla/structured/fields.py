@@ -70,7 +70,7 @@ class Field(fields.BaseField):
 
     def bind(self, parent):
         self.parent = parent
-    
+
     @classmethod
     def to_db_transform(cls, data):
         return data
@@ -174,7 +174,6 @@ class URLField(CharField):
 
 
 class ListField(fields.ListField, Field):
-    
     def parse_value(self, values):
         """Cast value to proper collection."""
         result = self.get_default_value()
@@ -184,13 +183,14 @@ class ListField(fields.ListField, Field):
             return values
         parent = self.parent
         return [self._cast_value(value, parent) for value in values]
-    
+
     def _cast_value(self, value, parent):
         if isinstance(value, self.items_types):
             return value
         else:
             main_type = self._get_main_type()
             from camomilla.structured.models import Model
+
             if issubclass(main_type, Model):
                 instance = main_type()
                 relations = instance.prepopulate(**value)
@@ -207,7 +207,8 @@ class ListField(fields.ListField, Field):
                 )
             )
         return self.items_types[0]
-    
+
+
 class DictField(fields.DictField, Field):
     pass
 

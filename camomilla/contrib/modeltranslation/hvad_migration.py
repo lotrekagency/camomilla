@@ -3,7 +3,6 @@ from django.db import migrations, connection
 
 
 class KeepTranslationsMixin:
-
     _saved_data_from_plain = {}
     language_codes = dict(getattr(settings, "LANGUAGES", {})).keys()
 

@@ -40,8 +40,8 @@ class UserProfileSerializer(BaseModelSerializer):
     def get_all_permissions(self, instance):
         return PermissionSerializer(
             Permission.objects.filter(
-                Q(group__pk__in=instance.groups.values_list("pk", flat=True)) |
-                Q(pk__in=instance.user_permissions.values_list("pk", flat=True))
+                Q(group__pk__in=instance.groups.values_list("pk", flat=True))
+                | Q(pk__in=instance.user_permissions.values_list("pk", flat=True))
             ),
             context=self.context,
             many=True,
@@ -68,7 +68,6 @@ class UserProfileSerializer(BaseModelSerializer):
 
 
 class UserSerializer(BaseModelSerializer):
-
     id = serializers.IntegerField(read_only=True)
     password = serializers.CharField(
         write_only=True, required=False, allow_null=True, allow_blank=True

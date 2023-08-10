@@ -3,7 +3,6 @@ from camomilla.models import Content, Page
 from camomilla.serializers.base import BaseModelSerializer
 
 
-
 class ContentSerializer(BaseModelSerializer):
     class Meta:
         model = Content

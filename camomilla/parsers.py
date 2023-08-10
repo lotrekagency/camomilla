@@ -38,7 +38,6 @@ def compile_payload(data, path, value):
 
 
 class MultipartJsonParser(parsers.BaseParser):
-
     media_type = "multipart/form-data"
 
     def parse(self, stream, media_type=None, parser_context=None):

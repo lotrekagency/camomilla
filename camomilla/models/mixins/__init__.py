@@ -2,7 +2,6 @@ from django.db import models
 
 
 class SeoMixin(models.Model):
-
     title = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     og_description = models.TextField(blank=True, null=True)

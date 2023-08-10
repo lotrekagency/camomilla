@@ -27,7 +27,6 @@ class CamomillaObtainAuthToken(ObtainAuthToken):
 
 
 class UserViewSet(BaseModelViewset):
-
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     model = get_user_model()
@@ -55,7 +54,6 @@ class UserViewSet(BaseModelViewset):
 
 
 class PermissionViewSet(BaseModelViewset):
-
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer
     model = Permission

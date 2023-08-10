@@ -13,7 +13,7 @@ def register(
     base_viewset=BaseModelViewset,
     serializer_meta={},
     viewset_attrs={},
-    filters = None
+    filters=None,
 ):
     """
     Register a model to the API.
@@ -30,8 +30,8 @@ def register(
             "model": model,
             "fields": "__all__",
         }
-        if 'exclude' in serializer_meta:
-            base_meta.pop('fields')
+        if "exclude" in serializer_meta:
+            base_meta.pop("fields")
         serializer = type(
             f"{model.__name__}Serializer",
             (base_serializer,),
@@ -51,7 +51,9 @@ def register(
             f"{model.__name__}ViewSet",
             (base_viewset,),
             {
-                "get_queryset": lambda self: model.objects.all() if filters is None else model.objects.filter(**filters),
+                "get_queryset": lambda self: model.objects.all()
+                if filters is None
+                else model.objects.filter(**filters),
                 "serializer_class": serializer,
                 **viewset_attrs,
             },

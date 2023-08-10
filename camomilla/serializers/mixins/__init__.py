@@ -121,7 +121,6 @@ class NestMixin:
         return field_class, field_kwargs
 
 
-
 class AbstractPageMixin(serializers.ModelSerializer):
     LANG_PERMALINK_FIELDS = [
         build_localized_fieldname("permalink", lang)
@@ -150,4 +149,3 @@ class AbstractPageMixin(serializers.ModelSerializer):
 
     def get_validators(self):
         return super().get_validators() + [UniquePermalinkValidator()]
- 

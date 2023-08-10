@@ -43,12 +43,16 @@ urlpatterns = [
     path("auth/login/", CamomillaAuthLogin.as_view(), name="login"),
     path("auth/logout/", CamomillaAuthLogout.as_view(), name="logout"),
     path("languages/", LanguageViewSet.as_view(), name="get_languages"),
-    path('openapi', get_schema_view(
-        title="Camomilla",
-        description="API for all things …",
-        version="1.0.0",
-        generator_class=SchemaGenerator
-    ), name='openapi-schema'),
+    path(
+        "openapi",
+        get_schema_view(
+            title="Camomilla",
+            description="API for all things …",
+            version="1.0.0",
+            generator_class=SchemaGenerator,
+        ),
+        name="openapi-schema",
+    ),
 ]
 
 if find_spec("djsuperadmin.urls") is not None:

@@ -34,7 +34,7 @@ def get_nofallbacks(instance: Model, attr: str, *args, **kwargs) -> Any:
 
 def url_lang_decompose(url):
     if BASE_URL and url.startswith(BASE_URL):
-        url = url[len(BASE_URL):]
+        url = url[len(BASE_URL) :]
     data = {"url": url, "permalink": url, "language": DEFAULT_LANGUAGE}
     result = re.match(f"^\/?({'|'.join(AVAILABLE_LANGUAGES)})?\/(.*)", url)
     groups = result and result.groups()
@@ -57,11 +57,14 @@ def lang_fallback_query(**kwargs):
     for lang in AVAILABLE_LANGUAGES:
         query |= Q(**{f"{key}_{lang}": value for key, value in kwargs.items()})
     if current_lang:
-        query = (query & Q(**{f"{key}_{current_lang}__isnull": True for key in kwargs.keys()}))
+        query = query & Q(
+            **{f"{key}_{current_lang}__isnull": True for key in kwargs.keys()}
+        )
         query |= Q(**{f"{key}_{current_lang}": value for key, value in kwargs.items()})
     return query
 
 
-def is_translatable(model:Model) -> bool:
+def is_translatable(model: Model) -> bool:
     from modeltranslation.translator import translator
+
     return model in translator.get_registered_models()

@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 
 from camomilla.models import Tag
+
 client = APIClient()
 
 
