@@ -1,7 +1,6 @@
 from collections import defaultdict
 from jsonmodels.models import Base
 from jsonmodels.fields import _LazyType
-from jsonmodels.validators import ValidationError
 from camomilla.structured.fields import (
     ForeignKey,
     ForeignKeyList,
@@ -24,7 +23,7 @@ class _Cache:
 
     @property
     def is_root(self):
-        return self.parent == None
+        return self.parent is None
 
     @property
     def root_node(self):
@@ -73,7 +72,7 @@ class Model(Base):
         return data
 
     @classmethod
-    def get_all_relateds(cls, struct):
+    def get_all_relateds(cls, struct):  # noqa: C901
         relateds = defaultdict(set)
         for _, struct_name, field in cls.iterate_with_name():
             if isinstance(field, ForeignKey):

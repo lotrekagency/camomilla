@@ -5,7 +5,6 @@ from io import BytesIO
 import magic
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage as storage
 from django.db import models
 from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.signals import post_save, pre_delete
@@ -181,7 +180,7 @@ class Media(models.Model):
     def _get_file_size(self):
         try:
             return self.file.storage.size(self.file.name)
-        except:
+        except Exception:
             return 0
 
     def __str__(self):

@@ -47,6 +47,6 @@ class OptimizedStorage(get_storage_class()):
             tmp.close()
             content.close()
             return optimized_content, True
-        except:
+        except Exception:
             traceback.print_exc()
             return content, False

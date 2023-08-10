@@ -241,7 +241,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
 
     def _update_url_node(self, force: bool = False) -> UrlNode:
         self.url_node = self._get_or_create_url_node()
-        for _ in activate_languages():
+        for __ in activate_languages():
             old_permalink = self.permalink
             new_permalink = self.generate_permalink()
             force = force or old_permalink != new_permalink

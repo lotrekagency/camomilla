@@ -155,9 +155,7 @@ class DurationField(fields.StringField, Field):
                 return parsed
 
         raise fields.ValidationError(
-            "“%(value)s” value has an invalid format. It must be in '[DD] [[HH:]MM:]ss[.uuuuuu] format.'".format(
-                value=value
-            )
+            f"“{value}” value has an invalid format. It must be in '[DD] [[HH:]MM:]ss[.uuuuuu] format.'"
         )
 
 

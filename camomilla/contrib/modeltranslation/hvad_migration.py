@@ -29,7 +29,7 @@ class KeepTranslationsMixin:
         for modelPath, fields in self.keep_translations.items():
             Model = apps.get_model(*modelPath.split("."))
             table = Model._meta.db_table + "_translation"
-            if not "language_code" in fields:
+            if "language_code" not in fields:
                 fields = ("language_code",) + fields
             with connection.cursor() as cursor:
                 cursor.execute("SELECT master_id FROM {0};".format(table))

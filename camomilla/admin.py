@@ -2,7 +2,6 @@ from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django import forms
 from django.contrib import admin
 from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _
 
 from camomilla import settings
 

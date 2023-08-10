@@ -52,7 +52,7 @@ class TranslationsMixin(serializers.ModelSerializer):
     @property
     def _writable_fields(self):
         for field in super()._writable_fields:
-            if not field.field_name in self.translation_fields:
+            if field.field_name not in self.translation_fields:
                 yield field
 
     def to_internal_value(self, data):

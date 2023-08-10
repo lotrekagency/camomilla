@@ -12,15 +12,7 @@ from django.contrib.postgres.fields import ArrayField as DjangoArrayField
 from django.db import models
 
 
-class JSONField(DjangoJSONField):
-    pass
-
-
-class ArrayField(DjangoArrayField):
-    pass
-
-
-if "sqlite" in settings.DATABASES["default"]["ENGINE"]:
+if "sqlite" in settings.DATABASES["default"]["ENGINE"]:  # noqa: C901
 
     class JSONField(models.Field):
         def db_type(self, connection):
@@ -64,3 +56,14 @@ if "sqlite" in settings.DATABASES["default"]["ENGINE"]:
                 }
             )
             return name, path, args, kwargs
+
+else:
+
+    class JSONField(DjangoJSONField):
+        pass
+
+    class ArrayField(DjangoArrayField):
+        pass
+
+
+__all__ = [JSONField, ArrayField]
