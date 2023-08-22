@@ -85,3 +85,6 @@ class Menu(models.Model):
         def __missing__(self, key):
             dict.__setitem__(self, key, Menu.objects.get_or_create(key=key)[0])
             return self[key]
+
+    def __str__(self) -> str:
+        return self.key
