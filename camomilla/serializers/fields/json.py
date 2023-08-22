@@ -21,7 +21,17 @@ class StructuredJSONField(serializers.JSONField):
             info = model_meta.get_field_info(parent.Meta.model)
             field = info.fields[field_name]
             self.schema = field.schema
+            self.many = field.many
         super().bind(field_name, parent)
+    
+    def to_json_schema(self):
+        if self.many:
+            return {
+                'type': 'array',
+                'items': self.schema.to_json_schema()
+            }
+        else:
+            return self.schema.to_json_schema()
 
     def to_internal_value(self, data):
         if isinstance(data, dict):

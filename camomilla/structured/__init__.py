@@ -44,6 +44,8 @@ class StructuredJSONField(JSONField):
 
     def __init__(self, schema, *args: Any, **kwargs: Any) -> None:
         self.schema = schema
+        default = kwargs.get("default", dict)
+        self.many = kwargs.pop("many", isinstance(default() if callable(default) else default, list))
         self._cache = _Cache(self)
         return super().__init__(*args, **kwargs)
 

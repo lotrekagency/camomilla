@@ -222,7 +222,7 @@ class EmbeddedField(fields.EmbeddedField, Field):
         return embed_instance
 
 
-class ForeignKey(Field):
+class ForeignKey(fields.IntField):
     types = (models.Model, int, str)
 
     def __init__(self, to, *args, **kwargs):

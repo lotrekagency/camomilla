@@ -7,6 +7,7 @@ from camomilla.contrib.rest_framework.serializer import (
     plain_to_nest,
     TRANS_ACCESSOR,
 )
+from camomilla.serializers.fields.json import StructuredJSONField
 
 
 class AutoSchema(DRFAutoSchema):
@@ -23,6 +24,11 @@ class AutoSchema(DRFAutoSchema):
             }
         return schema
 
+    def map_field(self, field):
+        if isinstance(field, StructuredJSONField):
+            return field.to_json_schema()
+        return super().map_field(field)
+    
 
 class SchemaGenerator(DRFSchemaGenerator):
     def create_view(self, callback, method, request=None):
