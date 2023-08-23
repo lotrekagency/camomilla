@@ -1,12 +1,32 @@
 from collections import defaultdict
 from typing import Any
 
+from django_jsonform.models.fields import JSONFormField
+
 from django.db.models import JSONField
 from django.db.models.query_utils import DeferredAttribute
+
+from camomilla.utils.getters import find_and_replace_dict
 
 from .fields import *
 from .models import *
 from .models import _Cache, build_model_cache
+import json
+
+
+class StructuredJSONFormField(JSONFormField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.encoder = kwargs.get("encoder", None)
+        self.decoder = kwargs.get("decoder", None)
+
+
+class StructuredEncoder(json.JSONEncoder):
+    def default(self, z):
+        if isinstance(z, models.Model):
+            return z.to_struct()
+        else:
+            return super().default(z)
 
 
 class StructuredDescriptior(DeferredAttribute):
@@ -45,7 +65,11 @@ class StructuredJSONField(JSONField):
     def __init__(self, schema, *args: Any, **kwargs: Any) -> None:
         self.schema = schema
         default = kwargs.get("default", dict)
-        self.many = kwargs.pop("many", isinstance(default() if callable(default) else default, list))
+        self.file_handler = kwargs.pop("file_handler", "")
+        self.many = kwargs.pop(
+            "many", isinstance(default() if callable(default) else default, list)
+        )
+        kwargs["encoder"] = kwargs.get("encoder", StructuredEncoder)
         self._cache = _Cache(self)
         return super().__init__(*args, **kwargs)
 
@@ -105,3 +129,46 @@ class StructuredJSONField(JSONField):
         name, path, args, kwargs = super().deconstruct()
         kwargs["schema"] = self.schema
         return name, path, args, kwargs
+
+    def formfield(self, **kwargs):
+        json_schema = self.to_json_schema()
+
+        def replace(key, value):
+            if (
+                key != "$ref"
+                and isinstance(value, str)
+                and value.startswith("#/definitions")
+            ):
+                return {"$ref": value}
+            elif isinstance(value, dict) and value.get("type", None) == "object":
+                if not bool(
+                    set(("properties", "keys", "oneOf", "anyOf", "allOf"))
+                    & set(value.keys())
+                ):
+                    value["keys"] = {}
+            return value
+
+        return super().formfield(
+            **{
+                "form_class": StructuredJSONFormField,
+                "schema": find_and_replace_dict(json_schema, replace),
+                "model_name": self.model.__name__,
+                "file_handler": self.file_handler,
+                **kwargs,
+            }
+        )
+
+    def to_json_schema(self):
+        json_schema = self.schema.to_json_schema()
+        definitions = json_schema.pop("definitions", None)
+        if self.many:
+            return {
+                "type": "array",
+                "items": json_schema,
+                **({"definitions": definitions} if definitions else {}),
+            }
+        else:
+            return {
+                **json_schema,
+                **({"definitions": definitions} if definitions else {}),
+            }

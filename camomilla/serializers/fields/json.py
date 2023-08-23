@@ -22,16 +22,8 @@ class StructuredJSONField(serializers.JSONField):
             field = info.fields[field_name]
             self.schema = field.schema
             self.many = field.many
+            self.json_schema = field.to_json_schema()
         super().bind(field_name, parent)
-    
-    def to_json_schema(self):
-        if self.many:
-            return {
-                'type': 'array',
-                'items': self.schema.to_json_schema()
-            }
-        else:
-            return self.schema.to_json_schema()
 
     def to_internal_value(self, data):
         if isinstance(data, dict):

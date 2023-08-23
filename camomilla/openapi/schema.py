@@ -26,7 +26,7 @@ class AutoSchema(DRFAutoSchema):
 
     def map_field(self, field):
         if isinstance(field, StructuredJSONField):
-            return field.to_json_schema()
+            return field.json_schema
         return super().map_field(field)
     
 

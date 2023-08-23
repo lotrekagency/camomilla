@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Callable, Union
 
 
 def safe_getter(instance: Union[dict, object], key: str, default: Any = None) -> Any:
@@ -15,3 +15,13 @@ def pointed_getter(
     if len(attrs) == 2:
         data = pointed_getter(data, attrs[1], default)
     return data
+
+
+def find_and_replace_dict(obj: dict, predicate: Callable):
+    result = {}
+    for k, v in obj.items():
+        v = predicate(key=k, value=v)
+        if isinstance(v, dict):
+            v = find_and_replace_dict(v, predicate)
+        result[k] = v
+    return result

@@ -11,6 +11,9 @@ class CamomillaThemeConfig(AppConfig):
     def ready(self):
         installed_apps = getattr(settings, "INSTALLED_APPS", [])
         changed = False
+        if "django_jsonform" not in installed_apps:
+            changed = True
+            installed_apps = ["django_jsonform", *installed_apps]
         if "admin_interface" not in installed_apps:
             changed = True
             installed_apps = ["admin_interface", *installed_apps]
