@@ -303,9 +303,10 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             bases = (UrlNode.DoesNotExist,)
             if hasattr(cls, "DoesNotExist"):
                 bases += (cls.DoesNotExist,)
-            raise type("PageDoesNotExist", bases, {})(
-                "%s matching query does not exist." % cls._meta.object_name
-            )
+            message = "%s matching query does not exist." % cls._meta.object_name
+            if public_error:
+                message = "Match found: %s.\nThe page appears not to be public.\nUse ?preview=true in the url to see it." % page
+            raise type("PageDoesNotExist", bases, {})(message)
         return page
 
     @classmethod
@@ -332,8 +333,8 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
     def get_or_404(cls, request, *args, **kwargs) -> "AbstractPage":
         try:
             return cls.get(request, *args, **kwargs)
-        except ObjectDoesNotExist:
-            raise Http404("No %s matches the given query." % cls._meta.object_name)
+        except ObjectDoesNotExist as ex:
+            raise Http404(ex)
 
     def alternate_urls(self, *args, **kwargs) -> dict:
         return get_field_translations(self.url_node or object, "permalink", None)
