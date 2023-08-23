@@ -8,9 +8,12 @@ from camomilla.contrib.rest_framework.serializer import (
     TRANS_ACCESSOR,
 )
 from camomilla.serializers.fields.json import StructuredJSONField
+from camomilla.utils.getters import find_and_replace_dict, pointed_getter
 
 
 class AutoSchema(DRFAutoSchema):
+    extra_components = {}
+
     def map_serializer(self, serializer):
         schema = super(AutoSchema, self).map_serializer(serializer)
         if isinstance(serializer, TranslationsMixin) and serializer.is_translatable:
@@ -24,11 +27,24 @@ class AutoSchema(DRFAutoSchema):
             }
         return schema
 
+    def get_components(self, path, method):
+        components = super().get_components(path, method)
+        if len(self.extra_components.keys()) > 0:
+            components = {**(components or {}), **self.extra_components}
+        return components
+
     def map_field(self, field):
         if isinstance(field, StructuredJSONField):
-            return field.json_schema
+            self.extra_components.update(**field.json_schema.pop("definitions", {}))
+
+            def replace(key, value):
+                if isinstance(value, str) and value.startswith("#/definitions"):
+                    return value.replace("#/definitions", "#/components/schemas")
+                return value
+
+            return find_and_replace_dict(field.json_schema, replace)
         return super().map_field(field)
-    
+
 
 class SchemaGenerator(DRFSchemaGenerator):
     def create_view(self, callback, method, request=None):
