@@ -35,12 +35,17 @@ class AutoSchema(DRFAutoSchema):
 
     def map_field(self, field):
         if isinstance(field, StructuredJSONField):
-            self.extra_components.update(**field.json_schema.pop("definitions", {}))
 
             def replace(key, value):
                 if isinstance(value, str) and value.startswith("#/definitions"):
                     return value.replace("#/definitions", "#/components/schemas")
                 return value
+
+            self.extra_components.update(
+                **find_and_replace_dict(
+                    field.json_schema.pop("definitions", {}), replace
+                )
+            )
 
             return find_and_replace_dict(field.json_schema, replace)
         return super().map_field(field)
