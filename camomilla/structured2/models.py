@@ -1,12 +1,14 @@
-import inspect
-from typing import Any, Dict, Tuple, get_args, get_origin
-from typing_extensions import Annotated
+from inspect import isclass
+from typing import Any, Dict, Tuple, get_origin
 
 import pydantic._internal._model_construction
 from django.db.models import Model as DjangoModel
 from pydantic import BaseModel as PyDBaseModel
-from pydantic import Field
+from pydantic import Field, model_validator
+from typing_extensions import Annotated
+
 from .fields import ForeignKey, QuerySet
+from .utils import get_type
 
 
 class BaseModelMeta(pydantic._internal._model_construction.ModelMetaclass):
@@ -21,20 +23,32 @@ class BaseModelMeta(pydantic._internal._model_construction.ModelMetaclass):
                 annotations.update(base_.__annotations__)
 
         for field in annotations:
-            origin = get_origin(annotations[field])
-            if inspect.isclass(annotations[field]) and issubclass(
-                annotations[field], DjangoModel
+            annotation = annotations[field]
+            origin = get_origin(annotation)
+            if isclass(annotation) and issubclass(
+                annotation, DjangoModel
             ):
-                annotations[field] = ForeignKey[annotations[field]]
-            elif inspect.isclass(origin) and issubclass(origin, QuerySet):
+                annotations[field] = ForeignKey[annotation]
+            elif isclass(origin) and issubclass(origin, QuerySet):
                 annotations[field] = Annotated[
-                    annotations[field],
-                    Field(default_factory=get_args(annotations[field])[0]._default_manager.none),
+                    annotation,
+                    Field(
+                        default_factory=get_type(
+                            annotation
+                        )._default_manager.none
+                    ),
                 ]
-
         namespaces["__annotations__"] = annotations
         return super().__new__(mcs, name, bases, namespaces, **kwargs)
 
 
 class BaseModel(PyDBaseModel, metaclass=BaseModelMeta):
-    pass
+    
+    @model_validator(mode="before")
+    @classmethod
+    def build_cache(cls, data: Any) -> Any:
+        from camomilla.structured2.cache import CacheBuilder
+        cache_builder = CacheBuilder.from_model(cls)
+        data = cache_builder.inject_cache(data)
+        return data
+    
