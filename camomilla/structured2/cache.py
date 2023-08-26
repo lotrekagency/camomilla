@@ -1,6 +1,6 @@
 from collections import defaultdict
 from inspect import isclass
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Sequence
 from typing_extensions import get_args, get_origin
 from camomilla.structured2.fields import ForeignKey, QuerySet
 from camomilla.structured2.models import BaseModel
@@ -23,7 +23,7 @@ class ValueWithCache:
 
     def retrieve(self):
         cache = self.cache.get(self.model)
-        if isinstance(self.value, Iterable):
+        if isinstance(self.value, Sequence):
             qs = self.model._default_manager.filter(pk__in=self.value)
             setattr(
                 qs,
@@ -76,7 +76,7 @@ class CacheBuilder:
                     get_type(annotation), RelInfo.QSField, field
                 )
 
-            elif isclass(origin) and issubclass(origin, Iterable):
+            elif isclass(origin) and issubclass(origin, Sequence):
                 lazy_types = [
                     _LazyType(arg).evaluate(model)
                     for arg in args
@@ -150,12 +150,12 @@ class CacheBuilder:
                     fk_data[model] += [(f"{field_name}.{t[0]}", t[1]) for t in touples]
         return fk_data
 
-    def inject_cache(self, data: Any):
+    def inject_cache(self, data: Any) -> Any:
         fk_data = self.get_all_fk_data(data)
         plainset = defaultdict(set)
         for model, touples in fk_data.items():
             for t in touples:
-                if isinstance(t[1], Iterable):
+                if isinstance(t[1], Sequence):
                     plainset[model].update(t[1])
                 else:
                     plainset[model].add(t[1])

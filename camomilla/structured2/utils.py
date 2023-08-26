@@ -1,6 +1,8 @@
-from typing import Any, Generic
+from typing import Any, Generic, Sequence
 from typing_extensions import TypeVar, get_args
 from django.core.exceptions import ImproperlyConfigured
+from camomilla.utils.getters import pointed_getter
+
 
 T = TypeVar("T")
 
@@ -67,24 +69,27 @@ def get_type_eval(source: Generic[T], model: Any, raise_exception=True) -> T:
               
         
 def set_key(data, key, val):
-    if isinstance(data, list):
+    if isinstance(data, Sequence):
         key = int(key)
         if key < len(data):
             data[key] = val
         else:
             data.append(val)
         return data
-    data[key] = val
+    elif isinstance(data, dict):
+        data[key] = val
+    else:
+        setattr(key, val)
     return data
 
 
 def get_key(data, key, default):
-    if isinstance(data, list):
+    if isinstance(data, Sequence):
         try:
             return data[int(key)]
         except IndexError:
             return default
-    return data.get(key, default)
+    return pointed_getter(data, key, default)
 
 
 def pointed_setter(data, path, value):

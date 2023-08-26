@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import Iterable
+from typing import Sequence
 
 from django import template as django_template
 from os.path import relpath
 
 
-def get_all_templates_files() -> Iterable[str]:
+def get_all_templates_files() -> Sequence[str]:
     dirs = []
     for engine in django_template.loader.engines.all():
         # Exclude pip installed site package template dirs

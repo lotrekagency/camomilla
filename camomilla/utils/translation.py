@@ -1,5 +1,5 @@
 import re
-from typing import Any, Iterable, Iterator
+from typing import Any, Sequence, Iterator
 
 from django.db.models import Model, Q
 from django.utils.translation.trans_real import activate, get_language
@@ -8,7 +8,7 @@ from modeltranslation.utils import build_localized_fieldname
 from camomilla.settings import BASE_URL
 
 
-def activate_languages(languages: Iterable[str] = AVAILABLE_LANGUAGES) -> Iterator[str]:
+def activate_languages(languages: Sequence[str] = AVAILABLE_LANGUAGES) -> Iterator[str]:
     old = get_language()
     for language in languages:
         activate(language)

@@ -1,4 +1,4 @@
-from typing import Iterable, Tuple
+from typing import Sequence, Tuple
 from uuid import uuid4
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -43,7 +43,7 @@ class UrlNodeManager(models.Manager):
     def _annotate_fields(
         self,
         qs: models.QuerySet,
-        field_names: Iterable[Tuple[str, models.Field, models.Value]],
+        field_names: Sequence[Tuple[str, models.Field, models.Value]],
     ):
         for field_name, output_field, default in field_names:
             whens = [
@@ -200,7 +200,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         return self.url_node and self.url_node.routerlink
 
     @property
-    def breadcrumbs(self) -> Iterable[dict]:
+    def breadcrumbs(self) -> Sequence[dict]:
         breadcrumb = {
             "permalink": self.permalink,
             "title": self.breadcrumbs_title or self.title or self.slug,

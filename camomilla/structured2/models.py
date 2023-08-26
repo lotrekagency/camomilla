@@ -48,7 +48,5 @@ class BaseModel(PyDBaseModel, metaclass=BaseModelMeta):
     @classmethod
     def build_cache(cls, data: Any) -> Any:
         from camomilla.structured2.cache import CacheBuilder
-        cache_builder = CacheBuilder.from_model(cls)
-        data = cache_builder.inject_cache(data)
-        return data
+        return CacheBuilder.from_model(cls).inject_cache(data)
     
