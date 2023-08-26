@@ -8,6 +8,12 @@ from camomilla.structured2.utils import _LazyType, get_type, pointed_setter
 
 from camomilla.utils.getters import pointed_getter
 
+# TODO:
+# ::: Actually this is a first draft. 
+# The system should be more type safe. 
+# It should handle initialization made with model instance not only dicts
+# Neet to check if there are problems with different formats for pks (model instaces or string or dicts)
+
 
 class ValueWithCache:
     def __init__(self, cache, model, value) -> None:
