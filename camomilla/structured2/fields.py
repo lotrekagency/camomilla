@@ -127,6 +127,6 @@ class QuerySet(Generic[T]):
                 ]
             ),
             serialization=cs.plain_serializer_function_ser_schema(
-                lambda qs: list(qs.values_list("pk", flat=True))
+                lambda qs: [x.pk for x in qs]
             ),
         )
