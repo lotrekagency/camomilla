@@ -25,28 +25,21 @@ class BaseModelMeta(pydantic._internal._model_construction.ModelMetaclass):
         for field in annotations:
             annotation = annotations[field]
             origin = get_origin(annotation)
-            if isclass(annotation) and issubclass(
-                annotation, DjangoModel
-            ):
+            if isclass(annotation) and issubclass(annotation, DjangoModel):
                 annotations[field] = ForeignKey[annotation]
             elif isclass(origin) and issubclass(origin, QuerySet):
                 annotations[field] = Annotated[
                     annotation,
-                    Field(
-                        default_factory=get_type(
-                            annotation
-                        )._default_manager.none
-                    ),
+                    Field(default_factory=get_type(annotation)._default_manager.none),
                 ]
         namespaces["__annotations__"] = annotations
         return super().__new__(mcs, name, bases, namespaces, **kwargs)
 
 
 class BaseModel(PyDBaseModel, metaclass=BaseModelMeta):
-    
     @model_validator(mode="before")
     @classmethod
     def build_cache(cls, data: Any) -> Any:
         from camomilla.structured2.cache import CacheBuilder
+
         return CacheBuilder.from_model(cls).inject_cache(data)
-    

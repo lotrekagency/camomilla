@@ -96,8 +96,18 @@ class CacheBuilder:
             elif isclass(annotation) and issubclass(annotation, BaseModel):
                 related[field_name] = RelInfo(annotation, RelInfo.RIField, field)
         return related
-
+    
     def get_all_fk_data(self, data):
+        if isinstance(data, Sequence):
+            fk_data = defaultdict(list)
+            for index in range(len(data)):
+                child_fk_data = self.get_all_fk_data(data[index])
+                for model, touples in child_fk_data.items():
+                    fk_data[model] += [(f"{index}.{t[0]}", t[1]) for t in touples]
+            return fk_data
+        return self.get_fk_data(data)
+
+    def get_fk_data(self, data):
         fk_data = defaultdict(list)
         if not data:
             return fk_data
@@ -105,7 +115,7 @@ class CacheBuilder:
             if info.type == RelInfo.FKField:
                 value = pointed_getter(data, field_name, None)
                 if value:
-                    if isinstance(value, ValueWithCache):
+                    if isinstance(value, ValueWithCache): # needed to break recursive cache builds
                         fk_data = {}
                         break
                     fk_data[info.model].append(
@@ -117,7 +127,7 @@ class CacheBuilder:
             elif info.type == RelInfo.QSField:
                 value = pointed_getter(data, field_name, [])
                 if isinstance(value, list):
-                    if any(True for v in value if isinstance(v, ValueWithCache)):
+                    if any(True for v in value if isinstance(v, ValueWithCache)): # needed to break recursive cache builds
                         fk_data = {}
                         break
                     fk_data[info.model].append(

@@ -79,7 +79,7 @@ def set_key(data, key, val):
     elif isinstance(data, dict):
         data[key] = val
     else:
-        setattr(key, val)
+        setattr(data, key, val)
     return data
 
 

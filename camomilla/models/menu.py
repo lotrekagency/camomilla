@@ -1,24 +1,33 @@
+from enum import Enum
+from uuid import uuid4
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.utils.safestring import mark_safe
-from camomilla import structured
+from pydantic import Field, computed_field, model_serializer, model_validator
+from camomilla import structured2
 from camomilla.models.page import UrlNode
-from typing import Union
+from typing import Optional, Union
 
 
-class MenuNodeLink(structured.Model):
-    link_type = structured.CharField()
-    static = structured.CharField()
-    url_node = structured.ForeignKey(UrlNode)
-    content_type = structured.IntegerField()
-    page_id = structured.IntegerField()
+class LinkTypes(str, Enum):
+    relational = "RE"
+    static = "ST"
 
-    @classmethod
-    def to_db_transform(cls, data):
-        if data.get("link_type", None) == "RE":
+
+class MenuNodeLink(structured2.BaseModel):
+    link_type: LinkTypes = LinkTypes.static
+    static: str = None
+    content_type: int = None
+    page_id: int = None
+    url_node: UrlNode = None
+
+    @model_serializer(mode="wrap", when_used="json")
+    def to_db_transform(self, value, handler):
+        data = handler(value)
+        if data.get("link_type", None) == LinkTypes.relational:
             ct_id = data.get("content_type", None)
             p_id = data.get("page_id", None)
             if ct_id and p_id:
@@ -32,39 +41,30 @@ class MenuNodeLink(structured.Model):
         return data
 
     def get_url(self, request=None):
-        if self.link_type == "RE":
-            return self.url_node and self.url_node.routerlink
-        elif self.link_type == "ST":
+        if self.link_type == LinkTypes.relational:
+            return isinstance(self.url_node, UrlNode) and self.url_node.routerlink
+        elif self.link_type == LinkTypes.static:
             return self.static
 
+    @computed_field
     @property
-    def url(self):
+    def url(self) -> Optional[str]:
         return self.get_url()
 
 
-class MenuNode(structured.Model):
-    id = structured.CharField()
-    meta = structured.DictField()
-    nodes = structured.ListField(items_types=("MenuNode",))
-    title = structured.CharField()
-    link = structured.EmbeddedField("MenuNodeLink")
-
-    @classmethod
-    def to_db_transform(cls, data):
-        link = data.pop("link", {})
-        nodes = data.pop("nodes", {})
-        return {
-            "link": MenuNodeLink.to_db_transform(link),
-            "nodes": [cls.to_db_transform(n) for n in nodes],
-            **data,
-        }
+class MenuNode(structured2.BaseModel):
+    id: str = Field(default_factory=uuid4)
+    meta: dict = {}
+    nodes: list["MenuNode"] = []
+    title: str = ""
+    link: MenuNodeLink
 
 
 class Menu(models.Model):
     key = models.CharField(max_length=200, unique=True, editable=False)
     available_classes = models.JSONField(default=dict, editable=False)
     enabled = models.BooleanField(default=True)
-    nodes = structured.StructuredJSONField(default=list, schema=MenuNode)
+    nodes = structured2.StructuredJSONField(default=list, schema=MenuNode)
 
     class Meta:
         verbose_name = _("menu")
