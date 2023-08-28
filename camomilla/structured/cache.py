@@ -2,9 +2,9 @@ from collections import defaultdict
 from inspect import isclass
 from typing import Any, Dict, Sequence
 from typing_extensions import get_args, get_origin
-from camomilla.structured2.fields import ForeignKey, QuerySet
-from camomilla.structured2.models import BaseModel
-from camomilla.structured2.utils import _LazyType, get_type, pointed_setter
+from camomilla.structured.fields import ForeignKey, QuerySet
+from camomilla.structured.models import BaseModel
+from camomilla.structured.utils import _LazyType, get_type, pointed_setter
 
 from camomilla.utils.getters import pointed_getter
 

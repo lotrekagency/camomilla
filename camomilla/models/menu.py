@@ -12,7 +12,7 @@ from pydantic import (
     computed_field,
     model_serializer,
 )
-from camomilla import structured2
+from camomilla import structured
 from camomilla.models.page import UrlNode
 from typing import Optional, Union, Callable
 
@@ -22,7 +22,7 @@ class LinkTypes(str, Enum):
     static = "ST"
 
 
-class MenuNodeLink(structured2.BaseModel):
+class MenuNodeLink(structured.BaseModel):
     link_type: LinkTypes = LinkTypes.static
     static: str = None
     content_type: int = None
@@ -51,7 +51,7 @@ class MenuNodeLink(structured2.BaseModel):
         return self.get_url()
 
 
-class MenuNode(structured2.BaseModel):
+class MenuNode(structured.BaseModel):
     id: str = Field(default_factory=uuid4)
     meta: dict = {}
     nodes: list["MenuNode"] = []
@@ -63,7 +63,7 @@ class Menu(models.Model):
     key = models.CharField(max_length=200, unique=True, editable=False)
     available_classes = models.JSONField(default=dict, editable=False)
     enabled = models.BooleanField(default=True)
-    nodes = structured2.StructuredJSONField(default=list, schema=MenuNode)
+    nodes = structured.StructuredJSONField(default=list, schema=MenuNode)
 
     class Meta:
         verbose_name = _("menu")
