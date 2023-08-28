@@ -6,10 +6,15 @@ from django.utils.translation import gettext_lazy as _
 from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.utils.safestring import mark_safe
-from pydantic import Field, computed_field, model_serializer, model_validator
+from pydantic import (
+    Field,
+    SerializationInfo,
+    computed_field,
+    model_serializer,
+)
 from camomilla import structured2
 from camomilla.models.page import UrlNode
-from typing import Optional, Union
+from typing import Optional, Union, Callable
 
 
 class LinkTypes(str, Enum):
@@ -25,20 +30,14 @@ class MenuNodeLink(structured2.BaseModel):
     url_node: UrlNode = None
 
     @model_serializer(mode="wrap", when_used="json")
-    def to_db_transform(self, value, handler):
-        data = handler(value)
-        if data.get("link_type", None) == LinkTypes.relational:
-            ct_id = data.get("content_type", None)
-            p_id = data.get("page_id", None)
-            if ct_id and p_id:
-                c_type = ContentType.objects.filter(pk=ct_id).first()
+    def update_relational(self, handler: Callable, info: SerializationInfo):
+        if self.link_type == LinkTypes.relational:
+            if self.content_type and self.page_id:
+                c_type = ContentType.objects.filter(pk=self.content_type).first()
                 model = c_type and c_type.model_class()
-                page = model and model.objects.filter(pk=p_id).first()
-                if page:
-                    data["url_node"] = page.url_node.pk
-                else:
-                    data["url_node"] = None
-        return data
+                page = model and model.objects.filter(pk=self.page_id).first()
+                self.url_node = page and page.url_node
+        return handler(self)
 
     def get_url(self, request=None):
         if self.link_type == LinkTypes.relational:

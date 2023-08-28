@@ -15,7 +15,6 @@ class _LazyType:
         module, type_name = self._evaluate_path(self.path, base_cls)
         return self._import(module, type_name)
 
-
     def _evaluate_path(self, relative_path, base_cls):
         base_module = base_cls.__module__
 
@@ -26,7 +25,6 @@ class _LazyType:
         if not module:
             module = base_module
         return module, type_name
-
 
     def _get_modules(self, relative_path, base_module):
         canonical_path = relative_path.lstrip(".")
@@ -41,7 +39,6 @@ class _LazyType:
         if parents_amount > len(parent_modules):
             raise ValueError(f"Can't evaluate path '{relative_path}'")
         return parent_modules[: parents_amount * -1] + canonical_modules
-
 
     def _import(self, module_name, type_name):
         module = __import__(module_name, fromlist=[type_name])
@@ -62,12 +59,13 @@ def get_type(source: Generic[T], raise_exception=True) -> T:
         else:
             return None
 
+
 def get_type_eval(source: Generic[T], model: Any, raise_exception=True) -> T:
     type = get_type(source, raise_exception)
     if isinstance(type, str):
         return _LazyType(type).evaluate(model)
-              
-        
+
+
 def set_key(data, key, val):
     if isinstance(data, Sequence):
         key = int(key)
@@ -98,4 +96,19 @@ def pointed_setter(data, path, value):
     if not len(path):
         return set_key(data, key, value)
     default = [] if path[0].isdigit() else {}
-    return set_key(data, key, pointed_setter(get_key(data, key, default), ".".join(path), value))
+    return set_key(
+        data, key, pointed_setter(get_key(data, key, default), ".".join(path), value)
+    )
+
+
+def map_method_aliases(new_cls):
+    method_aliases = {
+        # "validate_python": "model_validate",
+        # "validate_json": "model_validate_json",
+        # "dump_python": "model_dump",
+        # "dump_json": "model_dump_json",
+        "json_schema": "model_json_schema"
+    }
+    for alias_name, target_name in method_aliases.items():
+        setattr(new_cls, alias_name, getattr(new_cls, target_name))
+    return new_cls

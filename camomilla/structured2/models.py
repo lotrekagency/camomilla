@@ -8,7 +8,7 @@ from pydantic import Field, model_validator
 from typing_extensions import Annotated
 
 from .fields import ForeignKey, QuerySet
-from .utils import get_type
+from .utils import get_type, map_method_aliases
 
 
 class BaseModelMeta(pydantic._internal._model_construction.ModelMetaclass):
@@ -33,7 +33,9 @@ class BaseModelMeta(pydantic._internal._model_construction.ModelMetaclass):
                     Field(default_factory=get_type(annotation)._default_manager.none),
                 ]
         namespaces["__annotations__"] = annotations
-        return super().__new__(mcs, name, bases, namespaces, **kwargs)
+        return map_method_aliases(
+            super().__new__(mcs, name, bases, namespaces, **kwargs)
+        )
 
 
 class BaseModel(PyDBaseModel, metaclass=BaseModelMeta):

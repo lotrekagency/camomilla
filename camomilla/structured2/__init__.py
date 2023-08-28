@@ -49,8 +49,8 @@ class StructuredJSONField(JSONField):
             "many", isinstance(default() if callable(default) else default, list)
         )
         if self.many:
-            self.schema = TypeAdapter(list[self.schema])
-        kwargs["encoder"] = kwargs.get("encoder", StructuredEncoder)
+            self.schema = TypeAdapter(Annotated[list[self.schema], Field(default_factory=list)])
+        # kwargs["encoder"] = kwargs.get("encoder", StructuredEncoder)
         return super().__init__(*args, **kwargs)
 
     def check_type(self, value: Any):
@@ -60,7 +60,9 @@ class StructuredJSONField(JSONField):
             )
         return isinstance(value, self.orig_schema)
 
-    def get_prep_value(self, value):
+    def get_prep_value(self, value: Union[list[type[BaseModel]],type[ BaseModel]]) -> str:
+        if isinstance(value, list) and self.many:
+            return self.schema.dump_json(value, exclude_unset=True).decode()
         return value.model_dump_json(exclude_unset=True)
 
     def deconstruct(self):

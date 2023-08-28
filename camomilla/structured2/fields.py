@@ -1,9 +1,12 @@
 from typing import Any, Callable, Dict, Generic, TypeVar, Union
 
 from django.db import models as django_models
+from pydantic import SerializationInfo
 from pydantic_core import core_schema as cs
 
 from .utils import get_type
+from devtools import debug
+
 
 T = TypeVar("T", bound=django_models.Model)
 
@@ -45,6 +48,13 @@ class ForeignKey(django_models.Model, Generic[T]):
                 cs.no_info_plain_validator_function(lambda v: v.retrieve()),
             ]
         )
+        
+        def serialize_data(instance, info):
+            from camomilla.serializers.utils import build_standard_model_serializer
+            if info.mode == "python":
+                serializer = build_standard_model_serializer(model_class, depth=1)
+                return serializer(instance=instance).data
+            return instance.pk
 
         return cs.json_or_python_schema(
             json_schema=cs.union_schema(
@@ -59,7 +69,7 @@ class ForeignKey(django_models.Model, Generic[T]):
                 ]
             ),
             serialization=cs.plain_serializer_function_ser_schema(
-                lambda instance: instance.pk
+                serialize_data, info_arg=True
             ),
         )
 
@@ -113,6 +123,13 @@ class QuerySet(Generic[T]):
                 cs.no_info_plain_validator_function(lambda v: v.retrieve()),
             ]
         )
+    
+        def serialize_data(qs: django_models.QuerySet, info: SerializationInfo):
+            from camomilla.serializers.utils import build_standard_model_serializer
+            if info.mode == "python":
+                serializer = build_standard_model_serializer(model_class, depth=1)
+                return serializer(instance=qs, many=True).data
+            return [x.pk for x in qs]
 
         return cs.json_or_python_schema(
             json_schema=cs.union_schema(
@@ -127,6 +144,6 @@ class QuerySet(Generic[T]):
                 ]
             ),
             serialization=cs.plain_serializer_function_ser_schema(
-                lambda qs: [x.pk for x in qs]
+                serialize_data, info_arg=True
             ),
         )
