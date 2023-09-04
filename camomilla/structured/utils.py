@@ -103,8 +103,8 @@ def pointed_setter(data, path, value):
 
 def map_method_aliases(new_cls):
     method_aliases = {
-        # "validate_python": "model_validate",
-        # "validate_json": "model_validate_json",
+        "validate_python": "model_validate",
+        "validate_json": "model_validate_json",
         # "dump_python": "model_dump",
         # "dump_json": "model_dump_json",
         "json_schema": "model_json_schema"

@@ -56,7 +56,7 @@ class CacheBuilder:
         self.__related_fields__ = related_fields
 
     @classmethod
-    def from_model(cls, model):
+    def from_model(cls, model: BaseModel) -> 'CacheBuilder':
         return cls(related_fields=cls.inspect_related_fields(model))
 
     @classmethod
