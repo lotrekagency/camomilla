@@ -32,5 +32,6 @@ class CamomillaThemeConfig(AppConfig):
             getattr(
                 settings,
                 "X_FRAME_OPTIONS",
+                "SAMEORIGIN"
             ),
         )
