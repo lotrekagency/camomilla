@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.urls import path
 
+from camomilla import settings
+
 from .models import Page
 
 
@@ -10,6 +12,8 @@ def fetch(request, *args, **kwargs):
         page = Page.get_or_404(
             request, bypass_public_check=preview, bypass_type_check=True
         )
+    elif settings.AUTO_CREATE_HOMEPAGE is False:
+        page, _ = Page.get_or_404(permalink="/", bypass_type_check=True)
     else:
         page, _ = Page.get_or_create_homepage()
     return render(request, page.get_template_path(request), page.get_context(request))

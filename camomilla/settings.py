@@ -67,6 +67,10 @@ ENABLE_MEDIA_OPTIMIZATION = pointed_getter(
 
 API_NESTING_DEPTH = pointed_getter(django_settings, "CAMOMILLA.API.NESTING_DEPTH", 10)
 
+AUTO_CREATE_HOMEPAGE = pointed_getter(
+    django_settings, "CAMOMILLA.RENDER.AUTO_CREATE_HOMEPAGE", True
+)
+
 # camomilla settings example
 # CAMOMILLA = {
 #     "PROJECT_TITLE": "",
@@ -78,6 +82,7 @@ API_NESTING_DEPTH = pointed_getter(django_settings, "CAMOMILLA.API.NESTING_DEPTH
 #         "THUMBNAIL": {"FOLDER": "", "WIDTH": 50, "HEIGHT": 50}
 #     },
 #     "RENDER": {
+#         "AUTO_CREATE_HOMEPAGE": True,
 #         "ARTICLE": {"DEFAULT_TEMPLATE": "", "INJECT_CONTEXT": None },
 #         "PAGE": {"DEFAULT_TEMPLATE": "", "INJECT_CONTEXT": None }
 #     },
