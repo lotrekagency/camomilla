@@ -2,6 +2,56 @@
 
 <!--next-version-placeholder-->
 
+## v6.0.0-beta.3 (2023-09-08)
+### Feature
+* Make context funtions parameters free ([`16b3de7`](https://github.com/lotrekagency/camomilla/commit/16b3de7ca566689ad572a3a1f29bb4474a678d75))
+* Added context managers ([`8555a15`](https://github.com/lotrekagency/camomilla/commit/8555a15f3671738853d6d6bbf162724201831a4a))
+* Added settings AUTO_CREATE_HOMEPAGE, default=True ([`154c904`](https://github.com/lotrekagency/camomilla/commit/154c9041dc3fbba5ed776dd904035316f3783724))
+* Update serializers ([`8b71f27`](https://github.com/lotrekagency/camomilla/commit/8b71f27beba6a1cf0de9539c6acba0bdb9fcc7ff))
+* Update structuredJSONField and camomilla menu ([`ffa6c08`](https://github.com/lotrekagency/camomilla/commit/ffa6c084468fcb7a0e43d0b84f4d2e56498ae51b))
+* Added a cache engine ([`6277c30`](https://github.com/lotrekagency/camomilla/commit/6277c30209934f019f8df9a91868291df1bc597e))
+* Added first draft of pydantic ModelBase with django Fk and Qs support ([`760d62e`](https://github.com/lotrekagency/camomilla/commit/760d62e01c07f3306b91428a969aa8c90712c205))
+* Better error for draft 404 pages ([`7eb9c06`](https://github.com/lotrekagency/camomilla/commit/7eb9c06b86c86dc661d895c5b62c1bd8b8a8892f))
+* Added jsonform in admin ([`f2afcd4`](https://github.com/lotrekagency/camomilla/commit/f2afcd4cc4db290441dff71a7955dd8e21acdc99))
+* Added menu model to admin page ([`8df743b`](https://github.com/lotrekagency/camomilla/commit/8df743b23e259dca2d55b283ea798a333746f404))
+
+### Fix
+* Fix X_FRAME_OPTIONS default for camomilla admin ([`383e488`](https://github.com/lotrekagency/camomilla/commit/383e488beead8f147dd44bfcd5b1832fc9e67e39))
+* Fix Iterable types that are actually Sequences ([`41fc0f4`](https://github.com/lotrekagency/camomilla/commit/41fc0f4dc1a96c61c3c042fb81478017cd555760))
+* Fix cache making call before checking existance ([`fbfd51f`](https://github.com/lotrekagency/camomilla/commit/fbfd51fe140730cb2bd2f8b7b88c8cd77344a1fd))
+* Fix openapi json schema to point right definitions also inside definition refs ([`29a1311`](https://github.com/lotrekagency/camomilla/commit/29a13117bca4a5a7df575fd3c7569aab64fee87c))
+* Fix openapi json schema to point right definitions ([`0decf18`](https://github.com/lotrekagency/camomilla/commit/0decf1805010f49ed3aff4d4c3646bbff7a2109b))
+* Move admin registration in camomilla theme ([`da6a025`](https://github.com/lotrekagency/camomilla/commit/da6a025315d5ef9f63dba5b153ef4ef58241e56e))
+* Fix json schema ([`e502be0`](https://github.com/lotrekagency/camomilla/commit/e502be05538e74a1d94e77af80201efde44fcbe8))
+
+### Documentation
+* Update docs ([`9df236a`](https://github.com/lotrekagency/camomilla/commit/9df236a99a62a29e33f340e1443ab66b0d563455))
+
+### Performance
+* Decrease database hits on dumps with many qs ([`3a52d04`](https://github.com/lotrekagency/camomilla/commit/3a52d04ee26debe4ad5b0aaff3856b07db4bf7d9))
+
+## v6.0.0-beta.2 (2023-08-08)
+### Feature
+* Added openapi schema to api ([`c242c83`](https://github.com/lotrekagency/camomilla/commit/c242c83d76835f17d74f0e5af0dcdcb448b17ea2))
+* Added is translated utils in TranslationSerializerMixin ([`472f84f`](https://github.com/lotrekagency/camomilla/commit/472f84fed902b4105357440f62fc13f7f3ecfa2a))
+* Added favicon in admin panel ([`8b17888`](https://github.com/lotrekagency/camomilla/commit/8b1788873d77c2cdcc7cbf1dec368c0e86a897da))
+* Add page preview in admin page ([`078e925`](https://github.com/lotrekagency/camomilla/commit/078e9251cbc1aa525ca738616c259183e0a98e2a))
+* Dynamically set template choices ([`23f22bc`](https://github.com/lotrekagency/camomilla/commit/23f22bc4215cfeb34f18594f98844a2d429681d3))
+* Added rosetta compatibility to admin theme ([`a3d653b`](https://github.com/lotrekagency/camomilla/commit/a3d653bd8a1bd68b01a672bda2a7962090ef3b38))
+* Update camomilla admin theme ([`9f00116`](https://github.com/lotrekagency/camomilla/commit/9f00116e2f4c4212fa4c375426da6aefac0d9586))
+
+### Fix
+* Fix unique permalink validato in api ([`3e2f856`](https://github.com/lotrekagency/camomilla/commit/3e2f856ac765b40ad2ff53d3499995fbf7731231))
+* Fix django admin permalink generation ([`1f6b60c`](https://github.com/lotrekagency/camomilla/commit/1f6b60cc85ff37bcb68ea1a8de6de5346447672e))
+
+### Documentation
+* Update docs ([`08d0564`](https://github.com/lotrekagency/camomilla/commit/08d0564e71f83363dab7c0f3276187bc973ed5cf))
+* Update media docs ([`a2fc0cc`](https://github.com/lotrekagency/camomilla/commit/a2fc0cc1e3dde91f6cb9d27892f7682e277a8765))
+* Update media docs ([`b9de34c`](https://github.com/lotrekagency/camomilla/commit/b9de34c3127ba17443ebaa86220fcc28d207d12b))
+* Update docs ([`9a2261d`](https://github.com/lotrekagency/camomilla/commit/9a2261dbf491ee8a5b1023791dd76737db5497ae))
+* Update docs ([`fda7864`](https://github.com/lotrekagency/camomilla/commit/fda7864b4979cf33ccaf9af256bda77f48eb82a8))
+* Added changelog to documentation ([`a2bafc0`](https://github.com/lotrekagency/camomilla/commit/a2bafc00e0e7d1c5b9fa2120c2e0e4405ef353d7))
+
 ## v6.0.0-beta.1 (2023-07-31)
 ### Feature
 * Added autoptimized storage for media files ([`93e02a1`](https://github.com/lotrekagency/camomilla/commit/93e02a1c189da6520d80947c53f3ae741523668c))
