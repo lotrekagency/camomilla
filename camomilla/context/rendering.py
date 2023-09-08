@@ -51,8 +51,6 @@ class PagesContextRegistry:
             )
         )
 
-        print(len(all_funcs))
-
         def context_func(request: HttpRequest, super_ctx: dict = {}):
             context = super_ctx.copy()
             for func in all_funcs:
