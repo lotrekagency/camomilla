@@ -1,6 +1,6 @@
 from collections import defaultdict
 from typing import Callable, Optional, TYPE_CHECKING
-
+import inspect
 from django.http import HttpRequest
 
 if TYPE_CHECKING:
@@ -54,7 +54,13 @@ class PagesContextRegistry:
         def context_func(request: HttpRequest, super_ctx: dict = {}):
             context = super_ctx.copy()
             for func in all_funcs:
-                context.update(func(request, super_ctx=context) or {})
+                arg_spec = inspect.getfullargspec(func)
+                kwargs = {}
+                if "request" in arg_spec.args:
+                    kwargs["request"] = request
+                if "super_ctx" in arg_spec.args:                
+                    kwargs["super_ctx"] = context
+                context.update(func(**kwargs) or {})
             return context
 
         return context_func
