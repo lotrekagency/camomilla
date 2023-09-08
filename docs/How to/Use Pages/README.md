@@ -134,3 +134,7 @@ We suggest to always return `{ "page": self }` in the context.
 If you need to create an api endpoint for a model inheriting from the `AbstractPage` model remember to use inside the serializer the `AbstractPageMixin`.
 :::
 
+### Inject context from template_context.py
+
+To inject page context in a more safe way you can follow the [🧩 Use Page Context](../Use%20Pages%20Context/README.md) Documentation.
+
