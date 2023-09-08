@@ -24,6 +24,7 @@ from camomilla.utils import (
 )
 from camomilla.utils.getters import pointed_getter
 from camomilla import settings
+from camomilla.context.rendering import ctx_registry
 
 
 def GET_TEMPLATE_CHOICES():
@@ -181,7 +182,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             new_ctx = inject_func(request=request, super_ctx=context)
             if isinstance(new_ctx, dict):
                 context.update(new_ctx)
-        return context
+        return ctx_registry.get_context_for_page(self, request, super_ctx=context)
 
     @property
     def model_name(self) -> str:

@@ -1,0 +1,50 @@
+def autodiscover_context_files():
+    """
+    Auto-discover INSTALLED_APPS template_context.py modules and fail silently when
+    not present. This forces an import on them to register.
+    Also import explicit modules.
+    """
+    import copy
+    import sys
+    import os
+    from django.utils.module_loading import module_has_submodule
+    from camomilla.context.rendering import ctx_registry
+    from importlib import import_module
+    from django.apps import apps
+    from camomilla.settings import TEMPLATE_CONTEXT_FILES, DEBUG
+
+    mods = [
+        (app_config.name, app_config.module) for app_config in apps.get_app_configs()
+    ]
+
+    for app, mod in mods:
+        module = "%s.template_context" % app
+        _model_registry_bkp = copy.copy(ctx_registry._model_registry)
+        _template_registry_bkp = copy.copy(ctx_registry._template_registry)
+
+        try:
+            import_module(module)
+        except:
+            ctx_registry._model_registry = _model_registry_bkp
+            ctx_registry._template_registry = _template_registry_bkp
+            if module_has_submodule(mod, "template_context"):
+                raise
+
+    for module in TEMPLATE_CONTEXT_FILES:
+        import_module(module)
+
+    if DEBUG:
+        try:
+            if sys.argv[1] in ("runserver", "runserver_plus"):
+                print("Camomilla context files:")
+                for k, v in ctx_registry.get_registered_info().items():
+                    print(f"{k}:")
+                    models = v.get("models")
+                    templates = v.get("templates")
+                    if models:
+                        print(f"  models: {models}")
+                    if templates:
+                        print(f"  templates: {templates}")
+                    print("\n")
+        except IndexError:
+            pass

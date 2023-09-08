@@ -71,6 +71,12 @@ AUTO_CREATE_HOMEPAGE = pointed_getter(
     django_settings, "CAMOMILLA.RENDER.AUTO_CREATE_HOMEPAGE", True
 )
 
+TEMPLATE_CONTEXT_FILES = pointed_getter(
+    django_settings, "CAMOMILLA.RENDER.TEMPLATE_CONTEXT_FILES", []
+)
+
+DEBUG = pointed_getter(django_settings, "CAMOMILLA.DEBUG", django_settings.DEBUG)
+
 # camomilla settings example
 # CAMOMILLA = {
 #     "PROJECT_TITLE": "",
@@ -82,9 +88,11 @@ AUTO_CREATE_HOMEPAGE = pointed_getter(
 #         "THUMBNAIL": {"FOLDER": "", "WIDTH": 50, "HEIGHT": 50}
 #     },
 #     "RENDER": {
+#         "TEMPLATE_CONTEXT_FILES": [],
 #         "AUTO_CREATE_HOMEPAGE": True,
 #         "ARTICLE": {"DEFAULT_TEMPLATE": "", "INJECT_CONTEXT": None },
 #         "PAGE": {"DEFAULT_TEMPLATE": "", "INJECT_CONTEXT": None }
 #     },
-#     "API": {"NESTING_DEPTH": 10 }
+#     "API": {"NESTING_DEPTH": 10 },
+#     "DEBUG": False
 # }
