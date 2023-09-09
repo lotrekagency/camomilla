@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## v6.0.0-beta.4 (2023-09-09)
+### Feature
+* Added cache disable setting for structured field ([`39d726b`](https://github.com/lotrekagency/camomilla/commit/39d726b8ce2eb9bea5aa48486c1010da4a098c87))
+* Added pages-router endpoint and many new features for pages api ([`6a7497a`](https://github.com/lotrekagency/camomilla/commit/6a7497a2f3f6e1ce9d12dae7e521f357188bffb7))
+
+### Documentation
+* Update docs ([`a88da89`](https://github.com/lotrekagency/camomilla/commit/a88da898131fef67e716ce40182c2f639b8365dd))
+* Update docs ([`3a0018a`](https://github.com/lotrekagency/camomilla/commit/3a0018ab1371d0b8a6a7e30607bd555b48f80718))
+* Update docs ([`97722ae`](https://github.com/lotrekagency/camomilla/commit/97722ae67600ad9d20a27f376d4301be053ca95c))
+* Update docs ([`8a6c006`](https://github.com/lotrekagency/camomilla/commit/8a6c0063ae005df204d16ce7747c84b9cdc68d9c))
+* Update docs ([`4baebf8`](https://github.com/lotrekagency/camomilla/commit/4baebf820e3758a01a9ed4a81b3aba2f7591ecbe))
+
 ## v6.0.0-beta.3 (2023-09-08)
 ### Feature
 * Make context funtions parameters free ([`16b3de7`](https://github.com/lotrekagency/camomilla/commit/16b3de7ca566689ad572a3a1f29bb4474a678d75))
