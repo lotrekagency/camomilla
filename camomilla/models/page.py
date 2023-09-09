@@ -98,14 +98,18 @@ class UrlNode(models.Model):
     def page(self) -> "AbstractPage":
         return getattr(self, self.related_name)
 
+    @staticmethod
+    def reverse_url(permalink: str) -> str:
+        try:
+            if permalink == "/":
+                return reverse("camomilla-homepage")
+            return reverse("camomilla-permalink", args=(permalink.lstrip("/"),))
+        except NoReverseMatch:
+            return None
+
     @property
     def routerlink(self) -> str:
-        try:
-            if self.permalink == "/":
-                return reverse("camomilla-homepage")
-            return reverse("camomilla-permalink", args=(self.permalink.lstrip("/"),))
-        except NoReverseMatch:
-            return self.permalink
+        return self.reverse_url(self.permalink) or self.permalink
 
 
 PAGE_CHILD_RELATED_NAME = "%(app_label)s_%(class)s_child_pages"
@@ -306,7 +310,10 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
                 bases += (cls.DoesNotExist,)
             message = "%s matching query does not exist." % cls._meta.object_name
             if public_error:
-                message = "Match found: %s.\nThe page appears not to be public.\nUse ?preview=true in the url to see it." % page
+                message = (
+                    "Match found: %s.\nThe page appears not to be public.\nUse ?preview=true in the url to see it."
+                    % page
+                )
             raise type("PageDoesNotExist", bases, {})(message)
         return page
 
@@ -338,7 +345,11 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             raise Http404(ex)
 
     def alternate_urls(self, *args, **kwargs) -> dict:
-        return get_field_translations(self.url_node or object, "permalink", None)
+        permalinks = get_field_translations(self.url_node or object, "permalink", None)
+        for lang in activate_languages():
+            if lang in permalinks:
+                permalinks[lang] = UrlNode.reverse_url(permalinks[lang])
+        return permalinks
 
     class Meta:
         abstract = True

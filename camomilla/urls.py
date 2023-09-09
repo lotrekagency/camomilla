@@ -20,6 +20,7 @@ from camomilla.views import (
     UserViewSet,
     MenuViewSet,
 )
+from camomilla.views.pages import fetch_page
 
 router = routers.DefaultRouter()
 
@@ -36,6 +37,8 @@ router.register(r"menus", MenuViewSet, "camomilla-menus")
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("pages-router/", fetch_page),
+    path("pages-router/<path:permalink>", fetch_page),
     path(
         "profiles/me/", lambda _: redirect("../../users/current/"), name="profiles-me"
     ),

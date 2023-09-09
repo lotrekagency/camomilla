@@ -77,3 +77,33 @@ class TranslationsMixin(serializers.ModelSerializer):
     @property
     def is_translatable(self):
         return is_translatable(pointed_getter(self, "Meta.model"))
+
+
+class RemoveTranslationsMixin(serializers.ModelSerializer):
+    @cached_property
+    def translation_fields(self):
+        try:
+            return translator.get_options_for_model(self.Meta.model).get_field_names()
+        except NotRegistered:
+            return []
+
+    def get_default_field_names(self, declared_fields, model_info):
+        request = self.context.get("request", False)
+        included_translations = request and request.GET.get(
+            "included_translations", False
+        )
+        if included_translations == "all":
+            return super().get_default_field_names(declared_fields, model_info)
+        elif included_translations is not False:
+            included_translations = included_translations.split(",")
+        else:
+            included_translations = []
+
+        field_names = super().get_default_field_names(declared_fields, model_info)
+        for lang in mt_settings.AVAILABLE_LANGUAGES:
+            if lang not in included_translations:
+                for field in self.translation_fields:
+                    localized_fieldname = build_localized_fieldname(field, lang)
+                    if localized_fieldname in field_names:
+                        field_names.remove(localized_fieldname)
+        return field_names
