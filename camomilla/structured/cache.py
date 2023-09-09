@@ -2,6 +2,7 @@ from collections import defaultdict
 from inspect import isclass
 from typing import Any, Dict, Sequence
 from typing_extensions import get_args, get_origin
+from camomilla.settings import STRUCTURED_FIELD_CACHE_ENABLED
 from camomilla.structured.fields import ForeignKey, QuerySet
 from camomilla.structured.models import BaseModel
 from camomilla.structured.utils import _LazyType, get_type, pointed_setter
@@ -161,6 +162,8 @@ class CacheBuilder:
         return fk_data
 
     def inject_cache(self, data: Any) -> Any:
+        if not STRUCTURED_FIELD_CACHE_ENABLED:
+            return data
         fk_data = self.get_all_fk_data(data)
         plainset = defaultdict(set)
         for model, touples in fk_data.items():
