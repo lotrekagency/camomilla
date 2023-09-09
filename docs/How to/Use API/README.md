@@ -152,5 +152,3 @@ __Simple Response:__
 ```json
 { ... single model data ... }
 ```
-
-

@@ -39,6 +39,10 @@ CAMOMILLA = {
 
 ### Add template data
 
+::: warning ⚠️ Beware!
+[🧩 Use Page Context](../Use%20Pages%20Context/README.md) to inject context in a more safe way.
+:::
+
 The data that will be available in the rendering engine should be saved in the template_data field. This field is a django JSONField. So it will accept any json structure.
 The data in this field will be accessible inside the template through `page.template_data`.
 If you need to enrich the template context with other data that are not stored in the template data you can provide an `inject_context` function in camomilla settings:
@@ -112,6 +116,10 @@ From PageMeta class you can define:
 - `default_template` ==> set a different default template.
 - `inject_context_func` ==> add more data inside template context
 
+::: warning ⚠️ Beware!
+[🧩 Use Page Context](../Use%20Pages%20Context/README.md) to inject context in a more safe way.
+:::
+
 ### Override the page context
 
 This has almost the same functionality of `inject_context_func` PageMeta option but it runs at a more deep level. Overriding this will override the context and not only add things to it.
@@ -128,13 +136,81 @@ class MyPageModel(AbstractPage):
 
 We suggest to always return `{ "page": self }` in the context. 
 
-### Rest Api
+
+## 🗂️ Pages router API endpoint
 
 ::: warning ⚠️ Beware!
 If you need to create an api endpoint for a model inheriting from the `AbstractPage` model remember to use inside the serializer the `AbstractPageMixin`.
 :::
 
-### Inject context from template_context.py
+Camomilla comes with a builtin pages router endpoint that allows you to browse your pages by url.
 
-To inject page context in a more safe way you can follow the [🧩 Use Page Context](../Use%20Pages%20Context/README.md) Documentation.
+__URL Structure:__
+ - `api/camomilla/pages-router/<page_url>`
+
+You can provide as the page_url parameter the full url of the page without language prefix.
+The language you want to match against is taken from the request params.
+If no language is specified, the default language is used.
+
+To specify the language in the request params you can use the `lang` parameter:
+
+```/api/camomilla/pages-router/<page_url>?lang=en```
+
+When you try to get a page from the url, the router will always take in to account the active language.
+If you are trying to get a page with a certain language, make sure to set the language in the request params.
+If the specified url is not present in current language, the router endpoint will return a 404 error.
+
+__Simple Response:__
+```json
+{
+    "id": 1,
+    "is_public": false,
+    "status": "DRF",
+    "indexable": true,
+    "alternates": {
+        "it": "/",
+        "en": "/en/"
+    },
+    "permalink": "/",
+    "related_name": "camomilla_page",
+    "breadcrumbs": [
+        {
+            "permalink": "/",
+            "title": null
+        }
+    ],
+    "routerlink": "/",
+    "template": "website/home.html",
+    "title": null,
+    "description": null,
+    "og_description": null,
+    "og_title": null,
+    "og_type": null,
+    "og_url": null,
+    "canonical": null,
+    "meta": {},
+    "date_created": "2023-09-07T13:16:24.762269Z",
+    "date_updated_at": "2023-09-08T17:38:03.155480Z",
+    "breadcrumbs_title": null,
+    "slug": null,
+    "template_data": {},
+    "identifier": "4ee68c88-dd1a-4515-bf50-7839f2cf1e72",
+    "pubblication_date": null,
+    "ordering": 0,
+    "og_image": null,
+    "url_node": {
+        "id": 46,
+        "permalink": "/",
+        "related_name": "camomilla_page"
+    },
+    "parent_page": null
+}
+```
+
+The respose will not include field translations since the response has the content already translated in the active language.
+But if you need also some other language you can specify the `included_translations` parameter in the request.
+
+```/api/camomilla/pages-router/<page_url>?included_translations=it```
+
+The `included_translations` parameter accepts a comma separated list of languages or the value `all` to include all the translations.
 
