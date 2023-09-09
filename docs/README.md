@@ -48,37 +48,43 @@
 
 ## 📦 Quick Setup
 
-### Install 
+::: tip Env Virtualization 👾
+Use a virtualenv to isolate your project's dependencies from the system's python installation before starting. Check out [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) for more information.
+:::
 
+Install django-camomilla-cms and django from pip
 
 ```bash
-$ pip install django-camomilla-cms
+$ pip install django
+$ pip install django-camomilla-cms==6.0.0b3
 ```
 
-### Setup 
+Create a new django project
 
+```bash
+$ django-admin startproject <project_name>
+$ cd <project_name>
+```
+
+Create a dedicated folder for camomilla migrations
 
 ```bash
 $ mkdir -p camomilla_migrations
 $ touch camomilla_migrations.__init__.py
+```
+
+Create migrations and prepare the database
+
+```bash
 $ python manage.py makemigrations camomilla
-$ python manage.py migrate camomilla
+$ python manage.py migrate
 ```
 
-
-## 🔨 Settings
-
-
-Camomilla brings a lot of default settings you can include in your project's ones
+Add camomilla and camomilla dependencies to your project's INSTALLED_APPS
 
 ```python
-from camomilla.defaults import *
-```
+# <project_name>/settings.py
 
-Remember to add all the required applications in your project
-
-
-```python
 INSTALLED_APPS = [
     ...
     'camomilla', # always needed
@@ -91,15 +97,8 @@ INSTALLED_APPS = [
 ]
 ```
 
-### Run the server
+Run the server
 
 ```bash
 $ python manage.py runserver
-```
-
-## 💻 Development
-
-```bash
-$ pip install -r requirements-dev.txt
-$ make test
 ```
