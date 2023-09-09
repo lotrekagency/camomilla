@@ -1,4 +1,4 @@
-# Settings
+# ⚙️ Use Settings
 
 Camomilla comes with a set of settings that you can use to customize the behaviour of the app.
 

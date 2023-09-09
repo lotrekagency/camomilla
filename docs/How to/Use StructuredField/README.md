@@ -1,4 +1,4 @@
-# ⛓️ Use StructuredField 
+# 🧬 Use StructuredField 
 
 The StructuredField is a special type of field that allows you to create a structured JSONField.
 This kind of field allows you to declare a data structure that will be enforced to the json structure.

@@ -9,4 +9,5 @@ It is divided into "How to .." sections, each one covering a specific topic.
 - [🐝 Use API](Use%20API)
 - [🖼️ Use Media](Use%20Media)
 - [🍜 Use Menu](Use%20Menu)
-- [⛓️ Use StructuredField](Use%20StructuredField)
+- [🧬 Use StructuredField](Use%20StructuredField)
+- [⚙️ Use Settings](Use%20Settings)
