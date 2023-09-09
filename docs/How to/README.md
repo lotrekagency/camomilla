@@ -6,8 +6,11 @@ It is divided into "How to .." sections, each one covering a specific topic.
 - [🚀 Bootstrap your project](Bootstrap%20your%20project)
 - [📝 Use Pages ](Use%20Pages)
 - [🧩 Use Pages Context](Use%20Pages%20Context)
+- [🎭 Use Modeltranslation](Use%20Modeltranslation)
 - [🐝 Use API](Use%20API)
 - [🖼️ Use Media](Use%20Media)
 - [🍜 Use Menu](Use%20Menu)
 - [🧬 Use StructuredField](Use%20StructuredField)
 - [⚙️ Use Settings](Use%20Settings)
+
+Feel free to suggest new topics by opening an issue on the [issue tracker](https://github.com/lotrekagency/camomilla/issues).
