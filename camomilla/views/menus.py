@@ -15,6 +15,7 @@ from camomilla.views.decorators import active_lang
 
 from django.utils.translation import get_language
 
+
 class MenuViewSet(BaseModelViewset):
     queryset = Menu.objects.all()
     serializer_class = MenuSerializer
@@ -81,6 +82,3 @@ class MenuViewSet(BaseModelViewset):
         qs = UrlNode.objects.filter(permalink__icontains=url_node).order_by("permalink")
         print(get_language())
         return Response(BasicUrlNodeSerializer(qs, many=True).data)
-        
-        
-        

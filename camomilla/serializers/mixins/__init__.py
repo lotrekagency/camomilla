@@ -21,8 +21,10 @@ else:
     from django.contrib.postgres.fields import JSONField as DjangoJSONField
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from camomilla.models.page import AbstractPage
+
 
 # TODO: decide what to do with LangInfoMixin mixin!
 class LangInfoMixin(metaclass=serializers.SerializerMetaclass):
@@ -128,13 +130,13 @@ class AbstractPageMixin(serializers.ModelSerializer):
     breadcrumbs = serializers.SerializerMethodField()
     routerlink = serializers.CharField(read_only=True)
     template = serializers.SerializerMethodField()
-    
-    def get_template(self, instance: 'AbstractPage'):
+
+    def get_template(self, instance: "AbstractPage"):
         return instance.get_template_path()
-    
-    def get_breadcrumbs(self, instance: 'AbstractPage'):
+
+    def get_breadcrumbs(self, instance: "AbstractPage"):
         return instance.breadcrumbs
-    
+
     LANG_PERMALINK_FIELDS = [
         build_localized_fieldname("permalink", lang)
         for lang in AVAILABLE_LANGUAGES
@@ -147,6 +149,7 @@ class AbstractPageMixin(serializers.ModelSerializer):
 
     def get_default_field_names(self, *args):
         from camomilla.contrib.rest_framework.serializer import RemoveTranslationsMixin
+
         if RemoveTranslationsMixin in self.__class__.__bases__:  # noqa: E501
             return super().get_default_field_names(*args)
         return (

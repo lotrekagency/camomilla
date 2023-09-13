@@ -10,8 +10,8 @@ from camomilla.structured.utils import _LazyType, get_type, pointed_setter
 from camomilla.utils.getters import pointed_getter
 
 # TODO:
-# ::: Actually this is a first draft. 
-# The system should be more type safe. 
+# ::: Actually this is a first draft.
+# The system should be more type safe.
 # It should handle initialization made with model instance not only dicts
 # Neet to check if there are problems with different formats for pks (model instaces or string or dicts)
 
@@ -57,7 +57,7 @@ class CacheBuilder:
         self.__related_fields__ = related_fields
 
     @classmethod
-    def from_model(cls, model: BaseModel) -> 'CacheBuilder':
+    def from_model(cls, model: BaseModel) -> "CacheBuilder":
         return cls(related_fields=cls.inspect_related_fields(model))
 
     @classmethod
@@ -97,7 +97,7 @@ class CacheBuilder:
             elif isclass(annotation) and issubclass(annotation, BaseModel):
                 related[field_name] = RelInfo(annotation, RelInfo.RIField, field)
         return related
-    
+
     def get_all_fk_data(self, data):
         if isinstance(data, Sequence):
             fk_data = defaultdict(list)
@@ -116,7 +116,9 @@ class CacheBuilder:
             if info.type == RelInfo.FKField:
                 value = pointed_getter(data, field_name, None)
                 if value:
-                    if isinstance(value, ValueWithCache): # needed to break recursive cache builds
+                    if isinstance(
+                        value, ValueWithCache
+                    ):  # needed to break recursive cache builds
                         fk_data = {}
                         break
                     fk_data[info.model].append(
@@ -128,7 +130,9 @@ class CacheBuilder:
             elif info.type == RelInfo.QSField:
                 value = pointed_getter(data, field_name, [])
                 if isinstance(value, list):
-                    if any(True for v in value if isinstance(v, ValueWithCache)): # needed to break recursive cache builds
+                    if any(
+                        True for v in value if isinstance(v, ValueWithCache)
+                    ):  # needed to break recursive cache builds
                         fk_data = {}
                         break
                     fk_data[info.model].append(

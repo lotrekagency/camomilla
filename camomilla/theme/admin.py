@@ -82,10 +82,11 @@ class MediaAdmin(TranslationAwareModelAdmin):
 
 class PageAdmin(AbstractPageAdmin):
     readonly_fields = ("permalink",)
-    
-    
+
+
 class MenuAdmin(TranslationAwareModelAdmin):
     pass
+
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(MediaFolder, MediaFolderAdmin)

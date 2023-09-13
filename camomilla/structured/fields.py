@@ -48,9 +48,10 @@ class ForeignKey(django_models.Model, Generic[T]):
                 cs.no_info_plain_validator_function(lambda v: v.retrieve()),
             ]
         )
-        
+
         def serialize_data(instance, info):
             from camomilla.serializers.utils import build_standard_model_serializer
+
             if info.mode == "python":
                 serializer = build_standard_model_serializer(model_class, depth=1)
                 return serializer(instance=instance).data
@@ -123,9 +124,10 @@ class QuerySet(Generic[T]):
                 cs.no_info_plain_validator_function(lambda v: v.retrieve()),
             ]
         )
-    
+
         def serialize_data(qs: django_models.QuerySet, info: SerializationInfo):
             from camomilla.serializers.utils import build_standard_model_serializer
+
             if info.mode == "python":
                 serializer = build_standard_model_serializer(model_class, depth=1)
                 return serializer(instance=qs, many=True).data

@@ -19,6 +19,7 @@ def get_standard_bases() -> tuple:
         ModelSerializer,
     )
 
+
 def build_standard_model_serializer(model, depth, bases=None):
     if bases is None:
         bases = get_standard_bases()

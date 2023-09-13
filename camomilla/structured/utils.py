@@ -107,7 +107,7 @@ def map_method_aliases(new_cls):
         "validate_json": "model_validate_json",
         # "dump_python": "model_dump",
         # "dump_json": "model_dump_json",
-        "json_schema": "model_json_schema"
+        "json_schema": "model_json_schema",
     }
     for alias_name, target_name in method_aliases.items():
         setattr(new_cls, alias_name, getattr(new_cls, target_name))
