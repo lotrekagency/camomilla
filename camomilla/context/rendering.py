@@ -45,11 +45,11 @@ class PagesContextRegistry:
     def get_wrapper_context_func(
         self, template_path: str, page_model: type["AbstractPage"]
     ) -> Callable:
-        all_funcs: list[Callable] = list(
-            self._model_registry[page_model].union(
-                self._template_registry[template_path]
-            )
-        )
+        all_funcs = set()
+        for cls in self._model_registry.keys():
+            if issubclass(page_model, cls):
+                all_funcs.update(self._model_registry[cls])
+        all_funcs.update(self._template_registry[template_path])        
 
         def context_func(request: HttpRequest, super_ctx: dict = {}):
             context = super_ctx.copy()
