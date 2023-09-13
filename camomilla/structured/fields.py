@@ -5,7 +5,6 @@ from pydantic import SerializationInfo
 from pydantic_core import core_schema as cs
 
 from .utils import get_type
-from devtools import debug
 
 
 T = TypeVar("T", bound=django_models.Model)

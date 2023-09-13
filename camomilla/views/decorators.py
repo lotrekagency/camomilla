@@ -16,7 +16,7 @@ def active_lang(*args, **kwargs):
                 lang = request.GET.get("lang", request.GET.get("language", lang))
             if request and hasattr(request, "data"):
                 lang = request.data.pop("lang", request.data.pop("language", lang))
-            if lang and lang in [l[0] for l in settings.LANGUAGES]:
+            if lang and lang in [lng[0] for lng in settings.LANGUAGES]:
                 activate(lang)
                 request.LANGUAGE_CODE = lang
             return func(*args, **kwargs)

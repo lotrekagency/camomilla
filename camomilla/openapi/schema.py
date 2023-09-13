@@ -8,7 +8,7 @@ from camomilla.contrib.rest_framework.serializer import (
     TRANS_ACCESSOR,
 )
 from camomilla.serializers.fields.json import StructuredJSONField
-from camomilla.utils.getters import find_and_replace_dict, pointed_getter
+from camomilla.utils.getters import find_and_replace_dict
 
 
 class AutoSchema(DRFAutoSchema):

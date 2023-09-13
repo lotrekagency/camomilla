@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Union, TYPE_CHECKING
 
 from django.db.models import JSONField
 from django.db.models.query_utils import DeferredAttribute
@@ -13,6 +13,11 @@ from pydantic import (
 
 from .fields import *
 from .models import *
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel
+    from pydantic.fields import Field
+    from typing_extensions import Annotated
 
 
 class StructuredJSONFormField(JSONFormField):

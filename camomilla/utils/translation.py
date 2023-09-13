@@ -34,7 +34,7 @@ def get_nofallbacks(instance: Model, attr: str, *args, **kwargs) -> Any:
 
 def url_lang_decompose(url):
     if BASE_URL and url.startswith(BASE_URL):
-        url = url[len(BASE_URL) :]
+        url = url[len(BASE_URL):]
     data = {"url": url, "permalink": url, "language": DEFAULT_LANGUAGE}
     result = re.match(
         f"^\/?({'|'.join(AVAILABLE_LANGUAGES)})?\/(.*)", url

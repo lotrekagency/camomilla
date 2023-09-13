@@ -24,7 +24,7 @@ def test_create_tag_no_access():
 
 @pytest.mark.django_db
 def test_crud_tag():
-    ## Create
+    # Create
     token = login_superuser()
     client.credentials(HTTP_AUTHORIZATION="Token " + token)
     response = client.post("/api/camomilla/tags/", {"title": "Primo tag"})
@@ -34,7 +34,7 @@ def test_crud_tag():
     assert len(Tag.objects.all()) == 1
     assert response.status_code == 201
 
-    ## Create another with a different language
+    # Create another with a different language
     response = client.post(
         "/api/camomilla/tags/", {"title": "Second tag", "language_code": "en"}
     )
@@ -45,7 +45,7 @@ def test_crud_tag():
 
     assert response.status_code == 201
 
-    ## Translate the second one in italian
+    # Translate the second one in italian
     response = client.patch(
         "/api/camomilla/tags/2/", {"title": "Secondo tag", "language_code": "it"}
     )
@@ -56,19 +56,19 @@ def test_crud_tag():
 
     assert response.status_code == 200
 
-    ## Get the tags in 🇮🇹
+    # Get the tags in 🇮🇹
     response = client.get("/api/camomilla/tags/")
 
     assert response.json()[0]["title"] == "Secondo tag"
     assert response.json()[0]["language_code"] == "it"
 
-    ## Get the tags in 🇬🇧 with fallbacks!
+    # Get the tags in 🇬🇧 with fallbacks!
     response = client.get("/api/camomilla/tags/?language=en")
 
     assert response.json()[0]["title"] == "Second tag"
     assert response.json()[0]["language_code"] == "en"
 
-    ## Delete the tag
+    # Delete the tag
     response = client.delete("/api/camomilla/tags/2/")
 
     assert len(Tag.objects.all()) == 1

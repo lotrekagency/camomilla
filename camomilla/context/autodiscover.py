@@ -6,7 +6,6 @@ def autodiscover_context_files():
     """
     import copy
     import sys
-    import os
     from django.utils.module_loading import module_has_submodule
     from camomilla.context.rendering import ctx_registry
     from importlib import import_module
@@ -24,7 +23,7 @@ def autodiscover_context_files():
 
         try:
             import_module(module)
-        except:
+        except Exception:
             ctx_registry._model_registry = _model_registry_bkp
             ctx_registry._template_registry = _template_registry_bkp
             if module_has_submodule(mod, "template_context"):
