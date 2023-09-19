@@ -42,3 +42,6 @@ node_modules
 .temp
 .cache
 !docs/features/media
+camomilla_migrations
+test_db
+coverage.xml
