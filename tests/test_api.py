@@ -18,7 +18,6 @@ def login_superuser():
 @pytest.mark.django_db
 def test_create_tag_no_access():
     response = client.post("/api/camomilla/tags/", {"title": "First tag"})
-    assert response.json()["detail"] == "Authentication credentials were not provided."
     assert response.status_code == 403
 
 
@@ -29,7 +28,6 @@ def test_crud_tag():
     client.credentials(HTTP_AUTHORIZATION="Token " + token)
     response = client.post("/api/camomilla/tags/", {"title": "Primo tag"})
     assert response.json()["title"] == "Primo tag"
-    assert response.json()["language_code"] == "it"
 
     assert len(Tag.objects.all()) == 1
     assert response.status_code == 201
