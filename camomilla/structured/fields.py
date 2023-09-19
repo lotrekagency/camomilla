@@ -10,7 +10,7 @@ from .utils import get_type
 T = TypeVar("T", bound=django_models.Model)
 
 
-class ForeignKey(django_models.Model, Generic[T]):
+class ForeignKey(Generic[T]):
     @classmethod
     def __get_pydantic_core_schema__(
         cls, source: Any, handler: Callable[[Any], cs.CoreSchema]

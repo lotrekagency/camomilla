@@ -110,7 +110,7 @@ class StructuredJSONField(JSONField):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        kwargs["schema"] = self.schema
+        kwargs["schema"] = self.orig_schema
         return name, path, args, kwargs
 
     def formfield(self, **kwargs):
