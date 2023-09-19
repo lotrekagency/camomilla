@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n camomilla_filters %}
 
 <div>
     <style>
@@ -42,7 +42,7 @@
                 {% if redirect is None %}
                     onclick="submitLanguageWithoutRedirect('{{lang_code}}');"
                 {% else %}
-                    onclick="submitLanguage('{{lang_code}}', '{{redirect}}');"
+                    onclick="submitLanguage('{{lang_code}}', '{{redirect|strip_lang:lang_code}}');"
                 {% endif %}
             {% endif %}
         >
