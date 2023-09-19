@@ -1,17 +1,14 @@
 import os
-from django.conf import settings
 import shutil
 from django.core.management import call_command
 from django.db import connections
 import pytest
-from devtools import debug
 
 
 def clean_migration_folders():
     from django.conf import settings
 
     for dir in settings.MIGRATION_MODULES.values():
-        debug("Removing", dir, os.path.exists(dir))
         if os.path.exists(dir):
             shutil.rmtree(dir)
 
@@ -20,7 +17,6 @@ def create_migration_folders():
     from django.conf import settings
 
     for dir in settings.MIGRATION_MODULES.values():
-        debug("Creating", dir, os.path.exists(dir))
         if not os.path.exists(dir):
             os.makedirs(dir)
             open(os.path.join(dir, "__init__.py"), "w").close()
