@@ -1,0 +1,59 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=61.2"]
+
+[project]
+authors = [{name = "Lotrèk", email = "dimmitutto@lotrek.it"}]
+classifiers = [
+  "Environment :: Web Environment",
+  "Framework :: Django",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+]
+dependencies = [
+  "django-modeltranslation~=0.18.11",
+  "djsuperadmin>=0.9,<1.0.0",
+  "djangorestframework>=3.10.0,<4.0.0",
+  "django-admin-interface>=0.26.0,<1.0.0",
+  "Pillow>=6.2.0,<10.0.0",
+  "django-ckeditor>=5.7.1,<7.0.0",
+  "python-magic>=0.4,<0.5",
+  "django-jsonform~=2.19.0",
+  "Django>=3.2",
+  "pydantic~=2.2.1",
+]
+description = "Django powered cms"
+dynamic = ["version"]
+keywords = ["cms", "django", "api cms"]
+license = {text = "MIT"}
+name = "django-camomilla-cms"
+requires-python = ">= 3.6"
+
+[project.readme]
+content-type = "text/markdown"
+file = "README.md"
+
+[project.urls]
+Homepage = "https://github.com/lotrekagency/camomilla"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages]
+find = {namespaces = false}
+
+[tool.distutils.bdist_wheel]
+universal = true
+
+[tool.semantic_release]
+version_variables = ["setup.py:__version__", "camomilla/__init__.py:__version__", "camomilla/theme/__init__.py:__version__"]
+
+[tool.semantic_release.branches.release]
+match = "(release)"
+prerelease = false
+
+[tool.semantic_release.branches."next"]
+match = "next"
+prerelease = true
+prerelease_token = "beta"
