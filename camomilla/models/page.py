@@ -79,7 +79,7 @@ class UrlNodeManager(models.Manager):
                         models.Value(None, models.BooleanField()),
                     ),
                     (
-                        "pubblication_date",
+                        "publication_date",
                         models.DateTimeField(),
                         models.Value(timezone.now(), models.DateTimeField()),
                     ),
@@ -157,7 +157,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
     template = models.CharField(max_length=500, null=True, blank=True, choices=[])
     template_data = models.JSONField(default=dict, null=False, blank=True)
     identifier = models.CharField(max_length=200, null=True, unique=True, default=uuid4)
-    pubblication_date = models.DateTimeField(null=True, blank=True)
+    publication_date = models.DateTimeField(null=True, blank=True)
     indexable = models.BooleanField(default=True)
     ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
     parent_page = models.ForeignKey(
@@ -216,11 +216,13 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
 
     @property
     def is_public(self) -> bool:
-        if self.status == "PUB":
+        status = get_nofallbacks(self, "status")
+        publication_date = get_nofallbacks(self, "publication_date")
+        if status == "PUB":
             return True
-        if self.status == "PLA":
+        if status == "PLA":
             return (
-                bool(self.pubblication_date) and timezone.now() > self.pubblication_date
+                bool(publication_date) and timezone.now() > publication_date
             )
         return False
 
