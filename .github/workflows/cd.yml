@@ -1,7 +1,4 @@
 name: Release
-permissions:
-  id-token: write
-  contents: write
 
 on:
   workflow_dispatch:
@@ -26,6 +23,7 @@ jobs:
     name: Release to PYPI 🚀
     permissions:
       id-token: write
+      contents: write
 
     steps:
     - name: 📌 Checkout
