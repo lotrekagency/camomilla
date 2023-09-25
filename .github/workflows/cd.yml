@@ -1,15 +1,18 @@
 name: Release
 
 on:
-  workflow_run:
-    workflows: [ "Test and Coverage" ]
-    branches: [ release, next ]
-    types:
-      - completed
+  workflow_dispatch:
+    gh_release:
+      description: 'Release on GitHub'
+      required: false
+      type: boolean
+    py_release:
+      description: 'Release on PyPI'
+      required: false
+      type: boolean
 
 jobs:
   release:
-    # if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     concurrency: release
     name: Release to PYPI 🚀
@@ -31,10 +34,10 @@ jobs:
     
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      if: steps.release.outputs.released == 'true'
+      if: steps.release.outputs.released == 'true' && github.event.inputs.py_release == 'true'
 
     - name: Publish package distributions to GitHub Releases
       uses: python-semantic-release/upload-to-gh-release@main
-      if: steps.release.outputs.released == 'true'
+      if: steps.release.outputs.released == 'true' && github.event.inputs.gh_release == 'true'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
