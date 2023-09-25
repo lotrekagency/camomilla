@@ -4,15 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       root_options:
-        description: 'Root options for semantic-release version command. Example: --noop' 
+        description: 'Options: semantic-release command options, es: --noop' 
         required: false
         type: string
-      gh_release:
-        description: 'Release on GitHub'
+      force_gh_release:
+        description: 'Force Release on GitHub'
         required: false
         type: boolean
-      py_release:
-        description: 'Release on PyPI'
+      force_py_release:
+        description: 'Force Release on PyPI'
         required: false
         type: boolean
 
@@ -40,10 +40,10 @@ jobs:
     
     - name: 📤 Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      if: steps.release.outputs.released == 'true' && github.event.inputs.py_release == 'true'
+      if: steps.release.outputs.released == 'true' || github.event.inputs.force_py_release == 'true'
 
     - name: 📤 Publish package distributions to GitHub Releases
       uses: python-semantic-release/upload-to-gh-release@main
-      if: steps.release.outputs.released == 'true' && github.event.inputs.gh_release == 'true'
+      if: steps.release.outputs.released == 'true' || github.event.inputs.force_gh_release == 'true'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
