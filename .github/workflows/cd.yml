@@ -4,13 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       root_options:
-        description: 'Options: semantic-release command options, es: --noop' 
+        description: 'Options: semantic-release <options>, es: --noop' 
         required: false
         type: string
-      force_gh_release:
-        description: 'Force Release on GitHub'
-        required: false
-        type: boolean
       force_py_release:
         description: 'Force Release on PyPI'
         required: false
@@ -31,19 +27,23 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: 📦 Pack up with Semantic Release
+    - name: 🗂️ Generate Version and Changelog with Semantic Release
       id: release
       uses: python-semantic-release/python-semantic-release@v8.1.1
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        root_options: ${{ github.event.inputs.root_options || '-v' }}
+        root_options: ${{ github.event.inputs.root_options || '-v' }} --skip-build
+      
+    - name: 📦 Build package distributions
+      uses: actions/setup-python@v4
+      if: steps.release.outputs.released == 'true' || github.event.inputs.force_py_release == 'true'
+      with:
+        python-version: '3.x'
+        cache: 'pip'
+      run: python -m pip install --upgrade pip
+      run: pip install build
+      run: python -m build
     
     - name: 📤 Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       if: steps.release.outputs.released == 'true' || github.event.inputs.force_py_release == 'true'
-
-    - name: 📤 Publish package distributions to GitHub Releases
-      uses: python-semantic-release/upload-to-gh-release@main
-      if: steps.release.outputs.released == 'true' || github.event.inputs.force_gh_release == 'true'
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
