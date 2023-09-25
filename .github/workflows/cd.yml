@@ -5,12 +5,9 @@ on:
     inputs:
       root_options:
         description: "Options: semantic-release <options>, es: --noop"
+        default: "-v"
         required: false
         type: string
-      force_py_release:
-        description: "Force Release on PyPI"
-        required: false
-        type: boolean
 
 jobs:
   release:
@@ -32,11 +29,10 @@ jobs:
         uses: python-semantic-release/python-semantic-release@v8.1.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          root_options: ${{ github.event.inputs.root_options || '-v' }}
+          root_options: ${{ github.event.inputs.root_options }}
 
       - name: 🚧 Setup build environment
         uses: actions/setup-python@v4
-        if: steps.release.outputs.released == 'true' || github.event.inputs.force_py_release == 'true'
         with:
           python-version: "3.x"
           cache: "pip"
@@ -51,4 +47,3 @@ jobs:
 
       - name: 📤 Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        if: steps.release.outputs.released == 'true' || github.event.inputs.force_py_release == 'true'
