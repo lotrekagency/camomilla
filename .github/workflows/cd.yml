@@ -1,4 +1,4 @@
-name: Release
+name: 🚀 Release
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     concurrency: release
-    name: Release to PYPI 🚀
+    name: Release to PyPI 🐍
     permissions:
       id-token: write
       contents: write

@@ -1,9 +1,9 @@
-name: Test and Coverage
+name: 🧪 Test and Coverage
 
 on:
   workflow_dispatch:
   pull_request:
-    branches: [ master, release, next ]
+    branches: [ master, next ]
 
 jobs:
   test:
@@ -14,21 +14,20 @@ jobs:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
         django-version: ["2.2", "3.2", "4.0"]
-    name: Test on Python ${{ matrix.python-version }} with Django ${{ matrix.django-version }}
+    name: 🦠 Test on Python ${{ matrix.python-version }} with Django ${{ matrix.django-version }}
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }} 🐍
+    - name: 🐍 Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies 📦
+    - name: 📦 Install dependencies 
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements-dev.txt
         pip install Django==${{ matrix.django-version }}
-    - name: Test with pytest and calculate coverage 🧪
-      run: |
-        make test
-    - name: Upload coverage
+    - name: 🔬 Test with pytest and calculate coverage 
+      run: make test
+    - name: 🩺 Upload coverage to codecov.io
       uses: codecov/codecov-action@v2
