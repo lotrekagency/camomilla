@@ -2,14 +2,19 @@ name: Release
 
 on:
   workflow_dispatch:
-    gh_release:
-      description: 'Release on GitHub'
-      required: false
-      type: boolean
-    py_release:
-      description: 'Release on PyPI'
-      required: false
-      type: boolean
+    inputs:
+      root_options:
+        description: 'Root options for semantic-release version command. Example: --noop' 
+        required: false
+        type: string
+      gh_release:
+        description: 'Release on GitHub'
+        required: false
+        type: boolean
+      py_release:
+        description: 'Release on PyPI'
+        required: false
+        type: boolean
 
 jobs:
   release:
@@ -20,23 +25,23 @@ jobs:
       id-token: write
 
     steps:
-    - name: Checkout
+    - name: 📌 Checkout
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
-    - name: Build package distributions with Semantic Release
+    - name: 📦 Pack up with Semantic Release
       id: release
-      uses: python-semantic-release/python-semantic-release@v8.0.0
+      uses: python-semantic-release/python-semantic-release@v8.1.1
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        root_options: -vv --noop
+        root_options: ${{ github.event.inputs.root_options }} || '-v'
     
-    - name: Publish package distributions to PyPI
+    - name: 📤 Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       if: steps.release.outputs.released == 'true' && github.event.inputs.py_release == 'true'
 
-    - name: Publish package distributions to GitHub Releases
+    - name: 📤 Publish package distributions to GitHub Releases
       uses: python-semantic-release/upload-to-gh-release@main
       if: steps.release.outputs.released == 'true' && github.event.inputs.gh_release == 'true'
       with:
