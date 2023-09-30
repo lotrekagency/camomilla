@@ -16,7 +16,7 @@ Inside the file you can provide context with the register function in 2 differen
 To register some additional context to a specific template wite in the template_context.py file the following:
 
 ```python
-from camomilla.context.rendering import register
+from camomilla.templates_context.rendering import register
 from camomilla.models import Media
 
 @register("website/home.html")
@@ -33,7 +33,7 @@ def home_page():
 To register some additional context to a specific page wite in the template_context.py file the following:
 
 ```python
-from camomilla.context.rendering import register
+from camomilla.templates_context.rendering import register
 from camomilla.models import Media, Page
 
 @register(page_model=Page)
@@ -53,7 +53,7 @@ The super_ctx kwarg contains the context coming from upper functions or camomill
 
 
 ```python
-from camomilla.context.rendering import register
+from camomilla.templates_context.rendering import register
 from camomilla.models import Media, Page
 
 @register(page_model=Page)
