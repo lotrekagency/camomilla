@@ -50,7 +50,7 @@ universal = true
 version_variables = ["setup.py:__version__", "camomilla/__init__.py:__version__", "camomilla/theme/__init__.py:__version__"]
 
 [tool.semantic_release.branches.master]
-match = "(master)"
+match = "master"
 prerelease = false
 
 [tool.semantic_release.branches."next"]
