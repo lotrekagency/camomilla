@@ -23,7 +23,7 @@ class OptimizedStorage(get_storage_class()):
         )
         super().__init__(*args, **kwargs)
 
-    def _save(self, name:str, content:ContentFile):
+    def _save(self, name: str, content: ContentFile):
         if settings.ENABLE_MEDIA_OPTIMIZATION:
             content, _ = self._optimize(name, content)
         return super(OptimizedStorage, self)._save(name, content)
