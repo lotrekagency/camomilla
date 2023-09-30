@@ -7,7 +7,7 @@ def autodiscover_context_files():
     import copy
     import sys
     from django.utils.module_loading import module_has_submodule
-    from camomilla.context.rendering import ctx_registry
+    from camomilla.templates_context.rendering import ctx_registry
     from importlib import import_module
     from django.apps import apps
     from camomilla.settings import TEMPLATE_CONTEXT_FILES, DEBUG

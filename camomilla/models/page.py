@@ -24,7 +24,7 @@ from camomilla.utils import (
 )
 from camomilla.utils.getters import pointed_getter
 from camomilla import settings
-from camomilla.context.rendering import ctx_registry
+from camomilla.templates_context.rendering import ctx_registry
 
 
 def GET_TEMPLATE_CHOICES():
