@@ -2,6 +2,25 @@
 
 
 
+## v6.0.0-beta.7 (2023-09-30)
+
+### Chore
+
+* chore: update semanti releases branches ([`e0a4864`](https://github.com/lotrekagency/camomilla/commit/e0a48641c8436798762fbbf29a49c09e0db704bb))
+
+* chore: update example app ([`30f604f`](https://github.com/lotrekagency/camomilla/commit/30f604fbbf1265aef5ee87ec25459a2e4facc7e1))
+
+### Documentation
+
+* docs: update changelog ([`3b8a766`](https://github.com/lotrekagency/camomilla/commit/3b8a766a5a8655afd8e158a3b51b26217513d93c))
+
+* docs: update version ([`6314005`](https://github.com/lotrekagency/camomilla/commit/631400540ea3fec443cd1b72c38f68eb571d5ef0))
+
+### Fix
+
+* fix: fix optimized storage increasing file sizes in some cases ([`7547c45`](https://github.com/lotrekagency/camomilla/commit/7547c457cdd0a2f197118de7f1902b693b902c7a))
+
+
 ## v6.0.0-beta.6 (2023-09-30)
 
 ### Chore
