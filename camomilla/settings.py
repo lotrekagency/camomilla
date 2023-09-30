@@ -61,6 +61,10 @@ MEDIA_OPTIMIZE_MAX_HEIGHT = pointed_getter(
 )
 MEDIA_OPTIMIZE_DPI = pointed_getter(django_settings, "CAMOMILLA.MEDIA.OPTIMIZE.DPI", 30)
 
+MEDIA_OPTIMIZE_JPEG_QUALITY = pointed_getter(
+    django_settings, "CAMOMILLA.MEDIA.OPTIMIZE.JPEG_QUALITY", 85
+)
+
 ENABLE_MEDIA_OPTIMIZATION = pointed_getter(
     django_settings, "CAMOMILLA.MEDIA.OPTIMIZE.ENABLE", True
 )
@@ -88,7 +92,7 @@ DEBUG = pointed_getter(django_settings, "CAMOMILLA.DEBUG", django_settings.DEBUG
 #         "BASE_URL": ""
 #     },
 #     "MEDIA": {
-#         "OPTIMIZE": {"MAX_WIDTH": 1980, "MAX_HEIGHT": 1400, "DPI": 30, "ENABLE": True},
+#         "OPTIMIZE": {"MAX_WIDTH": 1980, "MAX_HEIGHT": 1400, "DPI": 30, "JPEG_QUALITY": 85, "ENABLE": True},
 #         "THUMBNAIL": {"FOLDER": "", "WIDTH": 50, "HEIGHT": 50}
 #     },
 #     "RENDER": {
