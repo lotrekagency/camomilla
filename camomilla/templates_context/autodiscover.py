@@ -35,6 +35,8 @@ def autodiscover_context_files():
     if DEBUG:
         try:
             if sys.argv[1] in ("runserver", "runserver_plus"):
+                if not ctx_registry.get_registered_info().items():
+                    return
                 print("Camomilla context files:")
                 for k, v in ctx_registry.get_registered_info().items():
                     print(f"{k}:")

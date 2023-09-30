@@ -10,10 +10,9 @@ class CamomillaConfig(AppConfig):
     name = "camomilla"
 
     def ready(self):
-        from camomilla.models import handle_context_registraion
 
         migration_modules = getattr(settings, "MIGRATION_MODULES", {})
         if "camomilla" not in migration_modules:
             migration_modules["camomilla"] = "camomilla_migrations"
         setattr(settings, "MIGRATION_MODULES", migration_modules)
-        handle_context_registraion()
+        self.module.autodiscover()
