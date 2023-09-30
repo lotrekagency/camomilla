@@ -2,6 +2,63 @@
 
 
 
+## v6.0.0-beta.6 (2023-09-30)
+
+### Chore
+
+* chore: always try to upload pypi ([`f92880c`](https://github.com/lotrekagency/camomilla/commit/f92880c17c936af0793956b704f1511a37d66d30))
+
+* chore: update testing workflow ([`0b9e073`](https://github.com/lotrekagency/camomilla/commit/0b9e073559fada746647ed089248ff43d4e0d567))
+
+* chore: better job step splitting ([`9d158d5`](https://github.com/lotrekagency/camomilla/commit/9d158d5836431171fb1a6fd11f4f7dc90b22b10f))
+
+* chore: fix run build in cd.yml ([`2cf8a30`](https://github.com/lotrekagency/camomilla/commit/2cf8a3086cd28c0b57679692645e45a3f6be025d))
+
+* chore: fix build run statement ([`d9d5f14`](https://github.com/lotrekagency/camomilla/commit/d9d5f14567c24f4713b223a896ff6d11c26b5147))
+
+* chore: decouple package build from version tagging in cd.yml ([`4c96a8e`](https://github.com/lotrekagency/camomilla/commit/4c96a8e4df9b9795ec06aff479f24f05ebeb599b))
+
+* chore: set force release options to release workflow ([`852f37f`](https://github.com/lotrekagency/camomilla/commit/852f37f53c3e3e3eef2e80b1fe1cae07ed8f7a08))
+
+### Documentation
+
+* docs: update templates_context docs ([`9ecbb4e`](https://github.com/lotrekagency/camomilla/commit/9ecbb4ead9f63c731f463aabd97a7f758f2a537e))
+
+* docs: update docs ([`9ef5674`](https://github.com/lotrekagency/camomilla/commit/9ef5674e1028b763ada0c1ba2df43693869b65a0))
+
+### Fix
+
+* fix: fix template context autodiscover&#34; ([`2189fe9`](https://github.com/lotrekagency/camomilla/commit/2189fe95c6d822a13bd432dc05803785133522ce))
+
+* fix: fix camomilla context init import ([`ac8e86b`](https://github.com/lotrekagency/camomilla/commit/ac8e86b1ca570be756810a7fcf748b137bf19499))
+
+* fix: fix camomilla context init ([`01914bd`](https://github.com/lotrekagency/camomilla/commit/01914bddcc13903917c71b7091e0b7d0dc454e70))
+
+* fix: fix camomilla context __init__py ([`4de1519`](https://github.com/lotrekagency/camomilla/commit/4de1519521babef9eb5237b182ec39cf261862b2))
+
+### Refactor
+
+* refactor: move context engine to templates_context module ([`d6a86f6`](https://github.com/lotrekagency/camomilla/commit/d6a86f614ce229952001612cfaaa692e31d59bdb))
+
+### Unknown
+
+* Merge branch &#39;master&#39; into next ([`3af5bbc`](https://github.com/lotrekagency/camomilla/commit/3af5bbc24807654fea884448dd398c5a3f6af450))
+
+* Merge branch &#39;master&#39; into next ([`57d1d9f`](https://github.com/lotrekagency/camomilla/commit/57d1d9f17f65970a272153338133e0b3e8315593))
+
+* Merge branch &#39;master&#39; into next ([`64b3a65`](https://github.com/lotrekagency/camomilla/commit/64b3a65e3a8cf91d1f90a1942bc45daaa0c3bee5))
+
+* Merge branch &#39;master&#39; into next ([`72d67e3`](https://github.com/lotrekagency/camomilla/commit/72d67e31e264a7d5a7d50a7a1ce06d27ae65ea8c))
+
+* Merge branch &#39;master&#39; into next ([`7d387ba`](https://github.com/lotrekagency/camomilla/commit/7d387ba380036baf9fa534c86f0595a4adcbd782))
+
+* Merge branch &#39;master&#39; into next ([`b7f0656`](https://github.com/lotrekagency/camomilla/commit/b7f0656b2f86179ac672deaa1b24668efa5d50ff))
+
+* Merge branch &#39;next&#39; of github.com:lotrekagency/camomilla into next ([`88ad9a2`](https://github.com/lotrekagency/camomilla/commit/88ad9a2b45d88e621f1f5ae422c9bf8fccb66020))
+
+* Merge branch &#39;master&#39; into next ([`cccacea`](https://github.com/lotrekagency/camomilla/commit/cccaceace13ab576a990daa9d7344d3043be8a4c))
+
+
 ## v6.0.0-beta.5 (2023-09-25)
 
 ### Chore
