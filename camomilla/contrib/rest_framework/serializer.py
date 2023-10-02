@@ -41,7 +41,8 @@ def nest_to_plain(data: Union[dict, QueryDict], fields: list[str], accessor=TRAN
                 # this saves on the default field the default language value
                 if lang == mt_settings.DEFAULT_LANGUAGE:
                     data[k] = nest_trans[k]
-                data["%s_%s" % (k, lang)] = nest_trans[k]
+                key = build_localized_fieldname(k, lang)
+                data[key] = data.get(key, nest_trans[k])
     return data
 
 
