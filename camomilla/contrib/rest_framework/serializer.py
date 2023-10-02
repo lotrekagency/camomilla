@@ -1,4 +1,6 @@
 from functools import cached_property
+from typing import Iterable, Union
+from django.http import QueryDict
 
 from modeltranslation import settings as mt_settings
 from modeltranslation.translator import NotRegistered, translator
@@ -27,7 +29,9 @@ def plain_to_nest(data, fields, accessor=TRANS_ACCESSOR):
     return data
 
 
-def nest_to_plain(data, fields, accessor=TRANS_ACCESSOR):
+def nest_to_plain(data: Union[dict, QueryDict], fields: list[str], accessor=TRANS_ACCESSOR):
+    if isinstance(data, QueryDict):
+        data = data.dict()
     translations = data.pop(accessor, {})
     for lang in mt_settings.AVAILABLE_LANGUAGES:
         nest_trans = translations.pop(lang, {})
@@ -43,14 +47,14 @@ def nest_to_plain(data, fields, accessor=TRANS_ACCESSOR):
 
 class TranslationsMixin(serializers.ModelSerializer):
     @cached_property
-    def translation_fields(self):
+    def translation_fields(self) -> list[str]:
         try:
             return translator.get_options_for_model(self.Meta.model).get_field_names()
         except NotRegistered:
             return []
 
     @property
-    def _writable_fields(self):
+    def _writable_fields(self) -> Iterable[serializers.Field]:
         for field in super()._writable_fields:
             if field.field_name not in self.translation_fields:
                 yield field
