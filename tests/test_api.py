@@ -17,8 +17,8 @@ def login_superuser():
 
 @pytest.mark.django_db
 def test_create_tag_no_access():
-    response = client.post("/api/camomilla/tags/", {"title": "First tag"})
-    assert response.status_code == 403
+    response = client.post("/api/camomilla/tags/", {"name_en": "First tag"})
+    assert response.status_code == 401
 
 
 @pytest.mark.django_db
@@ -26,45 +26,39 @@ def test_crud_tag():
     # Create
     token = login_superuser()
     client.credentials(HTTP_AUTHORIZATION="Token " + token)
-    response = client.post("/api/camomilla/tags/", {"title": "Primo tag"})
-    assert response.json()["title"] == "Primo tag"
-
+    response = client.post("/api/camomilla/tags/", {"name_en": "First tag"})
+    
+    assert response.json()["name"] == "First tag"
     assert len(Tag.objects.all()) == 1
     assert response.status_code == 201
 
     # Create another with a different language
-    response = client.post(
-        "/api/camomilla/tags/", {"title": "Second tag", "language_code": "en"}
-    )
-    assert response.json()["title"] == "Second tag"
-    assert response.json()["language_code"] == "en"
-
+    response = client.post("/api/camomilla/tags/", {"name_it": "Secondo tag"})
+    assert response.json()["translations"]["it"]["name"] == "Secondo tag"
     assert len(Tag.objects.all()) == 2
-
     assert response.status_code == 201
 
-    # Translate the second one in italian
+    # Translate the second one in english
     response = client.patch(
-        "/api/camomilla/tags/2/", {"title": "Secondo tag", "language_code": "it"}
+        "/api/camomilla/tags/2/",
+        {"translations": {"en": {"name": "Second tag"}}},
+        format="json",
     )
-    assert response.json()["title"] == "Secondo tag"
-    assert response.json()["language_code"] == "it"
-
+    assert response.json()["translations"]["en"]["name"] == "Second tag"
+    assert response.json()["translations"]["it"]["name"] == "Secondo tag"
     assert len(Tag.objects.all()) == 2
 
     assert response.status_code == 200
 
-    # Get the tags in 🇮🇹
+    # Get the tags in english
     response = client.get("/api/camomilla/tags/")
 
-    assert response.json()[0]["title"] == "Secondo tag"
-    assert response.json()[0]["language_code"] == "it"
+    assert response.json()[0]["name"] == "Second tag"
 
-    # Get the tags in 🇬🇧 with fallbacks!
-    response = client.get("/api/camomilla/tags/?language=en")
+    # Get the tags in italianith fallbacks!
+    response = client.get("/api/camomilla/tags/?language=it")
 
-    assert response.json()[0]["title"] == "Second tag"
-    assert response.json()[0]["language_code"] == "en"
+    assert response.json()[0]["name"] == "Secondo tag"
 
     # Delete the tag
     response = client.delete("/api/camomilla/tags/2/")
