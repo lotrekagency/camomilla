@@ -4,7 +4,6 @@ from ...contrib.rest_framework.serializer import TranslationsMixin
 from ..fields import FieldsOverrideMixin
 from ..mixins import (
     JSONFieldPatchMixin,
-    LangInfoMixin,
     NestMixin,
     OrderingMixin,
     SetupEagerLoadingMixin,

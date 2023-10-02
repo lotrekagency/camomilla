@@ -7,8 +7,8 @@ class KeepTranslationsMixin:
     This mixin make it possible to keep translations when migrating from django-hvad to modeltranslation and viceversa.
     To use it, you have to add a dictionary to your migration class called "keep_translations".
     The dictionary must have model paths as keys and a list of fields to keep as values.
-    
-    
+
+
     Example:
     ```python
     class Migration(KeepTranslationsMixin, migrations.Migration):
@@ -17,7 +17,7 @@ class KeepTranslationsMixin:
         }
     ```
     """
-    
+
     _saved_data_from_plain = {}
     language_codes = dict(getattr(settings, "LANGUAGES", {})).keys()
 
