@@ -141,3 +141,19 @@ CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://localhost:8000"]
 
 MEDIA_ROOT = Path(BASE_DIR / "media")
 MEDIA_URL = '/media/'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'camomilla.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
