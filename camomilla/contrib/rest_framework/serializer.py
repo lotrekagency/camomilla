@@ -15,6 +15,10 @@ TRANS_ACCESSOR = "translations"
 
 
 def plain_to_nest(data, fields, accessor=TRANS_ACCESSOR):
+    """
+    This function transforms a plain dictionary with translations fields (es. {"title_en": "Hello"})
+    into a dictionary with nested translations fields (es. {"translations": {"en": {"title": "Hello"}}}).
+    """
     trans_data = {}
     for lang in mt_settings.AVAILABLE_LANGUAGES:
         lang_data = {}
@@ -30,6 +34,11 @@ def plain_to_nest(data, fields, accessor=TRANS_ACCESSOR):
 
 
 def nest_to_plain(data: Union[dict, QueryDict], fields: list[str], accessor=TRANS_ACCESSOR):
+    """
+    This function is the inverse of plain_to_nest.
+    It transforms a dictionary with nested translations fields (es. {"translations": {"en": {"title": "Hello"}}})
+    into a plain dictionary with translations fields (es. {"title_en": "Hello"}).
+    """
     if isinstance(data, QueryDict):
         data = data.dict()
     translations = data.pop(accessor, {})
@@ -47,6 +56,17 @@ def nest_to_plain(data: Union[dict, QueryDict], fields: list[str], accessor=TRAN
 
 
 class TranslationsMixin(serializers.ModelSerializer):
+    """
+    This mixin adds support for modeltranslation fields.
+    It automatically nests all translations fields (es. title_en) under a "translations" field.
+    
+    This means that, in representation, the serializer will transform:
+    `{"title_en": "Hello", "title_it": "Ciao"}` -> `{"translations": {"en": {"title": "Hello"}, "it": {"title": "Ciao"}}`
+    
+    While in deserialization, the serializer will transform:
+    `{"translations": {"en": {"title": "Hello"}, "it": {"title": "Ciao"}}` -> `{"title_en": "Hello", "title_it": "Ciao"}`
+    """
+    
     @cached_property
     def translation_fields(self) -> list[str]:
         try:
@@ -85,6 +105,15 @@ class TranslationsMixin(serializers.ModelSerializer):
 
 
 class RemoveTranslationsMixin(serializers.ModelSerializer):
+    """
+    This mixin removes all translations fields (es. title_en) from the serializer.
+    It's useful when you want to create a serializer that doesn't need to include all translations fields.
+    
+    If request is passed in context, this serializer becomes aware of the query parameter "included_translations".
+    If the value is "all", all translations fields are included.
+    If the value is a comma separated list of languages (es. "en,it"), only the specified translations fields are included.
+    """
+    
     @cached_property
     def translation_fields(self):
         try:

@@ -10,6 +10,10 @@ if TYPE_CHECKING:
 
 
 class StructuredJSONField(serializers.JSONField):
+    """
+    This field allows to serialize and deserialize structured data.
+    """
+    
     schema: Union["BaseModel", TypeAdapter] = None
 
     def __init__(self, **kwargs):

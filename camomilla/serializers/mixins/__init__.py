@@ -28,6 +28,10 @@ if TYPE_CHECKING:
 
 # TODO: decide what to do with LangInfoMixin mixin!
 class LangInfoMixin(metaclass=serializers.SerializerMetaclass):
+    """
+    This mixin adds a "lang_info" field to the serializer.
+    This field contains information about the languages available in the site.
+    """
     lang_info = serializers.SerializerMethodField("get_lang_info", read_only=True)
 
     def get_lang_info(self, obj, *args, **kwargs):
@@ -51,12 +55,18 @@ class LangInfoMixin(metaclass=serializers.SerializerMetaclass):
 
 
 class SetupEagerLoadingMixin:
+    """
+    This mixin allows to use the setup_eager_loading method to optimize the queries.
+    """
     @staticmethod
     def setup_eager_loading(queryset):
         return queryset
 
 
 class OrderingMixin:
+    """
+    This mixin allows to set the default value of an ordering field to the max value + 1.
+    """
     def get_max_order(self, order_field):
         return self.Meta.model.objects.aggregate(
             max_order=Coalesce(Max(order_field), 0)
@@ -84,6 +94,11 @@ class OrderingMixin:
 
 
 class JSONFieldPatchMixin:
+    """
+    This mixin allows to patch JSONField values during partial updates.
+    This means that, if a JSONField is present in the request and the requsest uses PATCH method,
+    the serializer will merge the new data with the old one.
+    """
     def is_json_field(self, attr, value, info):
         return (
             attr in info.fields
@@ -103,6 +118,14 @@ class JSONFieldPatchMixin:
 
 
 class NestMixin:
+    """
+    This mixin automatically creates nested serializers for relational fields.
+    The depth of the nesting can be set using the "depth" attribute of the Meta class.
+    If the depth is not set, the serializer will use the value coming from the settings.
+    
+    CAMOMILLA = { "API": {"NESTING_DEPTH": 10} }
+    """
+    
     def __init__(self, *args, **kwargs):
         self._depth = kwargs.pop("depth", None)
         return super().__init__(*args, **kwargs)
@@ -127,6 +150,13 @@ class NestMixin:
 
 
 class AbstractPageMixin(serializers.ModelSerializer):
+    """
+    This mixin is needed to serialize AbstractPage models.
+    It provides permalink validation and some extra fields serialization.
+    
+    Use it as a base class for your serializer if you need to serialize custom AbstractPage models.
+    """
+    
     breadcrumbs = serializers.SerializerMethodField()
     routerlink = serializers.CharField(read_only=True)
     template = serializers.SerializerMethodField()

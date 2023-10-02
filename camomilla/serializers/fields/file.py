@@ -4,6 +4,10 @@ from rest_framework.fields import Field
 
 
 class SafeFileFieldMixin(Field):
+    """
+    This mixin prevents errors when trying to upload a file passing its current url.
+    In such cases, the current file will be kept.
+    """
     def to_internal_value(self, data):
         current = getattr(self.parent.instance, self.field_name, None)
         if (

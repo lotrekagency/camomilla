@@ -20,4 +20,19 @@ class BaseModelSerializer(
     TranslationsMixin,
     serializers.ModelSerializer,
 ):
+    """
+    This is the base serializer for all the models.
+    It adds support for:
+    - nesting translations fields under a "translations" field
+    - overriding related fields with auto-generated serializers
+    - patching JSONField
+    - ordering
+    - eager loading
+    """
+
     pass
+
+
+__all__ = [
+    "BaseModelSerializer",
+]

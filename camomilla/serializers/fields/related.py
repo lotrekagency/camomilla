@@ -3,6 +3,20 @@ from rest_framework import serializers, relations
 
 
 class RelatedField(serializers.PrimaryKeyRelatedField):
+    """
+    This field helps to serialize and deserialize related data.
+    It serializes related data building a nested serializer.
+    Allowing insertions with both nested and plain data.
+    
+    
+    For example it accepts as input data both:
+    ```json
+    {"related_field": 1}
+    {"related_field": {"id": 1, "field": "value"}}
+    ```
+
+    """
+    
     def __init__(self, **kwargs):
         self.serializer = kwargs.pop("serializer", None)
         self.lookup = kwargs.pop("lookup", "id")
