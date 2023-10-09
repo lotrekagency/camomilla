@@ -6,8 +6,10 @@ from camomilla.settings import STRUCTURED_FIELD_CACHE_ENABLED
 from camomilla.structured.fields import ForeignKey, QuerySet
 from camomilla.structured.models import BaseModel
 from camomilla.structured.utils import _LazyType, get_type, pointed_setter
-
+from django.db.models import Model as DjangoModel
 from camomilla.utils.getters import pointed_getter
+from typing import Iterable, Union
+
 
 # TODO:
 # ::: Actually this is a first draft.
@@ -16,16 +18,20 @@ from camomilla.utils.getters import pointed_getter
 # Neet to check if there are problems with different formats for pks (model instaces or string or dicts)
 
 
+class Cache(dict):
+    pass
+
+
 class ValueWithCache:
     def __init__(self, cache, model, value) -> None:
-        self.cache = cache
-        self.value = value
-        self.model = model
+        self.cache: Cache = cache
+        self.value: Union[Iterable[Union[str, int]], str, int] = value
+        self.model: type[DjangoModel] = model
 
     def retrieve(self):
         cache = self.cache.get(self.model)
-        if isinstance(self.value, Sequence):
-            qs = self.model._default_manager.filter(pk__in=self.value)
+        if hasattr(self.value, '__iter__'):
+            qs = self.model.objects.filter(pk__in=self.value)
             setattr(
                 qs,
                 "_result_cache",
@@ -33,11 +39,7 @@ class ValueWithCache:
             )
             return qs
         else:
-            val = cache.get(self.value, None)
-            if val is None:
-                return self.model._default_manager.get(pk=self.value)
-            else:
-                return val
+            return cache.get(self.value, None) or self.model.objects.get(pk=self.value)
 
 
 class RelInfo:
@@ -176,7 +178,7 @@ class CacheBuilder:
                     plainset[model].update(t[1])
                 else:
                     plainset[model].add(t[1])
-        cache = {}
+        cache = Cache()
         for model, values in plainset.items():
             models = []
             pks = []
