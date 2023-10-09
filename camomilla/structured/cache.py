@@ -39,7 +39,11 @@ class ValueWithCache:
             )
             return qs
         else:
-            return cache.get(self.value, None) or self.model.objects.get(pk=self.value)
+            val = cache.get(self.value, None)
+            if val is None:
+                return self.model._default_manager.get(pk=self.value)
+            else:
+                return val
 
 
 class RelInfo:
