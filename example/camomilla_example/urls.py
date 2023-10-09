@@ -20,6 +20,8 @@ from django.conf.urls.i18n import i18n_patterns
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve as staticserve
+from django.contrib.sitemaps.views import sitemap
+from camomilla.sitemap import camomilla_sitemaps
 
 
 urlpatterns = [
@@ -27,6 +29,12 @@ urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
     path("admin/", admin.site.urls),
     path("api/camomilla/", include("camomilla.urls")),
+    path(
+        "sitemap.xml",
+        sitemap,
+        {"sitemaps": camomilla_sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    )
 ]
 
 if getattr(settings, "DEBUG", False) or getattr(settings, "DEBUG404", False):
