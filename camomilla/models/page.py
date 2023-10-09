@@ -61,7 +61,19 @@ class UrlNodeManager(models.Manager):
                     )
                 }
             )
-        return qs
+        return self._annotate_is_public(qs)
+
+    def _annotate_is_public(self, qs: models.QuerySet):
+        return qs.annotate(
+            is_public=models.Case(
+                models.When(status="PUB", then=True),
+                models.When(
+                    status="PLA", publication_date__lte=timezone.now(), then=True
+                ),
+                default=False,
+                output_field=models.BooleanField(default=False),
+            )
+        )
 
     def get_queryset(self):
         try:
@@ -75,14 +87,19 @@ class UrlNodeManager(models.Manager):
                     ),
                     (
                         "status",
-                        models.BooleanField(),
-                        models.Value(None, models.BooleanField()),
+                        models.CharField(),
+                        models.Value("DRF", models.CharField()),
                     ),
                     (
                         "publication_date",
                         models.DateTimeField(),
                         models.Value(timezone.now(), models.DateTimeField()),
                     ),
+                    (
+                        "date_updated_at",
+                        models.DateTimeField(),
+                        models.Value(timezone.now(), models.DateTimeField()),
+                    )
                 ],
             )
         except (ProgrammingError, OperationalError):
@@ -110,6 +127,9 @@ class UrlNode(models.Model):
     @property
     def routerlink(self) -> str:
         return self.reverse_url(self.permalink) or self.permalink
+
+    def get_absolute_url(self) -> str:
+        return self.routerlink
 
 
 PAGE_CHILD_RELATED_NAME = "%(app_label)s_%(class)s_child_pages"
