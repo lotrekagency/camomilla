@@ -15,7 +15,7 @@ INSTALLED_APPS = [
 ]
 ```
 
-## Register your models
+## 🪡 Register your models
 
 To translate a model, you need to register in the `modeltranslation` registry.
 To register a model, you need to create a `translation.py` file in your django app folder and register your models there.
@@ -53,7 +53,7 @@ class MyModelTranslationOptions(AbstractPageTranslationOptions):
 translator.register(MyModel, MyModelTranslationOptions)
 ```
 
-## Caveats with Rest Framework
+## 🚨 Caveats with Rest Framework
 
 If you are using [Django Rest Framework](https://www.django-rest-framework.org/) you should always declare get_queryset in your viewsets, otherwise the statically declared queryset will not provide results in the requested language.
 
