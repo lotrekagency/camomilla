@@ -2,6 +2,55 @@
 
 
 
+## v6.0.0-beta.8 (2023-10-10)
+
+### Chore
+
+* chore: update test app to use sitemap ([`d049220`](https://github.com/lotrekagency/camomilla/commit/d0492205b7a262b8ab0d5514c43125b121989ab0))
+
+* chore: black . 💅 ([`eb78a3b`](https://github.com/lotrekagency/camomilla/commit/eb78a3bcc88266a9dcd3daca76ce6e7b7db2b6be))
+
+* chore: added some comments on code ([`0b1849b`](https://github.com/lotrekagency/camomilla/commit/0b1849bd9dd601e51b61bafa0476ff78163f50d8))
+
+* chore: code format ([`53af6b4`](https://github.com/lotrekagency/camomilla/commit/53af6b47b3dd35af33575aebc4e158de9077d341))
+
+* chore: added some typechecking to optimized storage ([`3f8e60a`](https://github.com/lotrekagency/camomilla/commit/3f8e60a96f254f99bc566735a101a6a5d4acaec0))
+
+### Documentation
+
+* docs: update docs emojis 😃 ([`53e511c`](https://github.com/lotrekagency/camomilla/commit/53e511c074a54aeeaba9ee470e7c58239e2857f2))
+
+* docs: fix StructuredJSONField documentation (wrong field name in examples) ([`1962b3b`](https://github.com/lotrekagency/camomilla/commit/1962b3b340c193233c4b3adcf080bb0d6f64e99f))
+
+* docs: added use sitemap on docs ([`5924ade`](https://github.com/lotrekagency/camomilla/commit/5924ade5a49d8ee58c5cb7bce671ae29b5c47659))
+
+* docs: update changelog ([`70c92e1`](https://github.com/lotrekagency/camomilla/commit/70c92e1fad48e20dd497bba31c6f5e56595906cd))
+
+### Feature
+
+* feat: added camomilla sitemap ([`0071ce3`](https://github.com/lotrekagency/camomilla/commit/0071ce37aefc569c75344c10a005e84eb2cf0c05))
+
+* feat: added is public annotation to urlnodes ([`19f6fcb`](https://github.com/lotrekagency/camomilla/commit/19f6fcbe1f0581bb9d823a72d12e344ddfe29b9e))
+
+* feat: accept also single lang fields like title_en from serializers ([`b1244d5`](https://github.com/lotrekagency/camomilla/commit/b1244d5ff36f351a43b66c2411fa2ec0e32a0fd4))
+
+### Fix
+
+* fix: fix structured cache getting value when not needed ([`b3f7c2d`](https://github.com/lotrekagency/camomilla/commit/b3f7c2d02474252a348e588922157ee1de964b39))
+
+* fix: fix nest to plain typing ([`d339a47`](https://github.com/lotrekagency/camomilla/commit/d339a47998eee315eb29d6e5007df54d40bde70d))
+
+### Refactor
+
+* refactor: better typing for structured cache ([`eac24b6`](https://github.com/lotrekagency/camomilla/commit/eac24b643dd83dbd6f7c0f444515aa1901d88898))
+
+### Test
+
+* test: add rest framework settings to example app ([`537dee1`](https://github.com/lotrekagency/camomilla/commit/537dee18643b0d389d3786eb0aa4f8c8902f677f))
+
+* test: fix test api ([`c7a1f97`](https://github.com/lotrekagency/camomilla/commit/c7a1f972b6b385637bdcdda78521b8eb0103a4dc))
+
+
 ## v6.0.0-beta.7 (2023-09-30)
 
 ### Chore
