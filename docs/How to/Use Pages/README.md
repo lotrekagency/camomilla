@@ -1,6 +1,6 @@
-# 📝 Use Pages 
+# 📝 Use Pages
 
-## The Page Model
+## 📎 The Page Model
 
 Camomilla has it's own page model. The page model has an attribute for every relevant data in a web page. It takes care of SEO data and permalinks and template, and exposes jsonfields to manage additional data.
 
@@ -10,7 +10,9 @@ To use camomilla pages you need to add the dynamic url resolver at the end of yo
 # <project_name>/urls.py
 urlpatterns += path('', include("camomilla.dynamic_pages_urls"))
 ```
+
 To handle multilanguage pages use:
+
 ```python
 # <project_name>/urls.py
 urlpatterns += i18n_patterns(
@@ -18,6 +20,7 @@ urlpatterns += i18n_patterns(
     prefix_default_language=False
 )
 ```
+
 This resolver is made to check any permalink that does not match anything in the url pattern and look in the database for a page with that permalink.
 
 ::: warning ⚠️ Beware!
@@ -70,13 +73,12 @@ By default camomilla Page gives you the possibility to define the page `slug` fi
 The permalink will be generated from page `slug` and `parent_page` field.
 With parent page field you can set a parent-child structure to pages.
 
-For example to generate the permalink `slug1/slug2` you will need to create 2 Pages, one with slug `slug1` and one with the slug `slug2` then set the first page as the parent page of the second. 
+For example to generate the permalink `slug1/slug2` you will need to create 2 Pages, one with slug `slug1` and one with the slug `slug2` then set the first page as the parent page of the second.
 
-## The AbstractPage Model 
+## 🖇️ The AbstractPage Model
 
 Camomilla comes with an `AbstractPage` model. AbstractPage is different from Page model, it is Abstract.
 This means that the AbstractPage by itself does not create a database table. The only whay an AbstractPage can have its own db table is to be inherited by a concrete model like this:
-
 
 ```python
 from camomilla.models import AbstractPage
@@ -87,14 +89,11 @@ class MyPageModel(AbstractPage):
 
 ```
 
-
 The AbstractPage contains all the logics of Page model. This means that you can override anything and define multiple custom page models. This is very usefull if you need to build complex sites, where you can have also other kid of data that need to be rendered and treated like a page (es. product, category, blog, anything..).
-
 
 You can also define some intresting properties when you are defining your own page model.:
 
 ### Define page options with PageMeta
-
 
 Many "settings" of the page model are stored inside a `PageMeta` class like this:
 
@@ -110,7 +109,7 @@ class MyPageModel(AbstractPage):
             return {"all_categories": Category.objects.all()}
 ```
 
-From PageMeta class you can define: 
+From PageMeta class you can define:
 
 - `parent_page_field` ==> set a different propery to store page parent. Like `category` or anything else.
 - `default_template` ==> set a different default template.
@@ -124,7 +123,6 @@ From PageMeta class you can define:
 
 This has almost the same functionality of `inject_context_func` PageMeta option but it runs at a more deep level. Overriding this will override the context and not only add things to it.
 
-
 ```python
 from camomilla.models import AbstractPage
 
@@ -134,8 +132,55 @@ class MyPageModel(AbstractPage):
         return {"page": self, "all_categories": Category.objects.all()}
 ```
 
-We suggest to always return `{ "page": self }` in the context. 
+We suggest to always return `{ "page": self }` in the context.
 
+## 🌐 Build a sitemap.xml
+
+To build a sitemap.xml you can use the standard django sitemap framework. Camomilla comes with a `CamomillaPageSitemap` class that you can use to include camomilla pages in your sitemap.xml.
+
+```python
+# <project_name>/sitemap.py
+from django.contrib.sitemaps import Sitemap
+from camomilla.sitemaps import CamomillaPageSitemap
+
+# declare your custom sitemaps
+class StaticViewSitemap(Sitemap):
+    def items(self):
+        return ['home', 'about', 'contact']
+
+    def location(self, item):
+        return reverse(item)
+
+sitemaps = {
+    'pages': CamomillaPageSitemap, # add the camomilla sitemap
+    'static': StaticViewSitemap, # add your custom sitemaps to the camomilla sitemaps
+}
+```
+
+```python
+# <project_name>/urls.py
+from django.contrib.sitemaps.views import sitemap
+from .sitemap import sitemaps
+
+urlpatterns += [
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
+]
+```
+
+To customize the camomilla sitemap you can override the `CamomillaPageSitemap` class. Overriding this class will allow you to customize changefreq, priority and also items.
+
+```python
+from camomilla.sitemaps import CamomillaPageSitemap
+
+class MyCamomillaPageSitemap(CamomillaPageSitemap):
+    changefreq = "monthly"
+    priority = 0.5
+
+    def items(self):
+        return super().items().filter(status="PUB")
+```
+
+Remember that items is a queryset of `UrlNode` objects and to access the page model you need to use the `page` property of the `UrlNode` object.
 
 ## 🗂️ Pages router API endpoint
 
@@ -145,8 +190,9 @@ If you need to create an api endpoint for a model inheriting from the `AbstractP
 
 Camomilla comes with a builtin pages router endpoint that allows you to browse your pages by url.
 
-__URL Structure:__
- - `api/camomilla/pages-router/<page_url>`
+**URL Structure:**
+
+- `api/camomilla/pages-router/<page_url>`
 
 You can provide as the page_url parameter the full url of the page without language prefix.
 The language you want to match against is taken from the request params.
@@ -154,63 +200,63 @@ If no language is specified, the default language is used.
 
 To specify the language in the request params you can use the `lang` parameter:
 
-```/api/camomilla/pages-router/<page_url>?lang=en```
+`/api/camomilla/pages-router/<page_url>?lang=en`
 
 When you try to get a page from the url, the router will always take in to account the active language.
 If you are trying to get a page with a certain language, make sure to set the language in the request params.
 If the specified url is not present in current language, the router endpoint will return a 404 error.
 
-__Simple Response:__
+**Simple Response:**
+
 ```json
 {
-    "id": 1,
-    "is_public": false,
-    "status": "DRF",
-    "indexable": true,
-    "alternates": {
-        "it": "/",
-        "en": "/en/"
-    },
+  "id": 1,
+  "is_public": false,
+  "status": "DRF",
+  "indexable": true,
+  "alternates": {
+    "it": "/",
+    "en": "/en/"
+  },
+  "permalink": "/",
+  "related_name": "camomilla_page",
+  "breadcrumbs": [
+    {
+      "permalink": "/",
+      "title": null
+    }
+  ],
+  "routerlink": "/",
+  "template": "website/home.html",
+  "title": null,
+  "description": null,
+  "og_description": null,
+  "og_title": null,
+  "og_type": null,
+  "og_url": null,
+  "canonical": null,
+  "meta": {},
+  "date_created": "2023-09-07T13:16:24.762269Z",
+  "date_updated_at": "2023-09-08T17:38:03.155480Z",
+  "breadcrumbs_title": null,
+  "slug": null,
+  "template_data": {},
+  "identifier": "4ee68c88-dd1a-4515-bf50-7839f2cf1e72",
+  "pubblication_date": null,
+  "ordering": 0,
+  "og_image": null,
+  "url_node": {
+    "id": 46,
     "permalink": "/",
-    "related_name": "camomilla_page",
-    "breadcrumbs": [
-        {
-            "permalink": "/",
-            "title": null
-        }
-    ],
-    "routerlink": "/",
-    "template": "website/home.html",
-    "title": null,
-    "description": null,
-    "og_description": null,
-    "og_title": null,
-    "og_type": null,
-    "og_url": null,
-    "canonical": null,
-    "meta": {},
-    "date_created": "2023-09-07T13:16:24.762269Z",
-    "date_updated_at": "2023-09-08T17:38:03.155480Z",
-    "breadcrumbs_title": null,
-    "slug": null,
-    "template_data": {},
-    "identifier": "4ee68c88-dd1a-4515-bf50-7839f2cf1e72",
-    "pubblication_date": null,
-    "ordering": 0,
-    "og_image": null,
-    "url_node": {
-        "id": 46,
-        "permalink": "/",
-        "related_name": "camomilla_page"
-    },
-    "parent_page": null
+    "related_name": "camomilla_page"
+  },
+  "parent_page": null
 }
 ```
 
 The respose will not include field translations since the response has the content already translated in the active language.
 But if you need also some other language you can specify the `included_translations` parameter in the request.
 
-```/api/camomilla/pages-router/<page_url>?included_translations=it```
+`/api/camomilla/pages-router/<page_url>?included_translations=it`
 
 The `included_translations` parameter accepts a comma separated list of languages or the value `all` to include all the translations.
-
