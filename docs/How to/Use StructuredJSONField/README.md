@@ -1,6 +1,6 @@
-# 🧬 Use StructuredField 
+# 🧬 Use Structured JSON Field 
 
-The StructuredField is a special type of field that allows you to create a structured JSONField.
+The StructuredJSONField is a special type of field that allows you to create a structured JSONField.
 This kind of field allows you to declare a data structure that will be enforced to the json structure.
 
 To declare a data structure you need to create a class that inherits from `camomilla.structured.BaseModel` and declare the fields that you want to use. The Base model is a pydantic model, so you can use all the pydantic features. If you never used pydantic before, you can find the documentation [here](https://pydantic-docs.helpmanual.io/).
@@ -8,17 +8,17 @@ To declare a data structure you need to create a class that inherits from `camom
 Let's see an example:
 
 ```python
-from camomilla.structured import BaseModel, StructuredField
+from camomilla.structured import BaseModel, StructuredJSONField
 
-class MyStructuredField(BaseModel):
+class MyStructuredJSONField(BaseModel):
     name: str
     age: int
 
 class MyModel(models.Model):    
-    structured_field = StructuredField(schema=MyStructuredField)
+    structured_field = StructuredJSONField(schema=MyStructuredJSONField)
 ```
 
-In this example we created a model with a StructuredField that will accept only jsons with the following structure:
+In this example we created a model with a StructuredJSONField that will accept only jsons with the following structure:
 
 ```json
 {
@@ -31,17 +31,17 @@ If you try to save a json with a different structure, the field will raise a `Va
 
 ### Default value
 
-Since the StructuredField is a JSONField, you can use all the JSONField features, like the `default` parameter:
+Since the StructuredJSONField is a JSONField, you can use all the JSONField features, like the `default` parameter:
 
 ```python
-from camomilla.structured import BaseModel, StructuredField
+from camomilla.structured import BaseModel, StructuredJSONField
 
-class MyStructuredField(BaseModel):
+class MyStructuredJSONField(BaseModel):
     name: str
     age: int
 
 class MyModel(models.Model):
-    structured_field = StructuredField(schema=MyStructuredField, default={"name": "John", "age": 30})
+    structured_field = StructuredJSONField(schema=MyStructuredJSONField, default={"name": "John", "age": 30})
 ```
 
 In this example we set a default value for the field. If you try to save a json without the `name` or `age` fields, the field will be populated with the default value.
@@ -49,9 +49,9 @@ In this example we set a default value for the field. If you try to save a json 
 You can also use a generator as default value:
 
 ```python
-from camomilla.structured import BaseModel, StructuredField
+from camomilla.structured import BaseModel, StructuredJSONField
 
-class MyStructuredField(BaseModel):
+class MyStructuredJSONField(BaseModel):
     name: str
     age: int
 
@@ -59,7 +59,7 @@ def default_value():
     return {"name": "John", "age": 30}
 
 class MyModel(models.Model):    
-    structured_field = StructuredField(schema=MyStructuredField, default=default_value)
+    structured_field = StructuredJSONField(schema=MyStructuredJSONField, default=default_value)
 ```
 
 In this example we used a function as default value. The function will be called every time a new instance of the model is created.
@@ -94,33 +94,33 @@ class MyNestedModel(BaseModel):
     childrens: list['MyNestedModel']
 ```
 
-## List of StructuredField
+## List of StructuredJSONField
 
 
 If you use a list as a default value, the field will adapt the schema to accept a list of the specified type:
 
 ```python
-from camomilla.structured import BaseModel, StructuredField
+from camomilla.structured import BaseModel, StructuredJSONField
 
-class MyStructuredField(BaseModel):
+class MyStructuredJSONField(BaseModel):
     name: str
     age: int
 
 class MyModel(models.Model):
-    structured_field = StructuredField(schema=MyStructuredField, default=list)
+    structured_field = StructuredJSONField(schema=MyStructuredJSONField, default=list)
 ```
 
 ## Foreign Key Field
 
-There are some special features that you can use with the StructuredField.
+There are some special features that you can use with the StructuredJSONField.
 
 If you declare a field with a django model as type, the field will be populated with the instance of the model, as it was a foreign key:
 
 ```python
-from camomilla.structured import BaseModel, StructuredField
+from camomilla.structured import BaseModel, StructuredJSONField
 from django.contrib.auth.models import User
 
-class MyStructuredField(BaseModel):
+class MyStructuredJSONField(BaseModel):
     name: str
     age: int
     user: User
@@ -136,10 +136,10 @@ You can also use an other special type of field: `camomilla.structured.QuerySet`
 
 
 ```python
-from camomilla.structured import BaseModel, StructuredField, QuerySet
+from camomilla.structured import BaseModel, StructuredJSONField, QuerySet
 from django.contrib.auth.models import User
 
-class MyStructuredField(BaseModel):
+class MyStructuredJSONField(BaseModel):
     name: str
     age: int
     users: QuerySet[User]
