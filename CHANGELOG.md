@@ -2,6 +2,17 @@
 
 
 
+## v6.0.0-beta.9 (2023-11-08)
+
+### Documentation
+
+* docs: update changelog ([`7dd4edf`](https://github.com/lotrekagency/camomilla/commit/7dd4edf38b6800d8a258714b617b3899cb1e4f5b))
+
+### Fix
+
+* fix: fix APPEND_SLASH django config ([`81a43e2`](https://github.com/lotrekagency/camomilla/commit/81a43e238c5c3d524b353c5d0564b3e1649b16a9))
+
+
 ## v6.0.0-beta.8 (2023-10-10)
 
 ### Chore
