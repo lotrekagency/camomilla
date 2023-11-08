@@ -40,7 +40,7 @@
         <div class="language-switch--btn" data-lang="{{lang_code}}" 
             {% if current_lang.code != lang_code %} 
                 {% if redirect is None %}
-                    onclick="submitLanguageWithoutRedirect('{{lang_code}}');"
+                    onclick="submitLanguageHomeRedirect('{{lang_code}}');"
                 {% else %}
                     onclick="submitLanguage('{{lang_code}}', '{{redirect|strip_lang:lang_code}}');"
                 {% endif %}
@@ -67,6 +67,14 @@
     window.submitLanguageWithoutRedirect = function (langCode) {
         document.getElementById('select_change_language').value = langCode;
         document.getElementById('next_form_change_language').disabled = true;
+        setTimeout(function () {
+            document.getElementById('form_change_language').submit();
+        }, 300);
+    };
+    window.submitLanguageHomeRedirect = function (langCode) {
+        document.getElementById('select_change_language').value = langCode;
+        document.getElementById('next_form_change_language').value = "/";
+        document.getElementById('next_form_change_language').disabled = false;
         setTimeout(function () {
             document.getElementById('form_change_language').submit();
         }, 300);
