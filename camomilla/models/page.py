@@ -118,10 +118,14 @@ class UrlNode(models.Model):
 
     @staticmethod
     def reverse_url(permalink: str) -> str:
+        append_slash = getattr(django_settings, "APPEND_SLASH", True)
         try:
             if permalink == "/":
                 return reverse("camomilla-homepage")
-            return reverse("camomilla-permalink", args=(permalink.lstrip("/"),))
+            url = reverse("camomilla-permalink", args=(permalink.lstrip("/"),))
+            if append_slash and not url.endswith("/"):
+                url += "/"
+            return url
         except NoReverseMatch:
             return None
 
@@ -370,10 +374,10 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             raise Http404(ex)
 
     def alternate_urls(self, *args, **kwargs) -> dict:
-        permalinks = get_field_translations(self.url_node or object, "permalink", None)
+        permalinks = get_field_translations(self.url_node or object, "permalink", None)        
         for lang in activate_languages():
             if lang in permalinks:
-                permalinks[lang] = UrlNode.reverse_url(permalinks[lang])
+                permalinks[lang] = UrlNode.reverse_url(permalinks[lang]) if self.is_public else None
         return permalinks
 
     class Meta:
