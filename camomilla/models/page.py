@@ -25,6 +25,7 @@ from camomilla.utils import (
 from camomilla.utils.getters import pointed_getter
 from camomilla import settings
 from camomilla.templates_context.rendering import ctx_registry
+from django.conf import settings as django_settings
 
 
 def GET_TEMPLATE_CHOICES():
@@ -314,12 +315,14 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
     def get(cls, request, *args, **kwargs) -> "AbstractPage":
         bypass_type_check = kwargs.pop("bypass_type_check", False)
         bypass_public_check = kwargs.pop("bypass_public_check", False)
-
+        path = request.path
+        if getattr(django_settings, "APPEND_SLASH", True):
+            path = path.rstrip("/")
         if len(kwargs.keys()) > 0:
             page = cls.objects.get(**kwargs)
         else:
             node = UrlNode.objects.filter(
-                permalink=url_lang_decompose(request.path)["permalink"]
+                permalink=url_lang_decompose(path)["permalink"]
             ).first()
             page = node and node.page
         type_error = not bypass_type_check and not isinstance(page, cls)

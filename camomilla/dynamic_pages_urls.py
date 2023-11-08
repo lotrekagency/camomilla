@@ -1,13 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import path
 
 from camomilla import settings
-
+from django.conf import settings as django_settings
 from .models import Page
 
 
 def fetch(request, *args, **kwargs):
     preview = request.user.is_staff and request.GET.get("preview", False)
+    append_slash = getattr(django_settings, "APPEND_SLASH", True)
+    if append_slash and not request.path.endswith("/"):
+        return redirect(request.path + "/")
     if "permalink" in kwargs:
         page = Page.get_or_404(
             request, bypass_public_check=preview, bypass_type_check=True
