@@ -100,7 +100,7 @@ class UrlNodeManager(models.Manager):
                         "date_updated_at",
                         models.DateTimeField(),
                         models.Value(timezone.now(), models.DateTimeField()),
-                    )
+                    ),
                 ],
             )
         except (ProgrammingError, OperationalError):
@@ -134,6 +134,8 @@ class UrlNode(models.Model):
         return self.reverse_url(self.permalink) or self.permalink
 
     def get_absolute_url(self) -> str:
+        if self.routerlink == "/":
+            return ""
         return self.routerlink
 
 
@@ -246,9 +248,7 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         if status == "PUB":
             return True
         if status == "PLA":
-            return (
-                bool(publication_date) and timezone.now() > publication_date
-            )
+            return bool(publication_date) and timezone.now() > publication_date
         return False
 
     def get_template_path(self, request=None) -> str:
@@ -374,10 +374,12 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             raise Http404(ex)
 
     def alternate_urls(self, *args, **kwargs) -> dict:
-        permalinks = get_field_translations(self.url_node or object, "permalink", None)        
+        permalinks = get_field_translations(self.url_node or object, "permalink", None)
         for lang in activate_languages():
             if lang in permalinks:
-                permalinks[lang] = UrlNode.reverse_url(permalinks[lang]) if self.is_public else None
+                permalinks[lang] = (
+                    UrlNode.reverse_url(permalinks[lang]) if self.is_public else None
+                )
         return permalinks
 
     class Meta:
