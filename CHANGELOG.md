@@ -2,6 +2,19 @@
 
 
 
+## v6.0.0-beta.10 (2023-11-08)
+
+### Fix
+
+* fix: fix language switch redirect ([`d87a031`](https://github.com/lotrekagency/camomilla/commit/d87a0318082149b54b9192f8c08d898b90c57a40))
+
+* fix: fix reverse url to return url with slash if append_slash ([`85d50a9`](https://github.com/lotrekagency/camomilla/commit/85d50a9b0f229d1bdc33f9d4443024d7953fb664))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of github.com:lotrekagency/camomilla into next ([`a9f6365`](https://github.com/lotrekagency/camomilla/commit/a9f6365791f566af22d0bd9737f20738f3a8689d))
+
+
 ## v6.0.0-beta.9 (2023-11-08)
 
 ### Documentation
