@@ -2,6 +2,17 @@
 
 
 
+## v6.0.0-beta.11 (2023-11-09)
+
+### Fix
+
+* fix: get_absolute_url to remove / from home in sitemap ([`fa42b1b`](https://github.com/lotrekagency/camomilla/commit/fa42b1bf12a8cfa2ae52ae036f1b013d6b0c62b2))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of github.com:lotrekagency/camomilla into next ([`8abeec6`](https://github.com/lotrekagency/camomilla/commit/8abeec632a22abffd590743df01f788fa2d4e942))
+
+
 ## v6.0.0-beta.10 (2023-11-08)
 
 ### Fix
