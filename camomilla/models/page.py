@@ -319,12 +319,14 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
     def get(cls, request, *args, **kwargs) -> "AbstractPage":
         bypass_type_check = kwargs.pop("bypass_type_check", False)
         bypass_public_check = kwargs.pop("bypass_public_check", False)
-        path = request.path
-        if getattr(django_settings, "APPEND_SLASH", True):
-            path = path.rstrip("/")
         if len(kwargs.keys()) > 0:
             page = cls.objects.get(**kwargs)
         else:
+            if not request:
+                raise ValueError("request is required if no kwargs are passed")
+            path = request.path
+            if getattr(django_settings, "APPEND_SLASH", True):
+                path = path.rstrip("/")
             node = UrlNode.objects.filter(
                 permalink=url_lang_decompose(path)["permalink"]
             ).first()
