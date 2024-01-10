@@ -14,7 +14,7 @@ from pydantic import (
 )
 from camomilla import structured
 from camomilla.models.page import UrlNode
-from typing import Optional, Union, Callable
+from typing import Optional, Union, Callable, List
 
 
 class LinkTypes(str, Enum):
@@ -54,7 +54,7 @@ class MenuNodeLink(structured.BaseModel):
 class MenuNode(structured.BaseModel):
     id: str = Field(default_factory=uuid4)
     meta: dict = {}
-    nodes: list["MenuNode"] = []
+    nodes: List["MenuNode"] = []
     title: str = ""
     link: MenuNodeLink
 

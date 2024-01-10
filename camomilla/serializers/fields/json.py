@@ -1,7 +1,7 @@
 from pydantic import TypeAdapter, ValidationError
 from rest_framework import serializers
 from rest_framework.utils import model_meta
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Union, Dict, List
 
 from camomilla.structured.utils import pointed_setter
 
@@ -29,7 +29,7 @@ class StructuredJSONField(serializers.JSONField):
             self.json_schema = field.schema.json_schema()
         super().bind(field_name, parent)
 
-    def to_representation(self, instance: Union["BaseModel", list["BaseModel"]]):
+    def to_representation(self, instance: Union["BaseModel", List["BaseModel"]]):
         if isinstance(instance, list) and self.many:
             return super().to_representation(
                 self.schema.dump_python(instance, exclude_unset=True)
@@ -40,7 +40,7 @@ class StructuredJSONField(serializers.JSONField):
         try:
             return self.schema.validate_python(super().to_internal_value(data))
         except ValidationError as e:
-            drf_error: Union[list, dict[str, Any]] = [] if self.many else {}
+            drf_error: Union[list, Dict[str, Any]] = [] if self.many else {}
             for error in e.errors():
                 pointed_setter(
                     drf_error, ".".join([str(x) for x in error["loc"]]), [error["msg"]]

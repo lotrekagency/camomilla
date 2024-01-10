@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Iterable, Union
+from typing import Iterable, Union, List
 from django.http import QueryDict
 
 from modeltranslation import settings as mt_settings
@@ -33,7 +33,7 @@ def plain_to_nest(data, fields, accessor=TRANS_ACCESSOR):
     return data
 
 
-def nest_to_plain(data: Union[dict, QueryDict], fields: list[str], accessor=TRANS_ACCESSOR):
+def nest_to_plain(data: Union[dict, QueryDict], fields: List[str], accessor=TRANS_ACCESSOR):
     """
     This function is the inverse of plain_to_nest.
     It transforms a dictionary with nested translations fields (es. {"translations": {"en": {"title": "Hello"}}})
@@ -68,7 +68,7 @@ class TranslationsMixin(serializers.ModelSerializer):
     """
 
     @cached_property
-    def translation_fields(self) -> list[str]:
+    def translation_fields(self) -> List[str]:
         try:
             return translator.get_options_for_model(self.Meta.model).get_field_names()
         except NotRegistered:

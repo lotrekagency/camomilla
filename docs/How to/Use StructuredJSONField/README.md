@@ -79,7 +79,7 @@ class MyOtherNestedModel(BaseModel):
     name: str
     age: int
     children: MyNestedModel
-    childrens: list[MyNestedModel]
+    childrens: List[MyNestedModel]
 ```
 
 If you need to nest recursively a model, for example a model that as itself as children, you can declare the type as a string:
@@ -91,7 +91,7 @@ class MyNestedModel(BaseModel):
     name: str
     age: int
     children: 'MyNestedModel'
-    childrens: list['MyNestedModel']
+    childrens: List['MyNestedModel']
 ```
 
 ## List of StructuredJSONField

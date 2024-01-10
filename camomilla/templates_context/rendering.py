@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Callable, Optional, TYPE_CHECKING
+from typing import Callable, Optional, TYPE_CHECKING, Type, Dict
 import inspect
 from django.http import HttpRequest
 
@@ -16,7 +16,7 @@ class PagesContextRegistry:
         self,
         func: Callable,
         template_path: Optional[str],
-        page_model: Optional[type["AbstractPage"]],
+        page_model: Optional[Type["AbstractPage"]],
     ):
         assert (
             template_path is not None or page_model is not None
@@ -26,7 +26,7 @@ class PagesContextRegistry:
         if page_model is not None:
             self._model_registry[page_model].add(func)
 
-    def get_registered_info(self) -> dict[str, dict]:
+    def get_registered_info(self) -> Dict[str, dict]:
         info = defaultdict(dict)
         for k, v in self._template_registry.items():
             for f in v:
@@ -43,7 +43,7 @@ class PagesContextRegistry:
         return info
 
     def get_wrapper_context_func(
-        self, template_path: str, page_model: type["AbstractPage"]
+        self, template_path: str, page_model: Type["AbstractPage"]
     ) -> Callable:
         all_funcs = set()
         for cls in self._model_registry.keys():
@@ -73,7 +73,7 @@ class PagesContextRegistry:
 
 def register(
     template_path: Optional[str] = None,
-    page_model: Optional[type["AbstractPage"]] = None,
+    page_model: Optional[Type["AbstractPage"]] = None,
 ):
     assert (
         template_path is not None or page_model is not None

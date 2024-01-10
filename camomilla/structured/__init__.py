@@ -1,5 +1,5 @@
 import json
-from typing import Any, Union, TYPE_CHECKING
+from typing import Any, Union, Type, TYPE_CHECKING, List
 
 from django.db.models import JSONField
 from django.db.models.query_utils import DeferredAttribute
@@ -70,7 +70,7 @@ class StructuredJSONField(JSONField):
 
         return list_data_validator
 
-    def __init__(self, schema: type[BaseModel], *args: Any, **kwargs: Any) -> None:
+    def __init__(self, schema: Type[BaseModel], *args: Any, **kwargs: Any) -> None:
         self.orig_schema = schema
         self.schema = schema
         default = kwargs.get("default", dict)
@@ -81,7 +81,7 @@ class StructuredJSONField(JSONField):
         if self.many:
             self.schema = TypeAdapter(
                 Annotated[
-                    list[self.schema],
+                    List[self.schema],
                     Field(default_factory=list),
                     WrapValidator(self.list_data_validator),
                 ]
@@ -96,7 +96,7 @@ class StructuredJSONField(JSONField):
         return isinstance(value, self.orig_schema)
 
     def get_prep_value(
-        self, value: Union[list[type[BaseModel]], type[BaseModel]]
+        self, value: Union[List[Type[BaseModel]], Type[BaseModel]]
     ) -> str:
         if isinstance(value, list) and self.many:
             return self.schema.dump_json(value, exclude_unset=True).decode()
