@@ -2,6 +2,25 @@
 
 
 
+## v6.0.0-beta.12 (2024-01-29)
+
+### Fix
+
+* fix(homepage): fix get_or_create_homepage ([`a3c1095`](https://github.com/lotrekagency/camomilla/commit/a3c1095bfa715f3d2de0b6aec8bba75fb051c72d))
+
+* fix(typing): fixed python 3.8 typing compatibility ([`df27aa2`](https://github.com/lotrekagency/camomilla/commit/df27aa27d8de5619b75daf2a6272799e996fe33d))
+
+### Unknown
+
+* Merge pull request #17 from lotrekagency/fix/template-parameter
+
+Fixed template update issue. ([`3e12882`](https://github.com/lotrekagency/camomilla/commit/3e128826f20bccb6667cc87c322f724554e296c8))
+
+* Fixed template update issue. ([`0b05519`](https://github.com/lotrekagency/camomilla/commit/0b05519e3e4482fb8930b64982168f6603c4076a))
+
+* Fixed template update issue. ([`957ff1f`](https://github.com/lotrekagency/camomilla/commit/957ff1feb7270922d5aab78a7ba9f8478d0958d9))
+
+
 ## v6.0.0-beta.11 (2023-11-09)
 
 ### Fix
