@@ -161,9 +161,9 @@ class AbstractPageMixin(serializers.ModelSerializer):
 
     breadcrumbs = serializers.SerializerMethodField()
     routerlink = serializers.CharField(read_only=True)
-    template = serializers.SerializerMethodField()
+    template_file = serializers.SerializerMethodField()
 
-    def get_template(self, instance: "AbstractPage"):
+    def get_template_file(self, instance: "AbstractPage"):
         return instance.get_template_path()
 
     def get_breadcrumbs(self, instance: "AbstractPage"):
