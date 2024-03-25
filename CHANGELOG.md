@@ -2,6 +2,13 @@
 
 
 
+## v6.0.0-beta.13 (2024-03-25)
+
+### Feature
+
+* feat: allow composite slugs in page models without a parent ([`4265a76`](https://github.com/lotrekagency/camomilla/commit/4265a76c655bac27fdb4182707ef035265f90ccb))
+
+
 ## v6.0.0-beta.12 (2024-01-29)
 
 ### Fix
