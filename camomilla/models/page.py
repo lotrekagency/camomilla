@@ -2,6 +2,8 @@ from typing import Sequence, Tuple
 from uuid import uuid4
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import RegexValidator
+
 from django.db import ProgrammingError, OperationalError, models, transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
@@ -12,6 +14,7 @@ from django.utils.functional import lazy
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
+from camomilla.managers.pages import PageQuerySet
 from camomilla.models.mixins import MetaMixin, SeoMixin
 from camomilla.utils import (
     activate_languages,
@@ -164,6 +167,16 @@ class PageBase(models.base.ModelBase):
         return new_class
 
 
+class UrlPathValidator(RegexValidator):
+    
+    regex = r"^[a-zA-Z0-9_\-\/]+[^\/]$"
+    message = _(
+        "Enter a valid 'slug' consisting of lowercase letters, numbers, "
+        "underscores, hyphens and slashes."
+    )
+    flags = 0
+
+
 class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated_at = models.DateTimeField(auto_now=True)
@@ -175,7 +188,9 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         editable=False,
     )
     breadcrumbs_title = models.CharField(max_length=128, null=True, blank=True)
-    slug = models.SlugField(max_length=150, allow_unicode=True, null=True, blank=True)
+    slug = models.CharField(
+        max_length=150, null=True, blank=True, validators=[UrlPathValidator()]
+    )
     status = models.CharField(
         max_length=3,
         choices=PAGE_STATUS,
@@ -194,6 +209,8 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
         blank=True,
         on_delete=models.CASCADE,
     )
+
+    objects = PageQuerySet.as_manager()
 
     def __init__(self, *args, **kwargs):
         super(AbstractPage, self).__init__(*args, **kwargs)
@@ -294,7 +311,10 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
                 else fallback_slug
             )
             set_nofallbacks(self, "slug", slug)
-        permalink = "/%s" % slugify(slug or "", allow_unicode=True)
+        slug_parts = (slug or "").split("/")
+        for i, part in enumerate(slug_parts):
+            slug_parts[i] = slugify(part, allow_unicode=True)            
+        permalink = "/%s" % "/".join(slug_parts)
         if self.parent:
             permalink = f"{self.parent.permalink}{permalink}"
         qs = UrlNode.objects.exclude(pk=getattr(self.url_node or object, "pk", None))
@@ -376,12 +396,20 @@ class AbstractPage(SeoMixin, MetaMixin, models.Model, metaclass=PageBase):
             raise Http404(ex)
 
     def alternate_urls(self, *args, **kwargs) -> dict:
+        request = False
+        if len(args) > 0:
+            request = args[0]
+        if "request" in kwargs:
+            request = kwargs["request"]
+        preview = request and getattr(request, "GET", {}).get("preview", False)
         permalinks = get_field_translations(self.url_node or object, "permalink", None)
         for lang in activate_languages():
             if lang in permalinks:
                 permalinks[lang] = (
-                    UrlNode.reverse_url(permalinks[lang]) if self.is_public else None
+                    UrlNode.reverse_url(permalinks[lang]) if preview or self.is_public else None
                 )
+            if preview:
+                permalinks = {k: f"{v}?preview=true" for k, v in permalinks.items()}
         return permalinks
 
     class Meta:
